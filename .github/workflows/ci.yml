@@ -34,10 +34,13 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install Rust components
+        run: rustup component add rustfmt clippy
+      
       - name: Check formatting
         run: cargo fmt --all -- --check
-
-      - name: Run clippy
+      
+      - name: Run Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Run tests
