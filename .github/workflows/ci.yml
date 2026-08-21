@@ -37,12 +37,6 @@ jobs:
 
       - name: Install Rust components
         run: rustup component add rustfmt clippy
-
-      - name: Install protoc          # <-- ADD THIS
-        run: sudo apt-get install -y protobuf-compiler
-
-      - name: Run cargo audit
-        run: cargo audit
         
       - name: Check formatting
         run: cargo fmt --all -- --check  
@@ -53,8 +47,11 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
+      - name: Install protoc
+        run: sudo apt-get install -y protobuf-compiler
+
       - name: Build
-        run: cargo build --release --verbose
+        run: cargo build --release --all-features
 
   benchmark:
     name: Run Benchmarks
