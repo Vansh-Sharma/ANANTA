@@ -43,6 +43,7 @@ jobs:
 
       - name: Run cargo audit
         run: cargo audit
+        
       - name: Check formatting
         run: cargo fmt --all -- --check  
       
