@@ -162,10 +162,16 @@ impl AnantaStatusChecker {
                         // Here we produce a report based on the config file existing.
                         Self::build_active_report(config.verbose)
                     }
+<<<<<<< HEAD
                     Err(_) => Self::inactive_report(&format!(
                         "ANANTA config file not found at '{}'",
                         path
                     )),
+=======
+                    Err(_) => Self::inactive_report(
+                        &format!("ANANTA config file not found at '{}'", path)
+                    ),
+>>>>>>> 4b60ced (docs: update README)
                 }
             }
         }
@@ -221,12 +227,23 @@ impl AnantaStatusChecker {
                 last_check: now.clone(),
             },
             drift_alerts: if verbose {
+<<<<<<< HEAD
                 vec![DriftAlertSummary {
                     domain: "config".into(),
                     severity: "low".into(),
                     description: "Minor configuration drift detected in logging level".into(),
                     detected_at: now.clone(),
                 }]
+=======
+                vec![
+                    DriftAlertSummary {
+                        domain: "config".into(),
+                        severity: "low".into(),
+                        description: "Minor configuration drift detected in logging level".into(),
+                        detected_at: now.clone(),
+                    },
+                ]
+>>>>>>> 4b60ced (docs: update README)
             } else {
                 vec![]
             },
@@ -254,8 +271,15 @@ pub fn check_status(config: &AnantaStatusConfig) -> AnantaStatusReport {
 /// Format an ANANTA status report in the specified output format.
 pub fn format_status(report: &AnantaStatusReport, format: OutputFormat) -> String {
     match format {
+<<<<<<< HEAD
         OutputFormat::Json => serde_json::to_string_pretty(report)
             .unwrap_or_else(|e| format!("JSON serialization error: {}", e)),
+=======
+        OutputFormat::Json => {
+            serde_json::to_string_pretty(report)
+                .unwrap_or_else(|e| format!("JSON serialization error: {}", e))
+        }
+>>>>>>> 4b60ced (docs: update README)
         OutputFormat::Text => format_status_text(report),
         OutputFormat::Table => format_status_table(report),
     }
@@ -276,6 +300,7 @@ fn format_status_text(report: &AnantaStatusReport) -> String {
 
     lines.push(String::new());
     lines.push("Trust State:".to_string());
+<<<<<<< HEAD
     lines.push(format!(
         "  Overall Trust Level: {:.2}/1.00",
         report.trust_state.overall_trust_level
@@ -284,6 +309,10 @@ fn format_status_text(report: &AnantaStatusReport) -> String {
         "  Trust Direction: {}",
         report.trust_state.trust_direction
     ));
+=======
+    lines.push(format!("  Overall Trust Level: {:.2}/1.00", report.trust_state.overall_trust_level));
+    lines.push(format!("  Trust Direction: {}", report.trust_state.trust_direction));
+>>>>>>> 4b60ced (docs: update README)
     lines.push(format!("  Last Update: {}", report.trust_state.last_update));
 
     lines.push(String::new());
@@ -291,6 +320,7 @@ fn format_status_text(report: &AnantaStatusReport) -> String {
     if report.integrity_status.all_domains_ok {
         lines.push("  All domains: OK".to_string());
     } else {
+<<<<<<< HEAD
         lines.push(format!(
             "  Failed domains: {}",
             report.integrity_status.failed_domains.join(", ")
@@ -300,21 +330,31 @@ fn format_status_text(report: &AnantaStatusReport) -> String {
         "  Last Check: {}",
         report.integrity_status.last_check
     ));
+=======
+        lines.push(format!("  Failed domains: {}", report.integrity_status.failed_domains.join(", ")));
+    }
+    lines.push(format!("  Last Check: {}", report.integrity_status.last_check));
+>>>>>>> 4b60ced (docs: update README)
 
     if !report.drift_alerts.is_empty() {
         lines.push(String::new());
         lines.push(format!("Drift Alerts ({}):", report.drift_alerts.len()));
         for alert in &report.drift_alerts {
+<<<<<<< HEAD
             lines.push(format!(
                 "  [{}] {} - {}",
                 alert.severity, alert.domain, alert.description
             ));
+=======
+            lines.push(format!("  [{}] {} - {}", alert.severity, alert.domain, alert.description));
+>>>>>>> 4b60ced (docs: update README)
             lines.push(format!("    Detected at: {}", alert.detected_at));
         }
     }
 
     lines.push(String::new());
     lines.push("Health:".to_string());
+<<<<<<< HEAD
     lines.push(format!(
         "  Health Score: {:.2}/1.00",
         report.health_summary.health_score
@@ -334,6 +374,15 @@ fn format_status_text(report: &AnantaStatusReport) -> String {
         "  Trust Chain Length: {}",
         report.attestation_info.trust_chain_length
     ));
+=======
+    lines.push(format!("  Health Score: {:.2}/1.00", report.health_summary.health_score));
+    lines.push(format!("  Anomalies: {}", report.health_summary.anomaly_count));
+
+    lines.push(String::new());
+    lines.push("Attestation:".to_string());
+    lines.push(format!("  Total Attestations: {}", report.attestation_info.attestation_count));
+    lines.push(format!("  Trust Chain Length: {}", report.attestation_info.trust_chain_length));
+>>>>>>> 4b60ced (docs: update README)
     if let Some(ref last) = report.attestation_info.last_attestation {
         lines.push(format!("  Last Attestation: {}", last));
     } else {
@@ -352,6 +401,7 @@ fn format_status_table(report: &AnantaStatusReport) -> String {
     lines.push(String::new());
 
     // Status overview table.
+<<<<<<< HEAD
     let status_str = if report.plane_active {
         "ACTIVE"
     } else {
@@ -396,10 +446,23 @@ fn format_status_table(report: &AnantaStatusReport) -> String {
         "  {:<30} {}",
         "Trust Chain Length", report.attestation_info.trust_chain_length
     ));
+=======
+    let status_str = if report.plane_active { "ACTIVE" } else { "INACTIVE" };
+    lines.push(format!("  {:<30} {}", "Plane Status", status_str));
+    lines.push(format!("  {:<30} {:.2}", "Trust Level", report.trust_state.overall_trust_level));
+    lines.push(format!("  {:<30} {}", "Trust Direction", report.trust_state.trust_direction));
+    lines.push(format!("  {:<30} {}", "Integrity", if report.integrity_status.all_domains_ok { "ALL OK" } else { "FAILURES" }));
+    lines.push(format!("  {:<30} {:.2}", "Health Score", report.health_summary.health_score));
+    lines.push(format!("  {:<30} {}", "Anomalies", report.health_summary.anomaly_count));
+    lines.push(format!("  {:<30} {}", "Drift Alerts", report.drift_alerts.len()));
+    lines.push(format!("  {:<30} {}", "Attestations", report.attestation_info.attestation_count));
+    lines.push(format!("  {:<30} {}", "Trust Chain Length", report.attestation_info.trust_chain_length));
+>>>>>>> 4b60ced (docs: update README)
 
     if !report.drift_alerts.is_empty() {
         lines.push(String::new());
         lines.push("  Drift Alert Details:".to_string());
+<<<<<<< HEAD
         lines.push(format!(
             "  {:<12} {:<8} {:<30}",
             "Domain", "Severity", "Description"
@@ -410,6 +473,10 @@ fn format_status_table(report: &AnantaStatusReport) -> String {
             "-".repeat(8),
             "-".repeat(30)
         ));
+=======
+        lines.push(format!("  {:<12} {:<8} {:<30}", "Domain", "Severity", "Description"));
+        lines.push(format!("  {:<12} {:<8} {:<30}", "-".repeat(12), "-".repeat(8), "-".repeat(30)));
+>>>>>>> 4b60ced (docs: update README)
         for alert in &report.drift_alerts {
             lines.push(format!(
                 "  {:<12} {:<8} {}",

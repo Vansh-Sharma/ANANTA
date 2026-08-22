@@ -105,8 +105,16 @@ impl EvidenceItem {
     /// Verify this item's chain hash against its components.
     pub fn verify_chain_hash(&self) -> bool {
         let metadata_str = self.serialize_metadata();
+<<<<<<< HEAD
         let computed =
             Self::compute_chain_hash(&self.previous_hash, &self.data_hash, &metadata_str);
+=======
+        let computed = Self::compute_chain_hash(
+            &self.previous_hash,
+            &self.data_hash,
+            &metadata_str,
+        );
+>>>>>>> 4b60ced (docs: update README)
         computed == self.chain_hash
     }
 
@@ -165,7 +173,16 @@ impl ChainOfCustody {
     }
 
     /// Record an access event.
+<<<<<<< HEAD
     pub fn record_access(&mut self, evidence_id: &str, accessed_by: &str, purpose: &str) {
+=======
+    pub fn record_access(
+        &mut self,
+        evidence_id: &str,
+        accessed_by: &str,
+        purpose: &str,
+    ) {
+>>>>>>> 4b60ced (docs: update README)
         self.entries.push(CustodyEntry {
             evidence_id: evidence_id.to_string(),
             accessed_by: accessed_by.to_string(),
@@ -354,7 +371,12 @@ impl EvidenceCollector {
         let chain = self.chains.get(incident_id).ok_or_else(|| {
             Error::Other(format!("No evidence chain for incident: {incident_id}"))
         })?;
+<<<<<<< HEAD
         serde_json::to_string_pretty(chain).map_err(|e| Error::Serialization(e.to_string()))
+=======
+        serde_json::to_string_pretty(chain)
+            .map_err(|e| Error::Serialization(e.to_string()))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Compute a tamper-proof hash for the entire chain.
@@ -369,8 +391,12 @@ impl EvidenceCollector {
 
     /// Record a custody access event.
     pub fn record_access(&mut self, evidence_id: &str, accessed_by: &str, purpose: &str) {
+<<<<<<< HEAD
         self.custody
             .record_access(evidence_id, accessed_by, purpose);
+=======
+        self.custody.record_access(evidence_id, accessed_by, purpose);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get the chain of custody access log.
@@ -443,7 +469,11 @@ mod tests {
         assert_ne!(h1, h3);
         assert_ne!(h2, h3);
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 4b60ced (docs: update README)
     #[test]
     fn test_verify_chain_hash_valid() {
         let mut metadata = HashMap::new();

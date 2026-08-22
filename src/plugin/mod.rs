@@ -3,6 +3,7 @@
 // Simulates WASM execution for custom ring engines without real WASM dependency.
 // Provides a central PluginManager that coordinates loading, execution, and lifecycle.
 
+<<<<<<< HEAD
 pub mod plugin_api;
 pub mod plugin_marketplace;
 pub mod wasm_runtime;
@@ -13,12 +14,29 @@ pub use wasm_runtime::*;
 
 use crate::error::{Error, Result};
 
+=======
+pub mod wasm_runtime;
+pub mod plugin_api;
+pub mod plugin_marketplace;
+
+pub use wasm_runtime::*;
+pub use plugin_api::*;
+pub use plugin_marketplace::*;
+
+use crate::error::{Error, Result};
+
+
+>>>>>>> 4b60ced (docs: update README)
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, RwLock};
 use std::time::Instant;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4b60ced (docs: update README)
 // ─────────────────────────────────────────────────────────────────────
 // PluginConfig
 // ─────────────────────────────────────────────────────────────────────
@@ -74,10 +92,14 @@ impl std::fmt::Debug for LoadedPlugin {
             .field("name", &self.manifest.name)
             .field("version", &self.manifest.version)
             .field("is_active", &self.is_active)
+<<<<<<< HEAD
             .field(
                 "execution_count",
                 &self.execution_count.load(Ordering::Relaxed),
             )
+=======
+            .field("execution_count", &self.execution_count.load(Ordering::Relaxed))
+>>>>>>> 4b60ced (docs: update README)
             .finish()
     }
 }
@@ -139,6 +161,7 @@ impl PluginManager {
         let name = manifest.name.clone();
 
         {
+<<<<<<< HEAD
             let plugins = self
                 .plugins
                 .read()
@@ -148,6 +171,11 @@ impl PluginManager {
                     "max plugins ({}) reached",
                     self.max_plugins
                 )));
+=======
+            let plugins = self.plugins.read().map_err(|_| Error::Other("lock poisoned".to_string()))?;
+            if plugins.len() >= self.max_plugins {
+                return Err(Error::Other(format!("max plugins ({}) reached", self.max_plugins)));
+>>>>>>> 4b60ced (docs: update README)
             }
             if plugins.contains_key(&name) {
                 return Err(Error::Other(format!("plugin '{}' already loaded", name)));
@@ -155,8 +183,16 @@ impl PluginManager {
         }
 
         // Build a simple evaluate function that returns param 0.
+<<<<<<< HEAD
         let func = WasmFunction::new("evaluate", vec![WasmOpcode::LocalGet(0), WasmOpcode::End])
             .with_param(WasmValue::I32(0));
+=======
+        let func = WasmFunction::new(
+            "evaluate",
+            vec![WasmOpcode::LocalGet(0), WasmOpcode::End],
+        )
+        .with_param(WasmValue::I32(0));
+>>>>>>> 4b60ced (docs: update README)
 
         let module = WasmModule::new(&name)
             .with_function(func)
@@ -165,16 +201,21 @@ impl PluginManager {
             .with_version(&manifest.version.to_string());
 
         {
+<<<<<<< HEAD
             let mut rt = self
                 .runtime
                 .write()
                 .map_err(|_| Error::Other("runtime lock poisoned".to_string()))?;
+=======
+            let mut rt = self.runtime.write().map_err(|_| Error::Other("runtime lock poisoned".to_string()))?;
+>>>>>>> 4b60ced (docs: update README)
             rt.load_module(module)
                 .map_err(|e| Error::Other(format!("failed to load WASM module: {}", e)))?;
         }
 
         // Also register in API runtime for execution.
         {
+<<<<<<< HEAD
             let mut api = self
                 .api
                 .write()
@@ -182,6 +223,14 @@ impl PluginManager {
             let api_func =
                 WasmFunction::new("evaluate", vec![WasmOpcode::LocalGet(0), WasmOpcode::End])
                     .with_param(WasmValue::I32(0));
+=======
+            let mut api = self.api.write().map_err(|_| Error::Other("api lock poisoned".to_string()))?;
+            let api_func = WasmFunction::new(
+                "evaluate",
+                vec![WasmOpcode::LocalGet(0), WasmOpcode::End],
+            )
+            .with_param(WasmValue::I32(0));
+>>>>>>> 4b60ced (docs: update README)
             let api_module = WasmModule::new(&name)
                 .with_function(api_func)
                 .with_export("evaluate")
@@ -193,10 +242,14 @@ impl PluginManager {
 
         let loaded = LoadedPlugin::new(manifest.clone(), Vec::new());
         {
+<<<<<<< HEAD
             let mut plugins = self
                 .plugins
                 .write()
                 .map_err(|_| Error::Other("lock poisoned".to_string()))?;
+=======
+            let mut plugins = self.plugins.write().map_err(|_| Error::Other("lock poisoned".to_string()))?;
+>>>>>>> 4b60ced (docs: update README)
             plugins.insert(name.clone(), loaded);
         }
 
@@ -213,10 +266,14 @@ impl PluginManager {
     /// Unload a plugin by ID (name).
     pub fn unload_plugin(&self, id: &str) -> Result<()> {
         let removed = {
+<<<<<<< HEAD
             let mut plugins = self
                 .plugins
                 .write()
                 .map_err(|_| Error::Other("lock poisoned".to_string()))?;
+=======
+            let mut plugins = self.plugins.write().map_err(|_| Error::Other("lock poisoned".to_string()))?;
+>>>>>>> 4b60ced (docs: update README)
             plugins.remove(id).is_some()
         };
         if removed {
@@ -236,10 +293,14 @@ impl PluginManager {
     /// Execute a loaded plugin with the given input.
     pub fn execute_plugin(&self, id: &str, input: &PluginInput) -> Result<PluginOutput> {
         {
+<<<<<<< HEAD
             let plugins = self
                 .plugins
                 .read()
                 .map_err(|_| Error::Other("lock poisoned".to_string()))?;
+=======
+            let plugins = self.plugins.read().map_err(|_| Error::Other("lock poisoned".to_string()))?;
+>>>>>>> 4b60ced (docs: update README)
             if !plugins.contains_key(id) {
                 return Err(Error::Other(format!("plugin '{}' not found", id)));
             }
@@ -249,10 +310,14 @@ impl PluginManager {
             }
         }
 
+<<<<<<< HEAD
         let mut api = self
             .api
             .write()
             .map_err(|_| Error::Other("api lock poisoned".to_string()))?;
+=======
+        let mut api = self.api.write().map_err(|_| Error::Other("api lock poisoned".to_string()))?;
+>>>>>>> 4b60ced (docs: update README)
         let sandbox_result = api.execute(id, "evaluate", input);
 
         // Record last execution time.
@@ -260,12 +325,22 @@ impl PluginManager {
             last.insert(id.to_string(), Instant::now());
         }
 
+<<<<<<< HEAD
         sandbox_result.into_output().map_err(|e| Error::Other(e))
+=======
+        sandbox_result
+            .into_output()
+            .map_err(|e| Error::Other(e))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// List all loaded plugins.
     pub fn list_plugins(&self) -> Vec<PluginInfo> {
+<<<<<<< HEAD
         match self.plugins.read() {
+=======
+ match self.plugins.read() {
+>>>>>>> 4b60ced (docs: update README)
             Ok(plugins) => plugins
                 .values()
                 .map(|p| PluginInfo {
@@ -284,7 +359,13 @@ impl PluginManager {
 
     /// Hot-reload a plugin by ID.
     pub fn hot_reload(&self, id: &str) -> Result<()> {
+<<<<<<< HEAD
         self.hot_reload.reload(id).map_err(|e| Error::Other(e))?;
+=======
+        self.hot_reload
+            .reload(id)
+            .map_err(|e| Error::Other(e))?;
+>>>>>>> 4b60ced (docs: update README)
 
         if let Ok(mut plugins) = self.plugins.write() {
             if let Some(plugin) = plugins.get_mut(id) {
@@ -383,9 +464,13 @@ mod tests {
     #[test]
     fn test_unload_plugin() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let id = mgr
             .load_plugin(make_manifest("unload-me", "1.0.0"))
             .unwrap();
+=======
+        let id = mgr.load_plugin(make_manifest("unload-me", "1.0.0")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(mgr.list_plugins().len(), 1);
         mgr.unload_plugin(&id).unwrap();
         assert_eq!(mgr.list_plugins().len(), 0);
@@ -401,9 +486,13 @@ mod tests {
     #[test]
     fn test_execute_plugin() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let id = mgr
             .load_plugin(make_manifest("exec-plug", "1.0.0"))
             .unwrap();
+=======
+        let id = mgr.load_plugin(make_manifest("exec-plug", "1.0.0")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let input = make_input();
         let output = mgr.execute_plugin(&id, &input).unwrap();
         assert!(matches!(
@@ -415,9 +504,13 @@ mod tests {
     #[test]
     fn test_plugin_status() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let id = mgr
             .load_plugin(make_manifest("status-plug", "1.0.0"))
             .unwrap();
+=======
+        let id = mgr.load_plugin(make_manifest("status-plug", "1.0.0")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let status = mgr.plugin_status(&id).unwrap();
         assert_eq!(status.name, "status-plug");
         assert!(status.is_active);
@@ -437,9 +530,13 @@ mod tests {
     #[test]
     fn test_hot_reload_plugin() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let id = mgr
             .load_plugin(make_manifest("reload-plug", "1.0.0"))
             .unwrap();
+=======
+        let id = mgr.load_plugin(make_manifest("reload-plug", "1.0.0")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         mgr.hot_reload(&id).unwrap();
         let status = mgr.plugin_status(&id).unwrap();
         assert_eq!(status.version, Version::new(1, 0, 1));

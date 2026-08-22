@@ -10,8 +10,13 @@ use std::path::PathBuf;
 
 use clap::Subcommand;
 
+<<<<<<< HEAD
 use crate::cli::utils::{self, Color, ExitCode};
 use crate::Config;
+=======
+use crate::Config;
+use crate::cli::utils::{self, Color, ExitCode};
+>>>>>>> 4b60ced (docs: update README)
 
 #[derive(Subcommand, Debug)]
 pub enum ConfigCommand {
@@ -58,11 +63,15 @@ pub enum ConfigCommand {
 pub async fn run(cmd: ConfigCommand) -> ExitCode {
     match cmd {
         ConfigCommand::Validate { config, verbose } => cmd_validate(&config, verbose),
+<<<<<<< HEAD
         ConfigCommand::Show {
             config,
             format,
             section,
         } => cmd_show(&config, &format, section.as_deref()),
+=======
+        ConfigCommand::Show { config, format, section } => cmd_show(&config, &format, section.as_deref()),
+>>>>>>> 4b60ced (docs: update README)
         ConfigCommand::Defaults { format, output } => cmd_defaults(&format, output),
         ConfigCommand::Diff { base, modified } => cmd_diff(&base, &modified),
     }
@@ -77,11 +86,17 @@ fn cmd_validate(path: &PathBuf, verbose: bool) -> ExitCode {
     let content = match std::fs::read_to_string(path) {
         Ok(c) => c,
         Err(e) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} {}",
                 utils::StatusIndicator::fail(&format!("Cannot read file: {}", e)),
                 ""
             );
+=======
+            eprintln!("{} {}", utils::StatusIndicator::fail(&format!(
+                "Cannot read file: {}", e
+            )), "");
+>>>>>>> 4b60ced (docs: update README)
             return ExitCode::ConfigError;
         }
     };
@@ -95,6 +110,7 @@ fn cmd_validate(path: &PathBuf, verbose: bool) -> ExitCode {
 
             if verbose {
                 utils::sub_section("Parsed Sections");
+<<<<<<< HEAD
                 utils::kv(
                     "Shield Ring",
                     if cfg.shield.enabled {
@@ -216,6 +232,24 @@ fn cmd_validate(path: &PathBuf, verbose: bool) -> ExitCode {
                         "disabled"
                     },
                 );
+=======
+                utils::kv("Shield Ring", if cfg.shield.enabled { "enabled" } else { "disabled" });
+                utils::kv("Threat Ring", if cfg.threat.enabled { "enabled" } else { "disabled" });
+                utils::kv("Identity Ring", if cfg.identity.enabled { "enabled" } else { "disabled" });
+                utils::kv("Agent Ring", if cfg.agent.enabled { "enabled" } else { "disabled" });
+                utils::kv("Memory Ring", if cfg.memory.enabled { "enabled" } else { "disabled" });
+                utils::kv("Execution Ring", if cfg.execution.enabled { "enabled" } else { "disabled" });
+                utils::kv("Reasoning Ring", if cfg.reasoning.enabled { "enabled" } else { "disabled" });
+                utils::kv("Governance Ring", if cfg.governance.enabled { "enabled" } else { "disabled" });
+                utils::kv("Recovery Ring", if cfg.recovery_sec.enabled { "enabled" } else { "disabled" });
+                utils::kv("Keshav Core", if cfg.keshav.enabled { "enabled" } else { "disabled" });
+                utils::kv("Cross-Ring", if cfg.cross_ring.enabled { "enabled" } else { "disabled" });
+                utils::kv("Storage Backend", &cfg.storage.backend);
+                utils::kv("gRPC Server", if cfg.grpc.enabled { "enabled" } else { "disabled" });
+                utils::kv("Audit Trail", if cfg.audit.enabled { "enabled" } else { "disabled" });
+                utils::kv("API Keys", if cfg.api_keys.enabled { "enabled" } else { "disabled" });
+                utils::kv("Config Watcher", if cfg.config_watcher.enabled { "enabled" } else { "disabled" });
+>>>>>>> 4b60ced (docs: update README)
 
                 if let Some(ref ananta) = cfg.ananta_config_path {
                     utils::kv("ANANTA Config", ananta);
@@ -228,6 +262,7 @@ fn cmd_validate(path: &PathBuf, verbose: bool) -> ExitCode {
                     utils::sub_section("Upstream Configuration");
                     utils::kv("URL", &upstream.url);
                     utils::kv("Timeout", &format!("{}s", upstream.timeout_secs));
+<<<<<<< HEAD
                     utils::kv(
                         "Forward Client Auth",
                         if upstream.forward_client_auth {
@@ -244,17 +279,25 @@ fn cmd_validate(path: &PathBuf, verbose: bool) -> ExitCode {
                             "yes (masked)"
                         },
                     );
+=======
+                    utils::kv("Forward Client Auth", if upstream.forward_client_auth { "yes" } else { "no" });
+                    utils::kv("API Key Set", if upstream.api_key.is_empty() { "no" } else { "yes (masked)" });
+>>>>>>> 4b60ced (docs: update README)
                 }
             }
 
             ExitCode::Ok
         }
         Err(e) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Configuration invalid: {}",
                 utils::StatusIndicator::fail(""),
                 e
             );
+=======
+            eprintln!("{} Configuration invalid: {}", utils::StatusIndicator::fail(""), e);
+>>>>>>> 4b60ced (docs: update README)
             ExitCode::ConfigError
         }
     }
@@ -316,6 +359,7 @@ fn show_section(config: &Config, section: &str) {
         "shield" => {
             utils::sub_section("Shield Ring (Ring 1 — Perimeter Defense)");
             utils::kv("Enabled", if config.shield.enabled { "yes" } else { "no" });
+<<<<<<< HEAD
             utils::kv(
                 "Input Validator",
                 if config.shield.input_validator.enabled {
@@ -364,11 +408,20 @@ fn show_section(config: &Config, section: &str) {
                     "disabled"
                 },
             );
+=======
+            utils::kv("Input Validator", if config.shield.input_validator.enabled { "enabled" } else { "disabled" });
+            utils::kv("Rate Limiter", if config.shield.rate_limiter.enabled { "enabled" } else { "disabled" });
+            utils::kv("DoS Protector", if config.shield.dos_protector.enabled { "enabled" } else { "disabled" });
+            utils::kv("Geo Fencer", if config.shield.geo_fencer.enabled { "enabled" } else { "disabled" });
+            utils::kv("Bot Detector", if config.shield.bot_detector.enabled { "enabled" } else { "disabled" });
+            utils::kv("WAF Engine", if config.shield.waf.enabled { "enabled" } else { "disabled" });
+>>>>>>> 4b60ced (docs: update README)
         }
         "threat" => {
             utils::sub_section("Threat Ring (Ring 3 — Cognitive Threat Detection)");
             utils::kv("Enabled", if config.threat.enabled { "yes" } else { "no" });
             utils::kv("Deny Threshold", &config.threat.deny_threshold.to_string());
+<<<<<<< HEAD
             utils::kv(
                 "Challenge Threshold",
                 &config.threat.challenge_threshold.to_string(),
@@ -404,6 +457,16 @@ fn show_section(config: &Config, section: &str) {
                 "Enabled",
                 if config.identity.enabled { "yes" } else { "no" },
             );
+=======
+            utils::kv("Challenge Threshold", &config.threat.challenge_threshold.to_string());
+            utils::kv("Pattern Matcher", if config.threat.pattern_matcher.enabled { "enabled" } else { "disabled" });
+            utils::kv("Semantic Classifier", if config.threat.semantic_classifier.enabled { "enabled" } else { "disabled" });
+            utils::kv("Jailbreak Detector", if config.threat.jailbreak_detector.enabled { "enabled" } else { "disabled" });
+        }
+        "identity" => {
+            utils::sub_section("Identity Ring (Ring 2 — Auth, AuthZ & Trust)");
+            utils::kv("Enabled", if config.identity.enabled { "yes" } else { "no" });
+>>>>>>> 4b60ced (docs: update README)
         }
         "agent" => {
             utils::sub_section("Agent Ring (Ring 4 — Agent Policy & Behavior)");
@@ -415,6 +478,7 @@ fn show_section(config: &Config, section: &str) {
         }
         "execution" => {
             utils::sub_section("Execution Ring (Ring 6 — Tool Call Firewall)");
+<<<<<<< HEAD
             utils::kv(
                 "Enabled",
                 if config.execution.enabled {
@@ -423,6 +487,9 @@ fn show_section(config: &Config, section: &str) {
                     "no"
                 },
             );
+=======
+            utils::kv("Enabled", if config.execution.enabled { "yes" } else { "no" });
+>>>>>>> 4b60ced (docs: update README)
         }
         "keshav" => {
             utils::sub_section("Keshav Core — Central Decision Brain");
@@ -433,6 +500,7 @@ fn show_section(config: &Config, section: &str) {
         }
         "cross_ring" => {
             utils::sub_section("Cross-Ring Network");
+<<<<<<< HEAD
             utils::kv(
                 "Enabled",
                 if config.cross_ring.enabled {
@@ -457,6 +525,13 @@ fn show_section(config: &Config, section: &str) {
                 "Recovery Threshold",
                 &config.cross_ring.recovery.failure_threshold.to_string(),
             );
+=======
+            utils::kv("Enabled", if config.cross_ring.enabled { "yes" } else { "no" });
+            utils::kv("Command Buffer", &config.cross_ring.command.buffer_size.to_string());
+            utils::kv("Intel Buffer", &config.cross_ring.intel.buffer_size.to_string());
+            utils::kv("Control Buffer", &config.cross_ring.control.buffer_size.to_string());
+            utils::kv("Recovery Threshold", &config.cross_ring.recovery.failure_threshold.to_string());
+>>>>>>> 4b60ced (docs: update README)
         }
         "storage" => {
             utils::sub_section("Storage Backend");
@@ -467,6 +542,7 @@ fn show_section(config: &Config, section: &str) {
         }
         "governance" => {
             utils::sub_section("Governance Ring (Ring 8 — Policy & Compliance)");
+<<<<<<< HEAD
             utils::kv(
                 "Enabled",
                 if config.governance.enabled {
@@ -497,6 +573,17 @@ fn show_section(config: &Config, section: &str) {
                     "no"
                 },
             );
+=======
+            utils::kv("Enabled", if config.governance.enabled { "yes" } else { "no" });
+        }
+        "reasoning" => {
+            utils::sub_section("Reasoning Ring (Ring 7 — CoT Integrity)");
+            utils::kv("Enabled", if config.reasoning.enabled { "yes" } else { "no" });
+        }
+        "recovery_sec" => {
+            utils::sub_section("Recovery Security Ring (Ring 9)");
+            utils::kv("Enabled", if config.recovery_sec.enabled { "yes" } else { "no" });
+>>>>>>> 4b60ced (docs: update README)
         }
         _ => {
             utils::kv("Section", &format!("unknown section: {}", section));
@@ -521,6 +608,7 @@ fn cmd_defaults(format: &str, output: Option<PathBuf>) -> ExitCode {
     match output {
         Some(path) => {
             if let Err(e) = std::fs::write(&path, &content) {
+<<<<<<< HEAD
                 eprintln!(
                     "{} Failed to write: {}",
                     utils::StatusIndicator::fail(""),
@@ -533,6 +621,12 @@ fn cmd_defaults(format: &str, output: Option<PathBuf>) -> ExitCode {
                 utils::StatusIndicator::ok(""),
                 path.display()
             );
+=======
+                eprintln!("{} Failed to write: {}", utils::StatusIndicator::fail(""), e);
+                return ExitCode::GeneralError;
+            }
+            println!("{} Default config written to {}", utils::StatusIndicator::ok(""), path.display());
+>>>>>>> 4b60ced (docs: update README)
         }
         None => {
             println!("{}", content);
@@ -550,11 +644,15 @@ fn cmd_diff(base_path: &PathBuf, modified_path: &PathBuf) -> ExitCode {
     let base_content = match std::fs::read_to_string(base_path) {
         Ok(c) => c,
         Err(e) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Cannot read base: {}",
                 utils::StatusIndicator::fail(""),
                 e
             );
+=======
+            eprintln!("{} Cannot read base: {}", utils::StatusIndicator::fail(""), e);
+>>>>>>> 4b60ced (docs: update README)
             return ExitCode::ConfigError;
         }
     };
@@ -562,11 +660,15 @@ fn cmd_diff(base_path: &PathBuf, modified_path: &PathBuf) -> ExitCode {
     let modified_content = match std::fs::read_to_string(modified_path) {
         Ok(c) => c,
         Err(e) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Cannot read modified: {}",
                 utils::StatusIndicator::fail(""),
                 e
             );
+=======
+            eprintln!("{} Cannot read modified: {}", utils::StatusIndicator::fail(""), e);
+>>>>>>> 4b60ced (docs: update README)
             return ExitCode::ConfigError;
         }
     };
@@ -574,11 +676,15 @@ fn cmd_diff(base_path: &PathBuf, modified_path: &PathBuf) -> ExitCode {
     let base: Config = match base_content.parse() {
         Ok(c) => c,
         Err(e) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Base config invalid: {}",
                 utils::StatusIndicator::fail(""),
                 e
             );
+=======
+            eprintln!("{} Base config invalid: {}", utils::StatusIndicator::fail(""), e);
+>>>>>>> 4b60ced (docs: update README)
             return ExitCode::ConfigError;
         }
     };
@@ -586,11 +692,15 @@ fn cmd_diff(base_path: &PathBuf, modified_path: &PathBuf) -> ExitCode {
     let modified: Config = match modified_content.parse() {
         Ok(c) => c,
         Err(e) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Modified config invalid: {}",
                 utils::StatusIndicator::fail(""),
                 e
             );
+=======
+            eprintln!("{} Modified config invalid: {}", utils::StatusIndicator::fail(""), e);
+>>>>>>> 4b60ced (docs: update README)
             return ExitCode::ConfigError;
         }
     };
@@ -602,6 +712,7 @@ fn cmd_diff(base_path: &PathBuf, modified_path: &PathBuf) -> ExitCode {
 
     // Compare key boolean flags.
     if base.shield.enabled != modified.shield.enabled {
+<<<<<<< HEAD
         differences.push((
             "shield.enabled",
             base.shield.enabled.to_string(),
@@ -663,6 +774,51 @@ fn cmd_diff(base_path: &PathBuf, modified_path: &PathBuf) -> ExitCode {
             base.server.bind.clone(),
             modified.server.bind.clone(),
         ));
+=======
+        differences.push(("shield.enabled", 
+            base.shield.enabled.to_string(), 
+            modified.shield.enabled.to_string()));
+    }
+    if base.threat.enabled != modified.threat.enabled {
+        differences.push(("threat.enabled", 
+            base.threat.enabled.to_string(), 
+            modified.threat.enabled.to_string()));
+    }
+    if base.identity.enabled != modified.identity.enabled {
+        differences.push(("identity.enabled", 
+            base.identity.enabled.to_string(), 
+            modified.identity.enabled.to_string()));
+    }
+    if base.agent.enabled != modified.agent.enabled {
+        differences.push(("agent.enabled", 
+            base.agent.enabled.to_string(), 
+            modified.agent.enabled.to_string()));
+    }
+    if base.memory.enabled != modified.memory.enabled {
+        differences.push(("memory.enabled", 
+            base.memory.enabled.to_string(), 
+            modified.memory.enabled.to_string()));
+    }
+    if base.execution.enabled != modified.execution.enabled {
+        differences.push(("execution.enabled", 
+            base.execution.enabled.to_string(), 
+            modified.execution.enabled.to_string()));
+    }
+    if base.threat.deny_threshold != modified.threat.deny_threshold {
+        differences.push(("threat.deny_threshold", 
+            base.threat.deny_threshold.to_string(), 
+            modified.threat.deny_threshold.to_string()));
+    }
+    if base.storage.backend != modified.storage.backend {
+        differences.push(("storage.backend", 
+            base.storage.backend.clone(),
+            modified.storage.backend.clone()));
+    }
+    if base.server.bind != modified.server.bind {
+        differences.push(("server.bind", 
+            base.server.bind.clone(),
+            modified.server.bind.clone()));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     if differences.is_empty() {
@@ -701,8 +857,12 @@ mod tests {
         let code = run(ConfigCommand::Validate {
             config: f.path().to_path_buf(),
             verbose: false,
+<<<<<<< HEAD
         })
         .await;
+=======
+        }).await;
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(code, ExitCode::Ok);
     }
 
@@ -712,8 +872,12 @@ mod tests {
         let code = run(ConfigCommand::Validate {
             config: f.path().to_path_buf(),
             verbose: false,
+<<<<<<< HEAD
         })
         .await;
+=======
+        }).await;
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(code, ExitCode::ConfigError);
     }
 
@@ -722,8 +886,12 @@ mod tests {
         let code = run(ConfigCommand::Defaults {
             format: "yaml".to_string(),
             output: None,
+<<<<<<< HEAD
         })
         .await;
+=======
+        }).await;
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(code, ExitCode::Ok);
     }
 
@@ -734,8 +902,12 @@ mod tests {
         let code = run(ConfigCommand::Defaults {
             format: "yaml".to_string(),
             output: Some(out.clone()),
+<<<<<<< HEAD
         })
         .await;
+=======
+        }).await;
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(code, ExitCode::Ok);
         assert!(out.exists());
     }

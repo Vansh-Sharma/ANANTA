@@ -328,10 +328,15 @@ impl PhiAccrualDetector {
 
     /// Register a node for monitoring.
     pub fn register_node(&mut self, node_id: &str, trust_score: f64) {
+<<<<<<< HEAD
         self.node_states.insert(
             node_id.to_string(),
             NodeHeartbeatState::new(node_id, trust_score),
         );
+=======
+        self.node_states
+            .insert(node_id.to_string(), NodeHeartbeatState::new(node_id, trust_score));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Record a heartbeat from a node.
@@ -619,11 +624,15 @@ impl PartitionInfo {
     pub fn generate_id(nodes: &HashSet<String>) -> String {
         let mut sorted: Vec<&String> = nodes.iter().collect();
         sorted.sort();
+<<<<<<< HEAD
         let joined: String = sorted
             .iter()
             .map(|s| s.as_str())
             .collect::<Vec<_>>()
             .join(",");
+=======
+        let joined: String = sorted.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(",");
+>>>>>>> 4b60ced (docs: update README)
         // Simple hash-based ID.
         let hash = joined
             .bytes()
@@ -761,7 +770,14 @@ impl QuorumAnalyzer {
 
     /// Get the trust score for a node, defaulting to 0.5.
     pub fn trust_score(&self, node_id: &str) -> f64 {
+<<<<<<< HEAD
         self.trust_scores.get(node_id).copied().unwrap_or(0.5)
+=======
+        self.trust_scores
+            .get(node_id)
+            .copied()
+            .unwrap_or(0.5)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Compute the quorum size for a cluster of n nodes: majority = ⌊n/2⌋ + 1.
@@ -1115,7 +1131,12 @@ impl HeartbeatAggregator {
         if !intervals.is_empty() {
             let avg = intervals.iter().sum::<f64>() / intervals.len() as f64;
             // Smoothly update baseline.
+<<<<<<< HEAD
             self.baseline_avg_interval_ms = 0.8 * self.baseline_avg_interval_ms + 0.2 * avg;
+=======
+            self.baseline_avg_interval_ms =
+                0.8 * self.baseline_avg_interval_ms + 0.2 * avg;
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -1218,10 +1239,23 @@ impl HeartbeatAggregator {
                 (0.0, 0.0, 0.0, 0.0)
             } else {
                 let avg = intervals.iter().sum::<f64>() / intervals.len() as f64;
+<<<<<<< HEAD
                 let variance = intervals.iter().map(|x| (x - avg).powi(2)).sum::<f64>()
                     / intervals.len().max(1) as f64;
                 let std_dev = variance.sqrt();
                 let min_val = intervals.iter().cloned().fold(f64::INFINITY, f64::min);
+=======
+                let variance = intervals
+                    .iter()
+                    .map(|x| (x - avg).powi(2))
+                    .sum::<f64>()
+                    / intervals.len().max(1) as f64;
+                let std_dev = variance.sqrt();
+                let min_val = intervals
+                    .iter()
+                    .cloned()
+                    .fold(f64::INFINITY, f64::min);
+>>>>>>> 4b60ced (docs: update README)
                 let max_val = intervals.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
                 (avg, std_dev, min_val, max_val)
             };
@@ -1413,7 +1447,15 @@ impl RecoveryCoordinator {
 
         // Determine stale vs fresh nodes.
         // Nodes from minority partitions are considered stale.
+<<<<<<< HEAD
         let mut stale_nodes: Vec<String> = self.isolation_durations.keys().cloned().collect();
+=======
+        let mut stale_nodes: Vec<String> = self
+            .isolation_durations
+            .keys()
+            .cloned()
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
         stale_nodes.sort();
 
         let fresh_nodes: Vec<String> = new_map
@@ -1432,8 +1474,14 @@ impl RecoveryCoordinator {
             .map(|d| d.num_milliseconds().max(0))
             .max()
             .unwrap_or(0);
+<<<<<<< HEAD
         let missed_updates =
             (max_isolation_ms as u64 / DEFAULT_HEARTBEAT_INTERVAL_MS as u64).max(1);
+=======
+        let missed_updates = (max_isolation_ms as u64
+            / DEFAULT_HEARTBEAT_INTERVAL_MS as u64)
+            .max(1);
+>>>>>>> 4b60ced (docs: update README)
 
         // Compute divergence type.
         let divergence_type = if stale_nodes.is_empty() {
@@ -1473,6 +1521,7 @@ impl RecoveryCoordinator {
             0.0
         };
 
+<<<<<<< HEAD
         let divergence =
             StateDivergence {
                 divergence_type: divergence_type.clone(),
@@ -1485,6 +1534,19 @@ impl RecoveryCoordinator {
                 merged_count, new_partition_count, stale_nodes.len(), fresh_nodes.len()
             ),
             };
+=======
+        let divergence = StateDivergence {
+            divergence_type: divergence_type.clone(),
+            stale_nodes: stale_nodes.clone(),
+            fresh_nodes: fresh_nodes.clone(),
+            missed_updates,
+            trust_impact,
+            description: format!(
+                "Partition healed: {} partitions merged into {}. {} stale nodes, {} fresh nodes.",
+                merged_count, new_partition_count, stale_nodes.len(), fresh_nodes.len()
+            ),
+        };
+>>>>>>> 4b60ced (docs: update README)
 
         // Determine recovery action.
         let action = match divergence_type {
@@ -1640,6 +1702,7 @@ impl PartitionDetectorEngine {
         let quorum_report = self.quorum_analyzer.analyze(&partition_map);
 
         // Step 4: Detect split-brain and fence.
+<<<<<<< HEAD
         let fence_decision =
             self.split_brain_detector
                 .evaluate(&quorum_report, &self.trust_scores, now);
@@ -1647,6 +1710,14 @@ impl PartitionDetectorEngine {
         // Step 5: Update heartbeat baseline and check for degradation.
         self.heartbeat_aggregator
             .update_baseline(&self.phi_detector);
+=======
+        let fence_decision = self
+            .split_brain_detector
+            .evaluate(&quorum_report, &self.trust_scores, now);
+
+        // Step 5: Update heartbeat baseline and check for degradation.
+        self.heartbeat_aggregator.update_baseline(&self.phi_detector);
+>>>>>>> 4b60ced (docs: update README)
         let current_avg = self.heartbeat_aggregator.current_avg_interval();
         self.heartbeat_aggregator
             .push_interval_observation(now, current_avg);
@@ -1659,9 +1730,15 @@ impl PartitionDetectorEngine {
             self.recovery_coordinator
                 .record_partition_start(&partition_map, now);
         }
+<<<<<<< HEAD
         let recovery_plan =
             self.recovery_coordinator
                 .detect_heal(&partition_map, &self.trust_scores, now);
+=======
+        let recovery_plan = self
+            .recovery_coordinator
+            .detect_heal(&partition_map, &self.trust_scores, now);
+>>>>>>> 4b60ced (docs: update README)
 
         // Determine overall cluster health.
         let cluster_health = match &degradation_alert {
@@ -2349,10 +2426,14 @@ mod tests {
         nodes2.insert("a".to_string());
         nodes2.insert("b".to_string());
         // Same nodes in different insertion order should produce same ID.
+<<<<<<< HEAD
         assert_eq!(
             PartitionInfo::generate_id(&nodes1),
             PartitionInfo::generate_id(&nodes2)
         );
+=======
+        assert_eq!(PartitionInfo::generate_id(&nodes1), PartitionInfo::generate_id(&nodes2));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2360,6 +2441,7 @@ mod tests {
         let mut graph = ConnectivityGraph::new();
         let t = base_time();
         graph.update_reachability("a", "b", true, t, 10.0);
+<<<<<<< HEAD
         assert!(
             (graph
                 .edges
@@ -2377,6 +2459,12 @@ mod tests {
             .get(&("a".to_string(), "b".to_string()))
             .unwrap()
             .latency_ms;
+=======
+        assert!((graph.edges.get(&("a".to_string(), "b".to_string())).unwrap().latency_ms - 10.0).abs() < 0.01);
+        // Second update with 20ms — EMA should be between 10 and 20.
+        graph.update_reachability("a", "b", true, t, 20.0);
+        let lat = graph.edges.get(&("a".to_string(), "b".to_string())).unwrap().latency_ms;
+>>>>>>> 4b60ced (docs: update README)
         assert!(lat > 10.0 && lat < 20.0);
     }
 }

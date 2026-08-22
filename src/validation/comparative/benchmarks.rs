@@ -140,10 +140,14 @@ impl BenchmarkSuite {
     }
 
     pub fn benchmarks_by_category(&self, cat: BenchmarkCategory) -> Vec<&BenchmarkDef> {
+<<<<<<< HEAD
         self.benchmarks
             .iter()
             .filter(|b| b.category == cat)
             .collect()
+=======
+        self.benchmarks.iter().filter(|b| b.category == cat).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -169,7 +173,16 @@ pub struct BenchmarkResult {
 }
 
 impl BenchmarkResult {
+<<<<<<< HEAD
     pub fn new(benchmark_id: &str, system: &str, version: &str, run_id: &str) -> Self {
+=======
+    pub fn new(
+        benchmark_id: &str,
+        system: &str,
+        version: &str,
+        run_id: &str,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             benchmark_id: benchmark_id.to_string(),
             system: system.to_string(),
@@ -210,10 +223,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "SQL injection detection rate across 1000 mutated payloads",
             vec!["detection_rate".to_string()],
             Direction::HigherIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["owasp".to_string(), "sqli".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["owasp".to_string(), "sqli".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     suite.add_benchmark(
@@ -223,10 +241,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Cross-site scripting detection rate across 1000 mutated payloads",
             vec!["detection_rate".to_string()],
             Direction::HigherIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["owasp".to_string(), "xss".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["owasp".to_string(), "xss".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     suite.add_benchmark(
@@ -236,10 +259,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Jailbreak detection rate across all 10 mutation strategies",
             vec!["detection_rate".to_string()],
             Direction::HigherIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["llm".to_string(), "jailbreak".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["llm".to_string(), "jailbreak".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     suite.add_benchmark(
@@ -249,10 +277,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Prompt injection detection rate (LLM01) with 5 encoding strategies",
             vec!["detection_rate".to_string()],
             Direction::HigherIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["llm".to_string(), "prompt_injection".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["llm".to_string(), "prompt_injection".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     // False positive benchmarks.
@@ -263,10 +296,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "False positive rate on 1000 benign requests",
             vec!["fp_rate".to_string()],
             Direction::LowerIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["accuracy".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["accuracy".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     // Latency benchmarks.
@@ -275,6 +313,7 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "p99-latency-under-load",
             BenchmarkCategory::Latency,
             "P99 latency at 1000 RPS",
+<<<<<<< HEAD
             vec![
                 "p99_us".to_string(),
                 "p95_us".to_string(),
@@ -285,6 +324,12 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             v,
         )
         .with_tags(vec!["performance".to_string(), "latency".to_string()]),
+=======
+            vec!["p99_us".to_string(), "p95_us".to_string(), "mean_us".to_string()],
+            Direction::LowerIsBetter,
+            "chakravyuh", v,
+        ).with_tags(vec!["performance".to_string(), "latency".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     // Throughput benchmarks.
@@ -295,10 +340,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Maximum sustainable RPS with <1% error rate",
             vec!["max_rps".to_string(), "error_rate".to_string()],
             Direction::HigherIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["performance".to_string(), "throughput".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["performance".to_string(), "throughput".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     // Drift resistance.
@@ -309,10 +359,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Minimum detectable policy drift magnitude",
             vec!["min_detectable_drift".to_string()],
             Direction::LowerIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["ananta".to_string(), "drift".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["ananta".to_string(), "drift".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     // Recovery speed.
@@ -323,10 +378,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Time from ring failure to full trust recovery",
             vec!["recovery_ms".to_string()],
             Direction::LowerIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["resilience".to_string(), "recovery".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["resilience".to_string(), "recovery".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     // Coverage.
@@ -337,10 +397,15 @@ pub fn chakravyuh_benchmarks() -> BenchmarkSuite {
             "Percentage of OWASP LLM Top 10 attack vectors covered",
             vec!["coverage_pct".to_string()],
             Direction::HigherIsBetter,
+<<<<<<< HEAD
             "chakravyuh",
             v,
         )
         .with_tags(vec!["owasp".to_string(), "coverage".to_string()]),
+=======
+            "chakravyuh", v,
+        ).with_tags(vec!["owasp".to_string(), "coverage".to_string()])
+>>>>>>> 4b60ced (docs: update README)
     );
 
     suite
@@ -353,6 +418,7 @@ mod tests {
     #[test]
     fn benchmark_def_creation() {
         let b = BenchmarkDef::new(
+<<<<<<< HEAD
             "test-bench",
             BenchmarkCategory::Detection,
             "test desc",
@@ -360,6 +426,11 @@ mod tests {
             Direction::HigherIsBetter,
             "test",
             "1.0.0",
+=======
+            "test-bench", BenchmarkCategory::Detection,
+            "test desc", vec!["rate".to_string()],
+            Direction::HigherIsBetter, "test", "1.0.0",
+>>>>>>> 4b60ced (docs: update README)
         );
         assert_eq!(b.name, "test-bench");
         assert_eq!(b.category, BenchmarkCategory::Detection);
@@ -370,6 +441,7 @@ mod tests {
     fn benchmark_suite() {
         let mut suite = BenchmarkSuite::new("test", "desc", "1.0.0");
         suite.add_benchmark(BenchmarkDef::new(
+<<<<<<< HEAD
             "a",
             BenchmarkCategory::Latency,
             "d",
@@ -400,6 +472,18 @@ mod tests {
                 .len(),
             0
         );
+=======
+            "a", BenchmarkCategory::Latency, "d",
+            vec!["p99".to_string()], Direction::LowerIsBetter, "s", "v",
+        ));
+        suite.add_benchmark(BenchmarkDef::new(
+            "b", BenchmarkCategory::Latency, "d",
+            vec!["p50".to_string()], Direction::LowerIsBetter, "s", "v",
+        ));
+        assert_eq!(suite.benchmarks.len(), 2);
+        assert_eq!(suite.benchmarks_by_category(BenchmarkCategory::Latency).len(), 2);
+        assert_eq!(suite.benchmarks_by_category(BenchmarkCategory::Detection).len(), 0);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -415,8 +499,12 @@ mod tests {
     fn chakravyuh_benchmarks_not_empty() {
         let suite = chakravyuh_benchmarks();
         assert!(suite.benchmarks.len() >= 10);
+<<<<<<< HEAD
         let cats: std::collections::HashSet<_> =
             suite.benchmarks.iter().map(|b| b.category).collect();
+=======
+        let cats: std::collections::HashSet<_> = suite.benchmarks.iter().map(|b| b.category).collect();
+>>>>>>> 4b60ced (docs: update README)
         assert!(cats.contains(&BenchmarkCategory::Detection));
         assert!(cats.contains(&BenchmarkCategory::Latency));
         assert!(cats.contains(&BenchmarkCategory::Throughput));
@@ -425,6 +513,7 @@ mod tests {
     #[test]
     fn benchmark_serialization() {
         let b = BenchmarkDef::new(
+<<<<<<< HEAD
             "ser-test",
             BenchmarkCategory::RecoverySpeed,
             "d",
@@ -432,6 +521,10 @@ mod tests {
             Direction::LowerIsBetter,
             "s",
             "v",
+=======
+            "ser-test", BenchmarkCategory::RecoverySpeed, "d",
+            vec!["ms".to_string()], Direction::LowerIsBetter, "s", "v",
+>>>>>>> 4b60ced (docs: update README)
         );
         let json = serde_json::to_string(&b).unwrap();
         let restored: BenchmarkDef = serde_json::from_str(&json).unwrap();

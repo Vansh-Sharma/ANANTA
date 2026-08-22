@@ -11,6 +11,7 @@
 //   5. TrustDecay      — temporal trust decay engine (multi-model, scheduled, audited)
 //   6. TrustPropagationBridge — bridges Bayesian engine into AnantaPlane trust state updates
 
+<<<<<<< HEAD
 pub mod trust_decay;
 pub mod trust_engine;
 pub mod trust_graph;
@@ -23,3 +24,17 @@ pub use trust_engine::*;
 pub use trust_graph::TrustGraph;
 pub use trust_proof::TrustProof;
 pub use trust_state::TrustState;
+=======
+pub mod trust_state;
+pub mod trust_graph;
+pub mod trust_proof;
+pub mod trust_engine;
+pub mod trust_decay;
+pub mod trust_propagation_bridge;
+
+pub use trust_state::TrustState;
+pub use trust_graph::TrustGraph;
+pub use trust_proof::TrustProof;
+pub use trust_engine::*;
+pub use trust_decay::*;
+>>>>>>> 4b60ced (docs: update README)

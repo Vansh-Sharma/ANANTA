@@ -12,7 +12,11 @@
 //   4. Result Aggregation   — cross-run statistics and comparison
 //   5. Scenario Scheduling  — cron-like scheduling with overlap detection
 
+<<<<<<< HEAD
 use chrono::{DateTime, Datelike, Duration, Timelike, Utc};
+=======
+use chrono::{Datelike, DateTime, Duration, Timelike, Utc};
+>>>>>>> 4b60ced (docs: update README)
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet, VecDeque};
 
@@ -203,10 +207,14 @@ impl Postcondition {
     /// Create an optional (informational) postcondition.
     pub fn trust_above_optional(domain: &str, threshold: f64) -> Self {
         Self {
+<<<<<<< HEAD
             description: format!(
                 "Trust in '{}' should ideally be above {:.2}",
                 domain, threshold
             ),
+=======
+            description: format!("Trust in '{}' should ideally be above {:.2}", domain, threshold),
+>>>>>>> 4b60ced (docs: update README)
             expression: format!("trust_above:{}:{:.4}", domain, threshold),
             required: false,
         }
@@ -464,10 +472,14 @@ impl Scenario {
 
     /// Resolve a parameter by name, returning the default value.
     pub fn resolve_parameter(&self, name: &str) -> Option<&str> {
+<<<<<<< HEAD
         self.parameters
             .iter()
             .find(|p| p.name == name)
             .map(|p| p.default_value.as_str())
+=======
+        self.parameters.iter().find(|p| p.name == name).map(|p| p.default_value.as_str())
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -772,7 +784,12 @@ impl ScenarioRunner {
     fn apply_degradation(&mut self, domain: &str, amount: f64) -> f64 {
         let current = self.trust_levels.get(domain).copied().unwrap_or(1.0);
         let new_level = (current - amount).max(0.0).min(1.0);
+<<<<<<< HEAD
         self.trust_levels.insert(domain.to_string(), new_level);
+=======
+        self.trust_levels
+            .insert(domain.to_string(), new_level);
+>>>>>>> 4b60ced (docs: update README)
 
         // If trust drops below 0.3, count it as an alert.
         if new_level < 0.3 && current >= 0.3 {
@@ -800,6 +817,7 @@ impl ScenarioRunner {
         self.simulated_time_ms = 0;
 
         self.record_event(
+<<<<<<< HEAD
             ScenarioEvent::new(
                 &scenario.id,
                 "_global",
@@ -808,6 +826,10 @@ impl ScenarioRunner {
                 &format!("Started scenario: {}", scenario.name),
             )
             .with_severity(Severity::Info),
+=======
+            ScenarioEvent::new(&scenario.id, "_global", None, "scenario_start", &format!("Started scenario: {}", scenario.name))
+                .with_severity(Severity::Info),
+>>>>>>> 4b60ced (docs: update README)
         );
 
         Ok(())
@@ -821,10 +843,14 @@ impl ScenarioRunner {
         self.state = RunnerState::Paused;
         self.record_event(
             ScenarioEvent::new(
+<<<<<<< HEAD
                 self.active_scenario
                     .as_ref()
                     .map(|s| s.id.as_str())
                     .unwrap_or("?"),
+=======
+                self.active_scenario.as_ref().map(|s| s.id.as_str()).unwrap_or("?"),
+>>>>>>> 4b60ced (docs: update README)
                 "_control",
                 None,
                 "paused",
@@ -843,10 +869,14 @@ impl ScenarioRunner {
         self.state = RunnerState::Running;
         self.record_event(
             ScenarioEvent::new(
+<<<<<<< HEAD
                 self.active_scenario
                     .as_ref()
                     .map(|s| s.id.as_str())
                     .unwrap_or("?"),
+=======
+                self.active_scenario.as_ref().map(|s| s.id.as_str()).unwrap_or("?"),
+>>>>>>> 4b60ced (docs: update README)
                 "_control",
                 None,
                 "resumed",
@@ -868,10 +898,14 @@ impl ScenarioRunner {
         self.state = RunnerState::Aborted;
         self.record_event(
             ScenarioEvent::new(
+<<<<<<< HEAD
                 self.active_scenario
                     .as_ref()
                     .map(|s| s.id.as_str())
                     .unwrap_or("?"),
+=======
+                self.active_scenario.as_ref().map(|s| s.id.as_str()).unwrap_or("?"),
+>>>>>>> 4b60ced (docs: update README)
                 "_control",
                 None,
                 "aborted",
@@ -883,12 +917,16 @@ impl ScenarioRunner {
     }
 
     /// Execute a single step against the runner's state, returning the step result.
+<<<<<<< HEAD
     fn execute_step(
         &mut self,
         scenario_id: &str,
         phase: &ScenarioPhase,
         step: &ActionStep,
     ) -> StepResult {
+=======
+    fn execute_step(&mut self, scenario_id: &str, phase: &ScenarioPhase, step: &ActionStep) -> StepResult {
+>>>>>>> 4b60ced (docs: update README)
         let step_start = self.simulated_time_ms;
         let mut step_events: Vec<ScenarioEvent> = Vec::new();
 
@@ -943,6 +981,7 @@ impl ScenarioRunner {
         let phase_start = self.simulated_time_ms;
 
         self.record_event(
+<<<<<<< HEAD
             ScenarioEvent::new(
                 &scenario_id,
                 "_sub",
@@ -951,6 +990,10 @@ impl ScenarioRunner {
                 &format!("Nested scenario '{}' started", scenario.name),
             )
             .with_severity(Severity::Info),
+=======
+            ScenarioEvent::new(&scenario_id, "_sub", None, "sub_scenario_start", &format!("Nested scenario '{}' started", scenario.name))
+                .with_severity(Severity::Info),
+>>>>>>> 4b60ced (docs: update README)
         );
 
         for phase in &scenario.phases {
@@ -967,6 +1010,7 @@ impl ScenarioRunner {
         let duration = self.simulated_time_ms - phase_start;
 
         self.record_event(
+<<<<<<< HEAD
             ScenarioEvent::new(
                 &scenario_id,
                 "_sub",
@@ -975,6 +1019,10 @@ impl ScenarioRunner {
                 &format!("Nested scenario '{}' ended", scenario.name),
             )
             .with_severity(Severity::Info),
+=======
+            ScenarioEvent::new(&scenario_id, "_sub", None, "sub_scenario_end", &format!("Nested scenario '{}' ended", scenario.name))
+                .with_severity(Severity::Info),
+>>>>>>> 4b60ced (docs: update README)
         );
 
         PhaseResult {
@@ -996,6 +1044,7 @@ impl ScenarioRunner {
         let mut phase_events: Vec<ScenarioEvent> = Vec::new();
 
         self.record_event(
+<<<<<<< HEAD
             ScenarioEvent::new(
                 &scenario.id,
                 &phase.id,
@@ -1004,6 +1053,10 @@ impl ScenarioRunner {
                 &format!("Phase '{}' started", phase.name),
             )
             .with_severity(Severity::Info),
+=======
+            ScenarioEvent::new(&scenario.id, &phase.id, None, "phase_start", &format!("Phase '{}' started", phase.name))
+                .with_severity(Severity::Info),
+>>>>>>> 4b60ced (docs: update README)
         );
 
         // Check preconditions.
@@ -1055,8 +1108,12 @@ impl ScenarioRunner {
                                 };
                             }
                             FailurePolicy::Retry { max_attempts } => {
+<<<<<<< HEAD
                                 let attempts =
                                     self.retry_attempts.entry(step.id.clone()).or_insert(0);
+=======
+                                let attempts = self.retry_attempts.entry(step.id.clone()).or_insert(0);
+>>>>>>> 4b60ced (docs: update README)
                                 *attempts += 1;
                                 if *attempts < *max_attempts {
                                     // Re-execute (simplified — in real impl would re-run).
@@ -1077,10 +1134,14 @@ impl ScenarioRunner {
                             &phase.id,
                             None,
                             "phase_timeout",
+<<<<<<< HEAD
                             &format!(
                                 "Phase '{}' timed out after {}ms",
                                 phase.name, phase.timeout_ms
                             ),
+=======
+                            &format!("Phase '{}' timed out after {}ms", phase.name, phase.timeout_ms),
+>>>>>>> 4b60ced (docs: update README)
                         )
                         .with_severity(Severity::High);
                         self.record_event(event.clone());
@@ -1130,6 +1191,7 @@ impl ScenarioRunner {
         let duration = self.simulated_time_ms - phase_start;
 
         self.record_event(
+<<<<<<< HEAD
             ScenarioEvent::new(
                 &scenario.id,
                 &phase.id,
@@ -1138,6 +1200,10 @@ impl ScenarioRunner {
                 &format!("Phase '{}' ended", phase.name),
             )
             .with_severity(Severity::Info),
+=======
+            ScenarioEvent::new(&scenario.id, &phase.id, None, "phase_end", &format!("Phase '{}' ended", phase.name))
+                .with_severity(Severity::Info),
+>>>>>>> 4b60ced (docs: update README)
         );
 
         let outcome = if !required_postconditions_met {
@@ -1173,6 +1239,7 @@ impl ScenarioRunner {
             // All phases done.
             self.state = RunnerState::Completed;
             self.record_event(
+<<<<<<< HEAD
                 ScenarioEvent::new(
                     &scenario.id,
                     "_global",
@@ -1181,6 +1248,10 @@ impl ScenarioRunner {
                     "Scenario completed successfully",
                 )
                 .with_severity(Severity::Info),
+=======
+                ScenarioEvent::new(&scenario.id, "_global", None, "scenario_complete", "Scenario completed successfully")
+                    .with_severity(Severity::Info),
+>>>>>>> 4b60ced (docs: update README)
             );
             return None;
         }
@@ -1194,6 +1265,7 @@ impl ScenarioRunner {
         if scenario.timeout_ms > 0 && self.simulated_time_ms > scenario.timeout_ms {
             self.state = RunnerState::TimedOut;
             self.record_event(
+<<<<<<< HEAD
                 ScenarioEvent::new(
                     &scenario.id,
                     "_global",
@@ -1202,6 +1274,10 @@ impl ScenarioRunner {
                     &format!("Scenario timed out after {}ms", scenario.timeout_ms),
                 )
                 .with_severity(Severity::Critical),
+=======
+                ScenarioEvent::new(&scenario.id, "_global", None, "scenario_timeout", &format!("Scenario timed out after {}ms", scenario.timeout_ms))
+                    .with_severity(Severity::Critical),
+>>>>>>> 4b60ced (docs: update README)
             );
             return Some(result);
         }
@@ -1212,6 +1288,7 @@ impl ScenarioRunner {
         {
             self.state = RunnerState::Aborted;
             self.record_event(
+<<<<<<< HEAD
                 ScenarioEvent::new(
                     &scenario.id,
                     "_global",
@@ -1220,6 +1297,10 @@ impl ScenarioRunner {
                     "Scenario aborted due to phase failure",
                 )
                 .with_severity(Severity::High),
+=======
+                ScenarioEvent::new(&scenario.id, "_global", None, "scenario_aborted", "Scenario aborted due to phase failure")
+                    .with_severity(Severity::High),
+>>>>>>> 4b60ced (docs: update README)
             );
             return Some(result);
         }
@@ -1258,9 +1339,13 @@ impl ScenarioRunner {
             RunnerState::TimedOut => ScenarioOutcome::TimedOut,
             RunnerState::Running | RunnerState::Paused | RunnerState::Idle => {
                 // Check if any phase failed.
+<<<<<<< HEAD
                 let any_failed = phase_results
                     .iter()
                     .any(|p| p.outcome == PhaseOutcome::Failed);
+=======
+                let any_failed = phase_results.iter().any(|p| p.outcome == PhaseOutcome::Failed);
+>>>>>>> 4b60ced (docs: update README)
                 if any_failed {
                     ScenarioOutcome::Failed
                 } else {
@@ -1282,10 +1367,14 @@ impl ScenarioRunner {
             outcome,
             phases_passed,
             phases_total,
+<<<<<<< HEAD
             phase_results
                 .iter()
                 .map(|p| p.step_results.len())
                 .sum::<usize>(),
+=======
+            phase_results.iter().map(|p| p.step_results.len()).sum::<usize>(),
+>>>>>>> 4b60ced (docs: update README)
             scenario.map(|s| s.total_step_count()).unwrap_or(0),
             alert_count,
             duration_ms,
@@ -1345,6 +1434,7 @@ impl ScenarioLibrary {
         let degradation_step = ActionStep {
             id: format!("{}_degrade", target),
             label: format!("Degrade {}", target),
+<<<<<<< HEAD
             description: format!(
                 "Apply {:.1}% trust degradation to {}",
                 degradation * 100.0,
@@ -1356,6 +1446,11 @@ impl ScenarioLibrary {
             } else {
                 Severity::Medium
             },
+=======
+            description: format!("Apply {:.1}% trust degradation to {}", degradation * 100.0, target),
+            target: target.to_string(),
+            severity: if degradation > 0.5 { Severity::High } else { Severity::Medium },
+>>>>>>> 4b60ced (docs: update README)
             trust_degradation: degradation,
             delay_ms: 0,
             sub_scenario: None,
@@ -1372,6 +1467,7 @@ impl ScenarioLibrary {
             sub_scenario: None,
         };
 
+<<<<<<< HEAD
         Scenario::new(
             "single_component_failure",
             &format!("Single Component Failure: {}", target),
@@ -1391,6 +1487,24 @@ impl ScenarioLibrary {
                 .with_step(recovery_step)
                 .with_postcondition(Postcondition::trust_above_optional(target, 0.5)),
         )
+=======
+        Scenario::new("single_component_failure", &format!("Single Component Failure: {}", target))
+            .with_description("Simulates the failure and recovery of a single trusted component")
+            .with_category("failure")
+            .with_tag("component")
+            .with_tag("recovery")
+            .with_phase(
+                ScenarioPhase::new("degrade_phase", "Degradation")
+                    .with_description("Apply trust degradation to the target component")
+                    .with_step(degradation_step),
+            )
+            .with_phase(
+                ScenarioPhase::new("recovery_phase", "Recovery")
+                    .with_description("Attempt to restore trust in the target")
+                    .with_step(recovery_step)
+                    .with_postcondition(Postcondition::trust_above_optional(target, 0.5)),
+            )
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Build a cascade failure scenario across multiple components.
@@ -1453,6 +1567,7 @@ impl ScenarioLibrary {
         let mut degradation_steps = vec![primary_step];
         degradation_steps.extend(cascade_steps);
 
+<<<<<<< HEAD
         Scenario::new(
             "cascade_failure",
             &format!("Cascade Failure from {}", primary),
@@ -1472,6 +1587,24 @@ impl ScenarioLibrary {
                 .with_description("Recover all affected components concurrently")
                 .with_postcondition(Postcondition::trust_above_optional(primary, 0.4)),
         )
+=======
+        Scenario::new("cascade_failure", &format!("Cascade Failure from {}", primary))
+            .with_description("Simulates a cascading failure from a primary component to dependents")
+            .with_category("failure")
+            .with_tag("cascade")
+            .with_tag("multi-component")
+            .with_phase(
+                ScenarioPhase::new("cascade_degrade", "Cascade Degradation")
+                    .with_description("Primary failure cascades to secondary components")
+                    .with_step(degradation_steps.remove(0))
+                    .with_step(degradation_steps.remove(0)),
+            )
+            .with_phase(
+                ScenarioPhase::new_parallel("parallel_recovery", "Parallel Recovery")
+                    .with_description("Recover all affected components concurrently")
+                    .with_postcondition(Postcondition::trust_above_optional(primary, 0.4)),
+            )
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Build a DDoS simulation scenario.
@@ -1486,11 +1619,15 @@ impl ScenarioLibrary {
                 label: format!("DDoS burst #{}", i + 1),
                 description: format!("Request burst {} targeting {}", i + 1, target),
                 target: target.to_string(),
+<<<<<<< HEAD
                 severity: if burst_degradation > 0.1 {
                     Severity::Medium
                 } else {
                     Severity::Low
                 },
+=======
+                severity: if burst_degradation > 0.1 { Severity::Medium } else { Severity::Low },
+>>>>>>> 4b60ced (docs: update README)
                 trust_degradation: burst_degradation,
                 delay_ms: 50,
                 sub_scenario: None,
@@ -1509,9 +1646,13 @@ impl ScenarioLibrary {
         };
 
         Scenario::new("ddos_simulation", &format!("DDoS Attack on {}", target))
+<<<<<<< HEAD
             .with_description(
                 "Simulates a distributed denial of service attack with repeated bursts",
             )
+=======
+            .with_description("Simulates a distributed denial of service attack with repeated bursts")
+>>>>>>> 4b60ced (docs: update README)
             .with_category("attack")
             .with_tag("ddos")
             .with_tag("availability")
@@ -1605,10 +1746,14 @@ impl ScenarioLibrary {
         let escalation_step = ActionStep {
             id: format!("insider_escalate_{}", insider_id),
             label: "Privilege Escalation".to_string(),
+<<<<<<< HEAD
             description: format!(
                 "Insider {} escalates privileges beyond authorised level",
                 insider_id
             ),
+=======
+            description: format!("Insider {} escalates privileges beyond authorised level", insider_id),
+>>>>>>> 4b60ced (docs: update README)
             target: "access_control".to_string(),
             severity: Severity::High,
             trust_degradation: 0.4,
@@ -1654,11 +1799,15 @@ impl ScenarioLibrary {
             label: format!("Zero-day exploit on {}", component),
             description: format!("Unknown vulnerability exploited in {}", component),
             target: component.to_string(),
+<<<<<<< HEAD
             severity: if exploit_severity > 0.7 {
                 Severity::Critical
             } else {
                 Severity::High
             },
+=======
+            severity: if exploit_severity > 0.7 { Severity::Critical } else { Severity::High },
+>>>>>>> 4b60ced (docs: update README)
             trust_degradation: exploit_severity,
             delay_ms: 0,
             sub_scenario: None,
@@ -1710,8 +1859,12 @@ impl ScenarioLibrary {
         let mut phases: Vec<ScenarioPhase> = Vec::new();
 
         for (idx, &component) in components.iter().enumerate() {
+<<<<<<< HEAD
             let sub =
                 ScenarioLibrary::single_component_failure(component, 0.4 + (idx as f64 * 0.05));
+=======
+            let sub = ScenarioLibrary::single_component_failure(component, 0.4 + (idx as f64 * 0.05));
+>>>>>>> 4b60ced (docs: update README)
 
             let wrapper_step = ActionStep {
                 id: format!("stress_sub_{}", component),
@@ -1734,6 +1887,7 @@ impl ScenarioLibrary {
             );
         }
 
+<<<<<<< HEAD
         let mut scenario = Scenario::new(
             "combined_stress_test",
             "Combined Multi-Component Stress Test",
@@ -1745,6 +1899,14 @@ impl ScenarioLibrary {
         .with_tag("stress")
         .with_tag("multi-component")
         .with_timeout_ms(30000);
+=======
+        let mut scenario = Scenario::new("combined_stress_test", "Combined Multi-Component Stress Test")
+            .with_description("Runs nested failure/recovery scenarios across multiple components in sequence")
+            .with_category("stress")
+            .with_tag("stress")
+            .with_tag("multi-component")
+            .with_timeout_ms(30000);
+>>>>>>> 4b60ced (docs: update README)
         for phase in phases {
             scenario = scenario.with_phase(phase);
         }
@@ -1955,10 +2117,14 @@ impl ResultAggregator {
         }
         let mut per_scenario: HashMap<String, ScenarioAggStats> = HashMap::new();
         for (scenario_id, group) in scenario_groups {
+<<<<<<< HEAD
             let sc_passes = group
                 .iter()
                 .filter(|r| r.outcome == ScenarioOutcome::Passed)
                 .count();
+=======
+            let sc_passes = group.iter().filter(|r| r.outcome == ScenarioOutcome::Passed).count();
+>>>>>>> 4b60ced (docs: update README)
             let sc_durations: Vec<u64> = group.iter().map(|r| r.duration_ms).collect();
             let sc_mean_trusts: Vec<f64> = group
                 .iter()
@@ -2108,8 +2274,16 @@ impl ResultAggregator {
         if values.len() <= 1 {
             return 0.0;
         }
+<<<<<<< HEAD
         let variance =
             values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / (values.len() - 1) as f64;
+=======
+        let variance = values
+            .iter()
+            .map(|v| (v - mean).powi(2))
+            .sum::<f64>()
+            / (values.len() - 1) as f64;
+>>>>>>> 4b60ced (docs: update README)
         variance.sqrt()
     }
 }
@@ -2212,17 +2386,29 @@ impl CronExpression {
             }
             if let Some(range) = trimmed.find('-') {
                 // Range: use the start value.
+<<<<<<< HEAD
                 let start = trimmed[..range]
                     .parse::<u32>()
                     .map_err(|_| format!("Invalid {} range start: '{}'", name, trimmed))?;
+=======
+                let start = trimmed[..range].parse::<u32>().map_err(|_| {
+                    format!("Invalid {} range start: '{}'", name, trimmed)
+                })?;
+>>>>>>> 4b60ced (docs: update README)
                 if start > max {
                     return Err(format!("{} value {} exceeds maximum {}", name, start, max));
                 }
                 Ok(Some(start))
             } else {
+<<<<<<< HEAD
                 let val = trimmed
                     .parse::<u32>()
                     .map_err(|_| format!("Invalid {} value: '{}'", name, trimmed))?;
+=======
+                let val = trimmed.parse::<u32>().map_err(|_| {
+                    format!("Invalid {} value: '{}'", name, trimmed)
+                })?;
+>>>>>>> 4b60ced (docs: update README)
                 if val > max {
                     return Err(format!("{} value {} exceeds maximum {}", name, val, max));
                 }
@@ -2565,6 +2751,7 @@ mod tests {
 
     #[test]
     fn severity_weight_range() {
+<<<<<<< HEAD
         for sev in &[
             Severity::Info,
             Severity::Low,
@@ -2572,6 +2759,9 @@ mod tests {
             Severity::High,
             Severity::Critical,
         ] {
+=======
+        for sev in &[Severity::Info, Severity::Low, Severity::Medium, Severity::High, Severity::Critical] {
+>>>>>>> 4b60ced (docs: update README)
             let w = sev.weight();
             assert!(w <= 4, "weight {} out of range", w);
             let f = sev.as_f64();
@@ -2719,7 +2909,12 @@ mod tests {
 
     #[test]
     fn scenario_all_tags_includes_nested() {
+<<<<<<< HEAD
         let inner = Scenario::new("inner", "Inner").with_tag("nested_tag");
+=======
+        let inner = Scenario::new("inner", "Inner")
+            .with_tag("nested_tag");
+>>>>>>> 4b60ced (docs: update README)
         let inner_step = ActionStep {
             id: "s1".into(),
             label: "S1".into(),
@@ -2767,6 +2962,7 @@ mod tests {
     fn runner_pause_resume() {
         let mut scenario = build_simple_scenario();
         // Add a second phase so we can pause mid-execution.
+<<<<<<< HEAD
         scenario = scenario.with_phase(ScenarioPhase::new("p2", "Second Phase").with_step(
             ActionStep {
                 id: "s2".into(),
@@ -2779,6 +2975,21 @@ mod tests {
                 sub_scenario: None,
             },
         ));
+=======
+        scenario = scenario.with_phase(
+            ScenarioPhase::new("p2", "Second Phase")
+                .with_step(ActionStep {
+                    id: "s2".into(),
+                    label: "Step 2".into(),
+                    description: "".into(),
+                    target: "model".into(),
+                    severity: Severity::Low,
+                    trust_degradation: 0.05,
+                    delay_ms: 0,
+                    sub_scenario: None,
+                }),
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         let mut runner = ScenarioRunner::new();
         runner.set_trust_levels(trust_map(&[("decision", 1.0), ("model", 1.0)]));
@@ -2835,10 +3046,14 @@ mod tests {
         runner.run_to_completion();
 
         assert!(runner.events().len() > 0);
+<<<<<<< HEAD
         let has_start = runner
             .events()
             .iter()
             .any(|e| e.event_type == "scenario_start");
+=======
+        let has_start = runner.events().iter().any(|e| e.event_type == "scenario_start");
+>>>>>>> 4b60ced (docs: update README)
         assert!(has_start);
     }
 
@@ -2850,6 +3065,7 @@ mod tests {
         runner.start(scenario).unwrap();
         let result = runner.run_to_completion();
 
+<<<<<<< HEAD
         let final_decision = result
             .final_trust_levels
             .get("decision")
@@ -2860,6 +3076,10 @@ mod tests {
             "Expected degradation but got {}",
             final_decision
         );
+=======
+        let final_decision = result.final_trust_levels.get("decision").copied().unwrap_or(1.0);
+        assert!(final_decision < 1.0, "Expected degradation but got {}", final_decision);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2884,6 +3104,7 @@ mod tests {
 
     #[test]
     fn runner_phase_precondition_skip() {
+<<<<<<< HEAD
         let scenario = Scenario::new("pre_test", "Precondition Test").with_phase(
             ScenarioPhase::new("p1", "Should Skip")
                 .with_precondition(Precondition::trust_above("decision", 0.99))
@@ -2898,6 +3119,23 @@ mod tests {
                     sub_scenario: None,
                 }),
         );
+=======
+        let scenario = Scenario::new("pre_test", "Precondition Test")
+            .with_phase(
+                ScenarioPhase::new("p1", "Should Skip")
+                    .with_precondition(Precondition::trust_above("decision", 0.99))
+                    .with_step(ActionStep {
+                        id: "s1".into(),
+                        label: "S1".into(),
+                        description: "".into(),
+                        target: "decision".into(),
+                        severity: Severity::High,
+                        trust_degradation: 0.5,
+                        delay_ms: 0,
+                        sub_scenario: None,
+                    }),
+            );
+>>>>>>> 4b60ced (docs: update README)
 
         let mut runner = ScenarioRunner::new();
         runner.set_trust_levels(trust_map(&[("decision", 0.5)])); // Below 0.99
@@ -2976,6 +3214,7 @@ mod tests {
 
     // ── Result Aggregation tests ──
 
+<<<<<<< HEAD
     fn make_run_result(
         id: &str,
         name: &str,
@@ -2983,6 +3222,9 @@ mod tests {
         duration_ms: u64,
         trust: f64,
     ) -> ScenarioRunResult {
+=======
+    fn make_run_result(id: &str, name: &str, outcome: ScenarioOutcome, duration_ms: u64, trust: f64) -> ScenarioRunResult {
+>>>>>>> 4b60ced (docs: update README)
         ScenarioRunResult {
             scenario_id: id.to_string(),
             scenario_name: name.to_string(),
@@ -3011,6 +3253,7 @@ mod tests {
     #[test]
     fn aggregator_single_run() {
         let mut agg = ResultAggregator::new();
+<<<<<<< HEAD
         agg.add_result(make_run_result(
             "s1",
             "Scenario 1",
@@ -3018,6 +3261,9 @@ mod tests {
             100,
             0.8,
         ));
+=======
+        agg.add_result(make_run_result("s1", "Scenario 1", ScenarioOutcome::Passed, 100, 0.8));
+>>>>>>> 4b60ced (docs: update README)
         let stats = agg.aggregate();
         assert_eq!(stats.total_runs, 1);
         assert_eq!(stats.passed_runs, 1);
@@ -3028,6 +3274,7 @@ mod tests {
     #[test]
     fn aggregator_multiple_runs() {
         let mut agg = ResultAggregator::new();
+<<<<<<< HEAD
         agg.add_result(make_run_result(
             "s1",
             "S1",
@@ -3056,6 +3303,12 @@ mod tests {
             500,
             0.1,
         ));
+=======
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 100, 0.8));
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Failed, 200, 0.3));
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 150, 0.7));
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::TimedOut, 500, 0.1));
+>>>>>>> 4b60ced (docs: update README)
 
         let stats = agg.aggregate();
         assert_eq!(stats.total_runs, 4);
@@ -3072,6 +3325,7 @@ mod tests {
     #[test]
     fn aggregator_trust_impact() {
         let mut agg = ResultAggregator::new();
+<<<<<<< HEAD
         agg.add_result(make_run_result(
             "s1",
             "S1",
@@ -3093,6 +3347,11 @@ mod tests {
             100,
             0.7,
         ));
+=======
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 100, 0.9));
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 100, 0.5));
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 100, 0.7));
+>>>>>>> 4b60ced (docs: update README)
 
         let stats = agg.aggregate();
         let decision_stats = stats.trust_impact.get("decision").unwrap();
@@ -3103,6 +3362,7 @@ mod tests {
     #[test]
     fn comparison_report() {
         let mut agg_a = ResultAggregator::new();
+<<<<<<< HEAD
         agg_a.add_result(make_run_result(
             "s1",
             "S1",
@@ -3119,6 +3379,12 @@ mod tests {
             150,
             0.8,
         ));
+=======
+        agg_a.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 200, 0.6));
+
+        let mut agg_b = ResultAggregator::new();
+        agg_b.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 150, 0.8));
+>>>>>>> 4b60ced (docs: update README)
 
         let stats_a = agg_a.aggregate();
         let stats_b = agg_b.aggregate();
@@ -3132,6 +3398,7 @@ mod tests {
     #[test]
     fn comparison_identifies_regressions() {
         let mut agg_a = ResultAggregator::new();
+<<<<<<< HEAD
         agg_a.add_result(make_run_result(
             "s1",
             "S1",
@@ -3148,6 +3415,12 @@ mod tests {
             300,
             0.2,
         ));
+=======
+        agg_a.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 100, 0.9));
+
+        let mut agg_b = ResultAggregator::new();
+        agg_b.add_result(make_run_result("s1", "S1", ScenarioOutcome::Failed, 300, 0.2));
+>>>>>>> 4b60ced (docs: update README)
 
         let stats_a = agg_a.aggregate();
         let stats_b = agg_b.aggregate();
@@ -3186,6 +3459,7 @@ mod tests {
     fn cron_matches() {
         let cron = CronExpression::parse("30 14 15 *").unwrap();
         // Construct a DateTime at 14:30 on the 15th.
+<<<<<<< HEAD
         let dt = DateTime::parse_from_rfc3339("2025-01-15T14:30:00Z")
             .unwrap()
             .with_timezone(&Utc);
@@ -3195,15 +3469,26 @@ mod tests {
         let dt2 = DateTime::parse_from_rfc3339("2025-01-15T14:31:00Z")
             .unwrap()
             .with_timezone(&Utc);
+=======
+        let dt = DateTime::parse_from_rfc3339("2025-01-15T14:30:00Z").unwrap().with_timezone(&Utc);
+        assert!(cron.matches(&dt));
+
+        // Different minute.
+        let dt2 = DateTime::parse_from_rfc3339("2025-01-15T14:31:00Z").unwrap().with_timezone(&Utc);
+>>>>>>> 4b60ced (docs: update README)
         assert!(!cron.matches(&dt2));
     }
 
     #[test]
     fn cron_next_match() {
         let cron = CronExpression::parse("0 12 * *").unwrap(); // Every day at noon.
+<<<<<<< HEAD
         let before = DateTime::parse_from_rfc3339("2025-01-15T11:59:00Z")
             .unwrap()
             .with_timezone(&Utc);
+=======
+        let before = DateTime::parse_from_rfc3339("2025-01-15T11:59:00Z").unwrap().with_timezone(&Utc);
+>>>>>>> 4b60ced (docs: update README)
         let next = cron.next_match_after(&before);
         assert_eq!(next.hour(), 12);
         assert_eq!(next.minute(), 0);
@@ -3287,8 +3572,13 @@ mod tests {
         let scenario = build_simple_scenario();
         // Set cron to match every minute.
         let cron = CronExpression::parse("* * * *").unwrap();
+<<<<<<< HEAD
         let sched =
             ScheduledScenario::new("sched_every_min", scenario, cron).with_max_concurrent(1);
+=======
+        let sched = ScheduledScenario::new("sched_every_min", scenario, cron)
+            .with_max_concurrent(1);
+>>>>>>> 4b60ced (docs: update README)
 
         scheduler.register(sched);
 
@@ -3341,12 +3631,19 @@ mod tests {
         let cron = CronExpression::parse("0 * * *").unwrap();
 
         scheduler.register(
+<<<<<<< HEAD
             ScheduledScenario::new("s1", build_simple_scenario(), cron.clone())
                 .with_tag("security"),
         );
         scheduler.register(
             ScheduledScenario::new("s2", build_simple_scenario(), cron.clone())
                 .with_tag("performance"),
+=======
+            ScheduledScenario::new("s1", build_simple_scenario(), cron.clone()).with_tag("security"),
+        );
+        scheduler.register(
+            ScheduledScenario::new("s2", build_simple_scenario(), cron.clone()).with_tag("performance"),
+>>>>>>> 4b60ced (docs: update README)
         );
         scheduler.register(
             ScheduledScenario::new("s3", build_simple_scenario(), cron).with_tag("security"),
@@ -3379,6 +3676,7 @@ mod tests {
     #[test]
     fn aggregated_results_serialization_roundtrip() {
         let mut agg = ResultAggregator::new();
+<<<<<<< HEAD
         agg.add_result(make_run_result(
             "s1",
             "S1",
@@ -3393,6 +3691,10 @@ mod tests {
             200,
             0.4,
         ));
+=======
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Passed, 100, 0.9));
+        agg.add_result(make_run_result("s1", "S1", ScenarioOutcome::Failed, 200, 0.4));
+>>>>>>> 4b60ced (docs: update README)
         let stats = agg.aggregate();
         let json = serde_json::to_string(&stats).unwrap();
         let restored: AggregatedResults = serde_json::from_str(&json).unwrap();
@@ -3426,7 +3728,14 @@ mod tests {
     // ── Helpers ──
 
     fn trust_map(pairs: &[(&str, f64)]) -> HashMap<String, f64> {
+<<<<<<< HEAD
         pairs.iter().map(|(k, v)| (k.to_string(), *v)).collect()
+=======
+        pairs
+            .iter()
+            .map(|(k, v)| (k.to_string(), *v))
+            .collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     fn build_simple_scenario() -> Scenario {

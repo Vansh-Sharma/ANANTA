@@ -1,5 +1,6 @@
 // CapabilityGuard — controls what capabilities an agent can access.
 
+<<<<<<< HEAD
 use super::agent_policy::AgentType;
 use std::collections::HashMap;
 
@@ -14,6 +15,15 @@ pub enum Capability {
     EmailSend,
     DatabaseAccess,
     FileDelete,
+=======
+use std::collections::HashMap;
+use super::agent_policy::AgentType;
+
+#[derive(Debug, Clone, serde::Serialize, PartialEq, Eq, Hash)]
+pub enum Capability {
+    CodeExecution, FileWrite, NetworkAccess, ApiCalls, MemoryAccess,
+    ShellAccess, EmailSend, DatabaseAccess, FileDelete,
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -25,6 +35,7 @@ pub struct CapabilityGuardConfig {
     pub capability_policy: HashMap<String, Vec<String>>,
 }
 
+<<<<<<< HEAD
 fn default_enabled() -> bool {
     true
 }
@@ -36,6 +47,12 @@ impl Default for CapabilityGuardConfig {
             capability_policy: HashMap::new(),
         }
     }
+=======
+fn default_enabled() -> bool { true }
+
+impl Default for CapabilityGuardConfig {
+    fn default() -> Self { Self { enabled: default_enabled(), capability_policy: HashMap::new() } }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 pub struct CapabilityGuardResult {
@@ -47,6 +64,7 @@ pub struct CapabilityGuardResult {
 
 fn type_capabilities(agent_type: &AgentType) -> Vec<Capability> {
     match agent_type {
+<<<<<<< HEAD
         AgentType::Coder => vec![
             Capability::CodeExecution,
             Capability::FileWrite,
@@ -59,6 +77,12 @@ fn type_capabilities(agent_type: &AgentType) -> Vec<Capability> {
             Capability::ApiCalls,
             Capability::DatabaseAccess,
         ],
+=======
+        AgentType::Coder => vec![Capability::CodeExecution, Capability::FileWrite, Capability::FileDelete],
+        AgentType::Researcher => vec![Capability::NetworkAccess, Capability::ApiCalls],
+        AgentType::Assistant => vec![Capability::MemoryAccess],
+        AgentType::Analyst => vec![Capability::NetworkAccess, Capability::ApiCalls, Capability::DatabaseAccess],
+>>>>>>> 4b60ced (docs: update README)
         AgentType::Custom(_) => vec![],
     }
 }
@@ -81,6 +105,7 @@ fn parse_capability(s: &str) -> Option<Capability> {
 fn tool_to_capability(tool: &str) -> Vec<Capability> {
     let t = tool.to_lowercase();
     let mut caps = Vec::new();
+<<<<<<< HEAD
     if t.contains("code_exec") || t.contains("python") || t.contains("node") {
         caps.push(Capability::CodeExecution);
     }
@@ -130,6 +155,28 @@ impl CapabilityGuard {
                 denied_capabilities: vec![],
                 reason: "capability guard disabled".into(),
             };
+=======
+    if t.contains("code_exec") || t.contains("python") || t.contains("node") { caps.push(Capability::CodeExecution); }
+    if t.contains("file_write") || t.contains("create_file") || t.contains("save") { caps.push(Capability::FileWrite); }
+    if t.contains("file_delete") || t.contains("remove") { caps.push(Capability::FileDelete); }
+    if t.contains("http") || t.contains("curl") || t.contains("fetch") || t.contains("network") { caps.push(Capability::NetworkAccess); }
+    if t.contains("api_call") || t.contains("rest") { caps.push(Capability::ApiCalls); }
+    if t.contains("memory") || t.contains("rag") { caps.push(Capability::MemoryAccess); }
+    if t.contains("shell") || t.contains("bash") || t.contains("cmd") { caps.push(Capability::ShellAccess); }
+    if t.contains("email") || t.contains("smtp") { caps.push(Capability::EmailSend); }
+    if t.contains("sql") || t.contains("db") || t.contains("database") { caps.push(Capability::DatabaseAccess); }
+    caps
+}
+
+pub struct CapabilityGuard { config: CapabilityGuardConfig }
+
+impl CapabilityGuard {
+    pub fn new(config: &CapabilityGuardConfig) -> Self { Self { config: config.clone() } }
+
+    pub fn evaluate(&self, agent_type: &AgentType, tools: &[String]) -> CapabilityGuardResult {
+        if !self.config.enabled {
+            return CapabilityGuardResult { allowed: true, granted: vec![], denied_capabilities: vec![], reason: "capability guard disabled".into() };
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let type_key = match agent_type {
@@ -137,12 +184,20 @@ impl CapabilityGuard {
             other => format!("{:?}", other).to_lowercase(),
         };
 
+<<<<<<< HEAD
         let granted: Vec<Capability> =
             if let Some(policy) = self.config.capability_policy.get(&type_key) {
                 policy.iter().filter_map(|c| parse_capability(c)).collect()
             } else {
                 type_capabilities(agent_type)
             };
+=======
+        let granted: Vec<Capability> = if let Some(policy) = self.config.capability_policy.get(&type_key) {
+            policy.iter().filter_map(|c| parse_capability(c)).collect()
+        } else {
+            type_capabilities(agent_type)
+        };
+>>>>>>> 4b60ced (docs: update README)
 
         let granted_set: std::collections::HashSet<_> = granted.iter().collect();
         let mut required_caps = Vec::new();
@@ -156,6 +211,7 @@ impl CapabilityGuard {
 
         let denied: Vec<String> = required_caps.iter().map(|c| format!("{:?}", c)).collect();
         let allowed = denied.is_empty();
+<<<<<<< HEAD
         let reason = if allowed {
             "all required capabilities granted".into()
         } else {
@@ -168,6 +224,11 @@ impl CapabilityGuard {
             denied_capabilities: denied,
             reason,
         }
+=======
+        let reason = if allowed { "all required capabilities granted".into() } else { format!("denied capabilities: {}", denied.join(", ")) };
+
+        CapabilityGuardResult { allowed, granted, denied_capabilities: denied, reason }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -175,9 +236,13 @@ impl CapabilityGuard {
 mod tests {
     use super::*;
 
+<<<<<<< HEAD
     fn default_guard() -> CapabilityGuard {
         CapabilityGuard::new(&CapabilityGuardConfig::default())
     }
+=======
+    fn default_guard() -> CapabilityGuard { CapabilityGuard::new(&CapabilityGuardConfig::default()) }
+>>>>>>> 4b60ced (docs: update README)
 
     #[test]
     fn coder_has_code_execution() {
@@ -211,10 +276,14 @@ mod tests {
     #[test]
     fn multiple_tools_checked() {
         let g = default_guard();
+<<<<<<< HEAD
         let r = g.evaluate(
             &AgentType::Assistant,
             &["shell_exec".into(), "code_execution".into()],
         );
+=======
+        let r = g.evaluate(&AgentType::Assistant, &["shell_exec".into(), "code_execution".into()]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(!r.allowed);
         assert!(r.denied_capabilities.len() >= 2);
     }

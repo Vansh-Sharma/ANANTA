@@ -135,7 +135,14 @@ impl SsrfProtector {
                         code: "EXEC_SSRF_BLOCKED".into(),
                         retry_after: None,
                     },
+<<<<<<< HEAD
                     reason: format!("target '{}' resolves to blocked range '{}'", target, label),
+=======
+                    reason: format!(
+                        "target '{}' resolves to blocked range '{}'",
+                        target, label
+                    ),
+>>>>>>> 4b60ced (docs: update README)
                     checked_target: target.into(),
                     matched_range: Some(label),
                     latency_ms: start.elapsed().as_secs_f64() * 1000.0,
@@ -221,18 +228,26 @@ impl SsrfProtector {
 
     /// Check if an IP address falls within any blocked range.
     fn check_ip(&self, ip: &IpAddr) -> Option<(ipnet::IpNet, String)> {
+<<<<<<< HEAD
         self.blocked_networks
             .iter()
             .find(|(net, _)| net.contains(ip))
             .cloned()
+=======
+        self.blocked_networks.iter().find(|(net, _)| net.contains(ip)).cloned()
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
 /// Extract hostname from a URL string.
 fn extract_host_from_url(target: &str) -> Option<String> {
+<<<<<<< HEAD
     let t = target
         .trim_start_matches("http://")
         .trim_start_matches("https://");
+=======
+    let t = target.trim_start_matches("http://").trim_start_matches("https://");
+>>>>>>> 4b60ced (docs: update README)
     let host = t.split('/').next()?;
     let host = host.split(':').next()?; // Remove port
     if host.is_empty() {
@@ -254,9 +269,13 @@ fn is_internal_hostname(host: &str) -> bool {
         "kubernetes.default",
         "kubernetes.default.svc",
     ];
+<<<<<<< HEAD
     internal_names
         .iter()
         .any(|name| lower == *name || lower.ends_with(&format!(".{}", name)))
+=======
+    internal_names.iter().any(|name| lower == *name || lower.ends_with(&format!(".{}", name)))
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[cfg(test)]
@@ -301,6 +320,7 @@ mod tests {
     #[test]
     fn block_url_with_internal_host() {
         let engine = default_engine();
+<<<<<<< HEAD
         assert!(engine
             .evaluate("http://169.254.169.254/latest/meta-data/")
             .decision
@@ -309,6 +329,10 @@ mod tests {
             .evaluate("http://localhost:8080/admin")
             .decision
             .is_deny());
+=======
+        assert!(engine.evaluate("http://169.254.169.254/latest/meta-data/").decision.is_deny());
+        assert!(engine.evaluate("http://localhost:8080/admin").decision.is_deny());
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -321,6 +345,7 @@ mod tests {
     #[test]
     fn block_internal_hostname() {
         let engine = default_engine();
+<<<<<<< HEAD
         assert!(engine
             .evaluate("http://metadata.google.internal/")
             .decision
@@ -329,6 +354,10 @@ mod tests {
             .evaluate("http://kubernetes.default.svc/api")
             .decision
             .is_deny());
+=======
+        assert!(engine.evaluate("http://metadata.google.internal/").decision.is_deny());
+        assert!(engine.evaluate("http://kubernetes.default.svc/api").decision.is_deny());
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

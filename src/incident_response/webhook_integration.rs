@@ -148,7 +148,11 @@ impl WebhookPayload for SlackPayload {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
+<<<<<<< HEAD
                     "text": format!(":rotating_light: Security Incident: {}",
+=======
+                    "text": format!(":rotating_light: Security Incident: {}", 
+>>>>>>> 4b60ced (docs: update README)
                         format!("{:?}", event.event_type).replace("_", " "))
                 }
             }),
@@ -262,7 +266,11 @@ impl WebhookPayload for JiraPayload {
         };
 
         let mut fields = serde_json::json!({
+<<<<<<< HEAD
             "summary": format!("[Security] Incident {} - {}",
+=======
+            "summary": format!("[Security] Incident {} - {}", 
+>>>>>>> 4b60ced (docs: update README)
                 event.incident_id,
                 format!("{:?}", event.event_type).replace("_", " ")
             ),
@@ -351,10 +359,14 @@ impl WebhookSender {
     pub fn rate_limit_check(&mut self, endpoint: &WebhookEndpoint) -> bool {
         let now = Instant::now();
         let limit = endpoint.rate_limit_per_min;
+<<<<<<< HEAD
         let entry = self
             .rate_limits
             .entry(endpoint.name.clone())
             .or_insert((0, now));
+=======
+        let entry = self.rate_limits.entry(endpoint.name.clone()).or_insert((0, now));
+>>>>>>> 4b60ced (docs: update README)
 
         // Reset window if more than 60 seconds have passed
         if now.duration_since(entry.1).as_secs() >= 60 {
@@ -394,8 +406,13 @@ impl WebhookSender {
         }
 
         let payload = self.build_payload(endpoint, event);
+<<<<<<< HEAD
         let payload_str =
             serde_json::to_string(&payload).map_err(|e| Error::Serialization(e.to_string()))?;
+=======
+        let payload_str = serde_json::to_string(&payload)
+            .map_err(|e| Error::Serialization(e.to_string()))?;
+>>>>>>> 4b60ced (docs: update README)
 
         let mut headers = endpoint.headers.clone();
         headers.insert("Content-Type".to_string(), "application/json".to_string());
@@ -526,10 +543,15 @@ mod tests {
 
     #[test]
     fn test_endpoint_handles_event() {
+<<<<<<< HEAD
         let ep = WebhookEndpoint::new("test", "https://example.com").with_events(vec![
             WebhookEventType::IncidentDetected,
             WebhookEventType::IncidentResolved,
         ]);
+=======
+        let ep = WebhookEndpoint::new("test", "https://example.com")
+            .with_events(vec![WebhookEventType::IncidentDetected, WebhookEventType::IncidentResolved]);
+>>>>>>> 4b60ced (docs: update README)
 
         assert!(ep.handles_event(&WebhookEventType::IncidentDetected));
         assert!(ep.handles_event(&WebhookEventType::IncidentResolved));
@@ -593,10 +615,14 @@ mod tests {
         let event = make_event(WebhookEventType::IncidentDetected);
         let payload = builder.build(&event);
 
+<<<<<<< HEAD
         assert!(payload["fields"]["summary"]
             .as_str()
             .unwrap()
             .contains("Security"));
+=======
+        assert!(payload["fields"]["summary"].as_str().unwrap().contains("Security"));
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(payload["fields"]["project"]["key"], "SEC");
         assert_eq!(payload["fields"]["issuetype"]["name"], "Bug");
     }

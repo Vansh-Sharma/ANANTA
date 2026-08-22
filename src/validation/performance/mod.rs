@@ -19,6 +19,10 @@ pub use metrics_collector::{
     LatencySummary, MetricsCollector, MetricsConfig, PerformanceSample, ThroughputPoint,
 };
 pub use profiler::{Profiler, RegionGuard, RegionSummary};
+<<<<<<< HEAD
 pub use report_gen::{
     check_targets, generate_report, PerformanceReport, PerformanceTargets, TargetsMet,
 };
+=======
+pub use report_gen::{PerformanceReport, PerformanceTargets, TargetsMet, generate_report, check_targets};
+>>>>>>> 4b60ced (docs: update README)

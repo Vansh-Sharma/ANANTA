@@ -222,7 +222,15 @@ impl HealthMonitor {
 
     /// Get all unique targets that have been sampled.
     pub fn sampled_targets(&self) -> Vec<FaultTarget> {
+<<<<<<< HEAD
         let mut targets: Vec<FaultTarget> = self.samples.iter().map(|s| s.target.clone()).collect();
+=======
+        let mut targets: Vec<FaultTarget> = self
+            .samples
+            .iter()
+            .map(|s| s.target.clone())
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
         targets.sort_by(|a, b| a.label().cmp(b.label()));
         targets.dedup();
         targets

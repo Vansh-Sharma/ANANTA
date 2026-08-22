@@ -126,6 +126,7 @@ impl ModelUpdate {
 
     /// Compute the weighted divergence from another update's weights.
     pub fn compute_weight_divergence(&self, other: &ModelUpdate) -> f64 {
+<<<<<<< HEAD
         let self_map: HashMap<&str, &ModelWeight> = self
             .weights
             .iter()
@@ -136,14 +137,24 @@ impl ModelUpdate {
             .iter()
             .map(|w| (w.layer_name.as_str(), w))
             .collect();
+=======
+        let self_map: HashMap<&str, &ModelWeight> =
+            self.weights.iter().map(|w| (w.layer_name.as_str(), w)).collect();
+        let other_map: HashMap<&str, &ModelWeight> =
+            other.weights.iter().map(|w| (w.layer_name.as_str(), w)).collect();
+>>>>>>> 4b60ced (docs: update README)
 
         let total_sq: f64 = self_map
             .keys()
             .filter_map(|k| {
                 self_map.get(k).and_then(|a| {
+<<<<<<< HEAD
                     other_map
                         .get(k)
                         .and_then(|b| a.compute_weight_divergence(b))
+=======
+                    other_map.get(k).and_then(|b| a.compute_weight_divergence(b))
+>>>>>>> 4b60ced (docs: update README)
                 })
             })
             .map(|d| d * d)
@@ -194,11 +205,17 @@ impl GlobalModel {
 
     /// Compute the total L2 norm of all weights.
     pub fn total_norm(&self) -> f64 {
+<<<<<<< HEAD
         let norm_sq: f64 = self
             .weights
             .iter()
             .map(|w| w.weights.iter().map(|v| v * v).sum::<f64>())
             .sum();
+=======
+        let norm_sq: f64 = self.weights.iter().map(|w| {
+            w.weights.iter().map(|v| v * v).sum::<f64>()
+        }).sum();
+>>>>>>> 4b60ced (docs: update README)
         norm_sq.sqrt()
     }
 }
@@ -308,7 +325,12 @@ impl FedAvgAggregator {
 
         // Collect all unique layer names in order.
         let mut layer_order: Vec<String> = Vec::new();
+<<<<<<< HEAD
         let mut seen_layers: std::collections::HashSet<String> = std::collections::HashSet::new();
+=======
+        let mut seen_layers: std::collections::HashSet<String> =
+            std::collections::HashSet::new();
+>>>>>>> 4b60ced (docs: update README)
         for update in &validated {
             for w in &update.weights {
                 if seen_layers.insert(w.layer_name.clone()) {
@@ -336,9 +358,13 @@ impl FedAvgAggregator {
                         if *ws != layer_w.weights.len() {
                             return Err(Error::Evaluation(format!(
                                 "Layer '{}' size mismatch: {} vs {}",
+<<<<<<< HEAD
                                 layer_name,
                                 ws,
                                 layer_w.weights.len()
+=======
+                                layer_name, ws, layer_w.weights.len()
+>>>>>>> 4b60ced (docs: update README)
                             )));
                         }
                     } else {
@@ -520,11 +546,15 @@ mod tests {
         // One peer has huge weights (norm >> 1.0), should be clipped.
         let huge_weights = vec![10.0; 10]; // norm = sqrt(1000) ~= 31.6
         let updates = vec![
+<<<<<<< HEAD
             make_update(
                 "p1",
                 vec![make_weight("l1", "p1", huge_weights.clone())],
                 100,
             ),
+=======
+            make_update("p1", vec![make_weight("l1", "p1", huge_weights.clone())], 100),
+>>>>>>> 4b60ced (docs: update README)
             make_update("p2", vec![make_weight("l1", "p2", vec![0.0; 10])], 100),
         ];
 
@@ -683,6 +713,7 @@ mod tests {
 
         for round in 0..12 {
             let updates = vec![
+<<<<<<< HEAD
                 make_update(
                     "p1",
                     vec![make_weight("l1", "p1", peer1_weight.clone())],
@@ -698,6 +729,11 @@ mod tests {
                     vec![make_weight("l1", "p3", peer3_weight.clone())],
                     100,
                 ),
+=======
+                make_update("p1", vec![make_weight("l1", "p1", peer1_weight.clone())], 100),
+                make_update("p2", vec![make_weight("l1", "p2", peer2_weight.clone())], 100),
+                make_update("p3", vec![make_weight("l1", "p3", peer3_weight.clone())], 100),
+>>>>>>> 4b60ced (docs: update README)
             ];
             let model = agg.aggregate(updates).unwrap();
             let new_w = model.weights[0].weights[0];
@@ -709,9 +745,16 @@ mod tests {
 
             // After a few rounds, the weights should be converging.
             if round >= 3 {
+<<<<<<< HEAD
                 let spread = (peer1_weight[0] - peer2_weight[0])
                     .abs()
                     .max((peer2_weight[0] - peer3_weight[0]).abs());
+=======
+                let spread =
+                    (peer1_weight[0] - peer2_weight[0]).abs().max(
+                        (peer2_weight[0] - peer3_weight[0]).abs(),
+                    );
+>>>>>>> 4b60ced (docs: update README)
                 assert!(
                     spread < 2.0,
                     "Round {}: peer weights should converge, spread = {}",
@@ -725,11 +768,15 @@ mod tests {
         let final_spread = (peer1_weight[0] - peer2_weight[0])
             .abs()
             .max((peer2_weight[0] - peer3_weight[0]).abs());
+<<<<<<< HEAD
         assert!(
             final_spread < 0.01,
             "Final spread should be tiny: {}",
             final_spread
         );
+=======
+        assert!(final_spread < 0.01, "Final spread should be tiny: {}", final_spread);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

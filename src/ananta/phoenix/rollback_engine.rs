@@ -242,6 +242,7 @@ impl StateDiff {
         }
 
         fields.sort_by(|a, b| a.key.cmp(&b.key));
+<<<<<<< HEAD
         let added = fields
             .iter()
             .filter(|f| f.diff_type == DiffType::Added)
@@ -254,6 +255,11 @@ impl StateDiff {
             .iter()
             .filter(|f| f.diff_type == DiffType::Modified)
             .count();
+=======
+        let added = fields.iter().filter(|f| f.diff_type == DiffType::Added).count();
+        let removed = fields.iter().filter(|f| f.diff_type == DiffType::Removed).count();
+        let modified = fields.iter().filter(|f| f.diff_type == DiffType::Modified).count();
+>>>>>>> 4b60ced (docs: update README)
         let summary = format!(
             "Diff: {} added, {} removed, {} modified, {} unchanged",
             added,
@@ -456,14 +462,26 @@ impl SnapshotStore {
 
     /// Retrieve the most recent snapshot for a domain, if any.
     pub fn latest(&self, domain: &str) -> Option<&StateSnapshot> {
+<<<<<<< HEAD
         self.snapshots.get(domain).and_then(|q| q.back())
+=======
+        self.snapshots
+            .get(domain)
+            .and_then(|q| q.back())
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Retrieve a specific snapshot by domain and ID.
     pub fn get(&self, domain: &str, snapshot_id: &str) -> Option<&StateSnapshot> {
+<<<<<<< HEAD
         self.snapshots
             .get(domain)
             .and_then(|q| q.iter().find(|s| s.snapshot_id == snapshot_id))
+=======
+        self.snapshots.get(domain).and_then(|q| {
+            q.iter().find(|s| s.snapshot_id == snapshot_id)
+        })
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// List all snapshots for a domain.
@@ -523,9 +541,16 @@ impl SnapshotStore {
     ) -> Result<StateSnapshot, String> {
         let mut snapshot = StateSnapshot::new(domain, data)?;
         snapshot.add_tag("last-known-good");
+<<<<<<< HEAD
         snapshot
             .metadata
             .insert("source".to_string(), "last-known-good".to_string());
+=======
+        snapshot.metadata.insert(
+            "source".to_string(),
+            "last-known-good".to_string(),
+        );
+>>>>>>> 4b60ced (docs: update README)
         let id = snapshot.snapshot_id.clone();
         self.store(snapshot.clone())?;
         info!(
@@ -545,7 +570,14 @@ impl SnapshotStore {
 
     /// Count of snapshots for a given domain.
     pub fn count(&self, domain: &str) -> usize {
+<<<<<<< HEAD
         self.snapshots.get(domain).map(|q| q.len()).unwrap_or(0)
+=======
+        self.snapshots
+            .get(domain)
+            .map(|q| q.len())
+            .unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Total count of all snapshots across all domains.
@@ -608,6 +640,7 @@ pub struct RollbackResult {
 }
 
 impl RollbackResult {
+<<<<<<< HEAD
     fn success(
         rollback_id: &str,
         domain: &str,
@@ -615,6 +648,9 @@ impl RollbackResult {
         target_id: &str,
         duration_ms: u64,
     ) -> Self {
+=======
+    fn success(rollback_id: &str, domain: &str, source_id: &str, target_id: &str, duration_ms: u64) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             rollback_id: rollback_id.to_string(),
             domain: domain.to_string(),
@@ -632,6 +668,7 @@ impl RollbackResult {
         }
     }
 
+<<<<<<< HEAD
     fn failed(
         rollback_id: &str,
         domain: &str,
@@ -640,6 +677,9 @@ impl RollbackResult {
         err: &str,
         duration_ms: u64,
     ) -> Self {
+=======
+    fn failed(rollback_id: &str, domain: &str, source_id: &str, target_id: &str, err: &str, duration_ms: u64) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             rollback_id: rollback_id.to_string(),
             domain: domain.to_string(),
@@ -697,9 +737,17 @@ impl RollbackExecutor {
                 .store
                 .lock()
                 .map_err(|e| format!("Lock poisoned: {}", e))?;
+<<<<<<< HEAD
             let lkg = store.get_last_known_good(domain).ok_or_else(|| {
                 format!("No last-known-good snapshot found for domain '{}'", domain)
             })?;
+=======
+            let lkg = store
+                .get_last_known_good(domain)
+                .ok_or_else(|| {
+                    format!("No last-known-good snapshot found for domain '{}'", domain)
+                })?;
+>>>>>>> 4b60ced (docs: update README)
             lkg.snapshot_id.clone()
         };
         self.execute_rollback_inner(domain, &target_id, false)
@@ -767,7 +815,14 @@ impl RollbackExecutor {
                 .store
                 .lock()
                 .map_err(|e| format!("Lock poisoned: {}", e))?;
+<<<<<<< HEAD
             let auto_snap = store.create_snapshot(domain, source_snapshot.data.clone())?;
+=======
+            let auto_snap = store.create_snapshot(
+                domain,
+                source_snapshot.data.clone(),
+            )?;
+>>>>>>> 4b60ced (docs: update README)
             info!(
                 auto_snapshot_id = %auto_snap.snapshot_id,
                 "Auto-snapshot created before rollback"
@@ -991,6 +1046,7 @@ impl RollbackExecutor {
             "Retrying last failed rollback"
         );
 
+<<<<<<< HEAD
         let mut result =
             match self.execute_rollback_inner(&last.domain, &last.target_snapshot_id, false) {
                 Ok(r) => r,
@@ -1006,6 +1062,26 @@ impl RollbackExecutor {
                     )
                 }
             };
+=======
+        let mut result = match self.execute_rollback_inner(
+            &last.domain,
+            &last.target_snapshot_id,
+            false,
+        ) {
+            Ok(r) => r,
+            Err(e) => {
+                warn!(error = %e, "Retry execution failed");
+                RollbackResult::failed(
+                    &Uuid::new_v4().to_string(),
+                    &last.domain,
+                    &last.source_snapshot_id,
+                    &last.target_snapshot_id,
+                    &e,
+                    0,
+                )
+            }
+        };
+>>>>>>> 4b60ced (docs: update README)
         result.attempts = last.attempts + 1;
 
         if result.attempts > self.config.max_rollback_attempts {
@@ -1220,7 +1296,16 @@ impl RollbackPlanner {
         (risk / (total as f64 * 25.0)).min(100.0)
     }
 
+<<<<<<< HEAD
     fn build_rationale(snap: &StateSnapshot, diff: &StateDiff, score: f64, risk: f64) -> String {
+=======
+    fn build_rationale(
+        snap: &StateSnapshot,
+        diff: &StateDiff,
+        score: f64,
+        risk: f64,
+    ) -> String {
+>>>>>>> 4b60ced (docs: update README)
         let mut parts: Vec<String> = Vec::new();
         if snap.has_tag("last-known-good") {
             parts.push("marked as last-known-good".to_string());
@@ -1258,7 +1343,13 @@ mod tests {
     use std::collections::HashMap;
 
     fn make_data(pairs: Vec<(&str, serde_json::Value)>) -> HashMap<String, serde_json::Value> {
+<<<<<<< HEAD
         pairs.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
+=======
+        pairs.into_iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     fn make_store_with_config(max: usize) -> Arc<Mutex<SnapshotStore>> {
@@ -1365,6 +1456,7 @@ mod tests {
 
     #[test]
     fn test_snapshot_merge() {
+<<<<<<< HEAD
         let d1 = make_data(vec![
             ("a", serde_json::json!(1)),
             ("b", serde_json::json!(2)),
@@ -1373,6 +1465,10 @@ mod tests {
             ("b", serde_json::json!(20)),
             ("c", serde_json::json!(3)),
         ]);
+=======
+        let d1 = make_data(vec![("a", serde_json::json!(1)), ("b", serde_json::json!(2))]);
+        let d2 = make_data(vec![("b", serde_json::json!(20)), ("c", serde_json::json!(3))]);
+>>>>>>> 4b60ced (docs: update README)
         let mut snap1 = StateSnapshot::new("d", d1).unwrap();
         let snap2 = StateSnapshot::new("d", d2).unwrap();
         snap1.merge(&snap2).unwrap();
@@ -1396,14 +1492,19 @@ mod tests {
     #[test]
     fn test_snapshot_diff_with_changes() {
         let d1 = make_data(vec![("a", serde_json::json!(1))]);
+<<<<<<< HEAD
         let d2 = make_data(vec![
             ("a", serde_json::json!(2)),
             ("b", serde_json::json!("new")),
         ]);
+=======
+        let d2 = make_data(vec![("a", serde_json::json!(2)), ("b", serde_json::json!("new"))]);
+>>>>>>> 4b60ced (docs: update README)
         let s1 = StateSnapshot::new("d", d1).unwrap();
         let s2 = StateSnapshot::new("d", d2).unwrap();
         let diff = s1.diff(&s2).unwrap();
         assert_eq!(diff.field_count(), 2);
+<<<<<<< HEAD
         assert!(diff
             .fields
             .iter()
@@ -1412,14 +1513,22 @@ mod tests {
             .fields
             .iter()
             .any(|f| f.key == "a" && f.diff_type == DiffType::Modified));
+=======
+        assert!(diff.fields.iter().any(|f| f.key == "b" && f.diff_type == DiffType::Added));
+        assert!(diff.fields.iter().any(|f| f.key == "a" && f.diff_type == DiffType::Modified));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn test_snapshot_metadata() {
         let data = make_data(vec![]);
         let mut snap = StateSnapshot::new("d", data).unwrap();
+<<<<<<< HEAD
         snap.metadata
             .insert("reason".to_string(), "test".to_string());
+=======
+        snap.metadata.insert("reason".to_string(), "test".to_string());
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(snap.metadata.get("reason"), Some(&"test".to_string()));
     }
 
@@ -1565,10 +1674,14 @@ mod tests {
     #[test]
     fn test_diff_summary() {
         let d1 = make_data(vec![("a", serde_json::json!(1))]);
+<<<<<<< HEAD
         let d2 = make_data(vec![
             ("a", serde_json::json!(2)),
             ("b", serde_json::json!(3)),
         ]);
+=======
+        let d2 = make_data(vec![("a", serde_json::json!(2)), ("b", serde_json::json!(3))]);
+>>>>>>> 4b60ced (docs: update README)
         let s1 = StateSnapshot::new("d", d1).unwrap();
         let s2 = StateSnapshot::new("d", d2).unwrap();
         let diff = s1.diff(&s2).unwrap();
@@ -1624,12 +1737,17 @@ mod tests {
     #[test]
     fn test_store_latest() {
         let mut store = SnapshotStore::with_defaults();
+<<<<<<< HEAD
         let _s1 = store
             .create_snapshot("d", make_data(vec![("v", serde_json::json!(1))]))
             .unwrap();
         let s2 = store
             .create_snapshot("d", make_data(vec![("v", serde_json::json!(2))]))
             .unwrap();
+=======
+        let _s1 = store.create_snapshot("d", make_data(vec![("v", serde_json::json!(1))])).unwrap();
+        let s2 = store.create_snapshot("d", make_data(vec![("v", serde_json::json!(2))])).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let latest = store.latest("d").unwrap();
         assert_eq!(latest.snapshot_id, s2.snapshot_id);
     }
@@ -1643,12 +1761,17 @@ mod tests {
     #[test]
     fn test_store_list() {
         let mut store = SnapshotStore::with_defaults();
+<<<<<<< HEAD
         store
             .create_snapshot("d", make_data(vec![("a", serde_json::json!(1))]))
             .unwrap();
         store
             .create_snapshot("d", make_data(vec![("b", serde_json::json!(2))]))
             .unwrap();
+=======
+        store.create_snapshot("d", make_data(vec![("a", serde_json::json!(1))])).unwrap();
+        store.create_snapshot("d", make_data(vec![("b", serde_json::json!(2))])).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let list = store.list("d");
         assert_eq!(list.len(), 2);
     }
@@ -1738,7 +1861,14 @@ mod tests {
             s.create_snapshot("d", make_data(vec![("v", serde_json::json!(2))]))
                 .unwrap();
         }
+<<<<<<< HEAD
         let mut executor = RollbackExecutor::new(store.clone(), RollbackConfig::new());
+=======
+        let mut executor = RollbackExecutor::new(
+            store.clone(),
+            RollbackConfig::new(),
+        );
+>>>>>>> 4b60ced (docs: update README)
         // Target the first snapshot
         let target_id = {
             let s = store.lock().unwrap();
@@ -1855,9 +1985,13 @@ mod tests {
         let store = make_store();
         let mut executor = RollbackExecutor::new(
             store,
+<<<<<<< HEAD
             RollbackConfig::new()
                 .with_verify(false)
                 .with_auto_snapshot(false),
+=======
+            RollbackConfig::new().with_verify(false).with_auto_snapshot(false),
+>>>>>>> 4b60ced (docs: update README)
         );
         // Manually inject a failed result into history
         executor.history.push(RollbackResult::failed(
@@ -1942,7 +2076,15 @@ mod tests {
 
     #[test]
     fn test_verification_fail() {
+<<<<<<< HEAD
         let vr = VerificationResult::fail(vec!["key mismatch".to_string()], 75.0, 10);
+=======
+        let vr = VerificationResult::fail(
+            vec!["key mismatch".to_string()],
+            75.0,
+            10,
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert!(!vr.verified);
         assert_eq!(vr.mismatches.len(), 1);
         assert_eq!(vr.match_percentage, 75.0);
@@ -2097,6 +2239,7 @@ mod tests {
         let lkg_id = {
             let mut s = store.lock().unwrap();
             let lkg = s
+<<<<<<< HEAD
                 .create_last_known_good(
                     "app",
                     make_data(vec![
@@ -2116,6 +2259,21 @@ mod tests {
                     ("workers", serde_json::json!(1)),
                 ]),
             )
+=======
+                .create_last_known_good("app", make_data(vec![
+                    ("port", serde_json::json!(8080)),
+                    ("log_level", serde_json::json!("info")),
+                    ("workers", serde_json::json!(4)),
+                ]))
+                .unwrap();
+            let id = lkg.snapshot_id.clone();
+            // Current (broken) state
+            s.create_snapshot("app", make_data(vec![
+                ("port", serde_json::json!(9090)),
+                ("log_level", serde_json::json!("debug")),
+                ("workers", serde_json::json!(1)),
+            ]))
+>>>>>>> 4b60ced (docs: update README)
             .unwrap();
             id
         };
@@ -2186,9 +2344,15 @@ mod tests {
         ]);
         let d2 = make_data(vec![
             ("a", serde_json::json!("changed")), // type change
+<<<<<<< HEAD
             ("b", serde_json::json!("world")),   // same type
             ("e", serde_json::json!(3.14)),      // added
                                                  // c and d removed
+=======
+            ("b", serde_json::json!("world")),  // same type
+            ("e", serde_json::json!(3.14)),     // added
+            // c and d removed
+>>>>>>> 4b60ced (docs: update README)
         ]);
         let s1 = StateSnapshot::new("d", d1).unwrap();
         let s2 = StateSnapshot::new("d", d2).unwrap();

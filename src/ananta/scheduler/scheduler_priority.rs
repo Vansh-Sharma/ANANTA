@@ -252,8 +252,12 @@ impl PriorityScheduler {
             task.effective_priority = self.priority_ceiling;
         }
         let idx = task.effective_priority.ordinal();
+<<<<<<< HEAD
         self.task_priorities
             .insert(task.id.clone(), task.effective_priority);
+=======
+        self.task_priorities.insert(task.id.clone(), task.effective_priority);
+>>>>>>> 4b60ced (docs: update README)
         self.queues[idx].push_back(task);
         self.total_count += 1;
     }
@@ -478,7 +482,13 @@ impl EDFScheduler {
             task.update_time(now_ms);
         }
         let all = std::mem::take(&mut self.tasks);
+<<<<<<< HEAD
         let (missed, remaining): (Vec<_>, Vec<_>) = all.into_iter().partition(|t| t.missed);
+=======
+        let (missed, remaining): (Vec<_>, Vec<_>) = all
+            .into_iter()
+            .partition(|t| t.missed);
+>>>>>>> 4b60ced (docs: update README)
         self.tasks = remaining;
         self.total_deadline_misses += missed.len() as u64;
         missed
@@ -878,8 +888,17 @@ impl DependencyGraph {
     /// Add a task node with an optional estimated duration.
     pub fn add_task(&mut self, task_id: &str, duration_ms: Option<u64>) {
         self.task_ids.insert(task_id.to_string());
+<<<<<<< HEAD
         self.predecessors.entry(task_id.to_string()).or_default();
         self.successors.entry(task_id.to_string()).or_default();
+=======
+        self.predecessors
+            .entry(task_id.to_string())
+            .or_default();
+        self.successors
+            .entry(task_id.to_string())
+            .or_default();
+>>>>>>> 4b60ced (docs: update README)
         if let Some(dur) = duration_ms {
             self.durations.insert(task_id.to_string(), dur);
         }
@@ -907,7 +926,13 @@ impl DependencyGraph {
             self.predecessors
                 .get_mut(task)
                 .map(|s| s.remove(depends_on));
+<<<<<<< HEAD
             self.successors.get_mut(depends_on).map(|s| s.remove(task));
+=======
+            self.successors
+                .get_mut(depends_on)
+                .map(|s| s.remove(task));
+>>>>>>> 4b60ced (docs: update README)
             return false;
         }
         true
@@ -1239,11 +1264,15 @@ impl SchedulingMetrics {
     }
 
     /// Record a snapshot of queue utilization by priority level.
+<<<<<<< HEAD
     pub fn snapshot_queue_utilization(
         &mut self,
         level_counts: &[(String, usize)],
         capacity_per_level: usize,
     ) {
+=======
+    pub fn snapshot_queue_utilization(&mut self, level_counts: &[(String, usize)], capacity_per_level: usize) {
+>>>>>>> 4b60ced (docs: update README)
         for (level, count) in level_counts {
             let util = if capacity_per_level == 0 {
                 0.0
@@ -1331,8 +1360,13 @@ mod tests {
 
     #[test]
     fn priority_task_age_computation() {
+<<<<<<< HEAD
         let task =
             PriorityTask::new("t1", "task1", PriorityLevel::Normal, 1000).with_scores(0.9, 0.9);
+=======
+        let task = PriorityTask::new("t1", "task1", PriorityLevel::Normal, 1000)
+            .with_scores(0.9, 0.9);
+>>>>>>> 4b60ced (docs: update README)
         let mut t = task;
         t.update_time(5000);
         assert_eq!(t.age_ms(), 4000);
@@ -1341,8 +1375,13 @@ mod tests {
     #[test]
     fn dynamic_priority_age_boost() {
         // A task aged well beyond the threshold should be boosted.
+<<<<<<< HEAD
         let mut task =
             PriorityTask::new("t1", "task1", PriorityLevel::Low, 0).with_scores(1.0, 1.0);
+=======
+        let mut task = PriorityTask::new("t1", "task1", PriorityLevel::Low, 0)
+            .with_scores(1.0, 1.0);
+>>>>>>> 4b60ced (docs: update README)
         // Age the task 20 seconds (above 10s threshold, two 5s intervals).
         task.update_time(20_000);
         assert!(task.effective_priority <= PriorityLevel::Normal);
@@ -1350,16 +1389,26 @@ mod tests {
 
     #[test]
     fn dynamic_priority_health_demotion() {
+<<<<<<< HEAD
         let mut task =
             PriorityTask::new("t1", "task1", PriorityLevel::Normal, 0).with_scores(0.2, 1.0);
+=======
+        let mut task = PriorityTask::new("t1", "task1", PriorityLevel::Normal, 0)
+            .with_scores(0.2, 1.0);
+>>>>>>> 4b60ced (docs: update README)
         task.update_time(100);
         assert!(task.effective_priority >= PriorityLevel::Low);
     }
 
     #[test]
     fn dynamic_priority_trust_demotion() {
+<<<<<<< HEAD
         let mut task =
             PriorityTask::new("t1", "task1", PriorityLevel::High, 0).with_scores(1.0, 0.2);
+=======
+        let mut task = PriorityTask::new("t1", "task1", PriorityLevel::High, 0)
+            .with_scores(1.0, 0.2);
+>>>>>>> 4b60ced (docs: update README)
         task.update_time(100);
         assert!(task.effective_priority >= PriorityLevel::Normal);
     }
@@ -1379,6 +1428,7 @@ mod tests {
         let mut scheduler = PriorityScheduler::default();
         let now = 1000u64;
         scheduler.enqueue(PriorityTask::new("low", "low", PriorityLevel::Low, now));
+<<<<<<< HEAD
         scheduler.enqueue(PriorityTask::new(
             "crit",
             "crit",
@@ -1391,6 +1441,10 @@ mod tests {
             PriorityLevel::Normal,
             now,
         ));
+=======
+        scheduler.enqueue(PriorityTask::new("crit", "crit", PriorityLevel::Critical, now));
+        scheduler.enqueue(PriorityTask::new("norm", "norm", PriorityLevel::Normal, now));
+>>>>>>> 4b60ced (docs: update README)
 
         let t1 = scheduler.dequeue(now).unwrap();
         assert_eq!(t1.id, "crit");
@@ -1418,8 +1472,13 @@ mod tests {
         let parent = PriorityTask::new("parent", "parent", PriorityLevel::High, 0);
         scheduler.enqueue(parent);
         // Child at Idle with parent reference.
+<<<<<<< HEAD
         let child =
             PriorityTask::new("child", "child", PriorityLevel::Idle, 0).with_parent("parent");
+=======
+        let child = PriorityTask::new("child", "child", PriorityLevel::Idle, 0)
+            .with_parent("parent");
+>>>>>>> 4b60ced (docs: update README)
         scheduler.enqueue(child);
         // Child should inherit High priority (higher than Idle).
         let level_counts = scheduler.level_counts();
@@ -1654,7 +1713,11 @@ mod tests {
         let mut graph = DependencyGraph::new();
         graph.add_task("a", Some(100)); // 100ms
         graph.add_task("b", Some(200)); // 200ms
+<<<<<<< HEAD
         graph.add_task("c", Some(50)); // 50ms
+=======
+        graph.add_task("c", Some(50));  // 50ms
+>>>>>>> 4b60ced (docs: update README)
         graph.add_dependency("b", "a");
         graph.add_dependency("c", "a");
         // Critical path: a(100) -> b(200) = 300ms

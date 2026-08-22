@@ -13,6 +13,7 @@
 //   - Observe: do nothing but monitor more closely
 //   - Escalate: alert human operator
 
+<<<<<<< HEAD
 pub mod planner;
 pub mod recovery_history;
 pub mod recovery_simulator;
@@ -23,3 +24,15 @@ pub use planner::RecoveryPlanner;
 pub use recovery_history::RecoveryHistory;
 pub use recovery_simulator::*;
 pub use strategies::{RecoveryAction, RecoveryOutcome, RecoveryResult, RecoveryStrategy};
+=======
+pub mod strategies;
+pub mod recovery_history;
+pub mod planner;
+pub mod recovery_simulator;
+pub mod rollback_engine;
+
+pub use strategies::{RecoveryOutcome, RecoveryStrategy, RecoveryAction, RecoveryResult};
+pub use recovery_history::RecoveryHistory;
+pub use planner::RecoveryPlanner;
+pub use recovery_simulator::*;
+>>>>>>> 4b60ced (docs: update README)

@@ -225,6 +225,7 @@ impl Evidence {
         observed: serde_json::Value,
     ) -> Self {
         Self::new(
+<<<<<<< HEAD
             run_id,
             check_name,
             phase,
@@ -233,6 +234,10 @@ impl Evidence {
             expected,
             observed,
             "Observed matches expected.",
+=======
+            run_id, check_name, phase, subsystem, Verdict::Pass,
+            expected, observed, "Observed matches expected.",
+>>>>>>> 4b60ced (docs: update README)
         )
     }
 
@@ -248,6 +253,7 @@ impl Evidence {
         explanation: &str,
     ) -> Self {
         let mut ev = Self::new(
+<<<<<<< HEAD
             run_id,
             check_name,
             phase,
@@ -256,6 +262,10 @@ impl Evidence {
             expected,
             observed,
             explanation,
+=======
+            run_id, check_name, phase, subsystem, Verdict::Fail,
+            expected, observed, explanation,
+>>>>>>> 4b60ced (docs: update README)
         );
         ev.severity = severity;
         ev
@@ -375,6 +385,7 @@ impl ReplayData {
 /// Collect current environment metadata.
 fn collect_environment() -> HashMap<String, String> {
     let mut env = HashMap::new();
+<<<<<<< HEAD
     env.insert(
         "rust_version".to_string(),
         env!("CARGO_PKG_RUST_VERSION").to_string(),
@@ -387,6 +398,11 @@ fn collect_environment() -> HashMap<String, String> {
         "target_arch".to_string(),
         std::env::consts::ARCH.to_string(),
     );
+=======
+    env.insert("rust_version".to_string(), env!("CARGO_PKG_RUST_VERSION").to_string());
+    env.insert("crate_version".to_string(), env!("CARGO_PKG_VERSION").to_string());
+    env.insert("target_arch".to_string(), std::env::consts::ARCH.to_string());
+>>>>>>> 4b60ced (docs: update README)
     env.insert("target_os".to_string(), std::env::consts::OS.to_string());
     if let Ok(v) = std::env::var("CHAKRAVYUH_PROFILE") {
         env.insert("profile".to_string(), v);
@@ -401,10 +417,14 @@ mod tests {
     #[test]
     fn evidence_new_and_integrity() {
         let ev = Evidence::new(
+<<<<<<< HEAD
             "run-1",
             "check-shield-waf",
             "D1",
             "shield",
+=======
+            "run-1", "check-shield-waf", "D1", "shield",
+>>>>>>> 4b60ced (docs: update README)
             Verdict::Pass,
             serde_json::json!({"blocked": true}),
             serde_json::json!({"blocked": true}),
@@ -419,10 +439,14 @@ mod tests {
     #[test]
     fn evidence_tamper_detection() {
         let mut ev = Evidence::new(
+<<<<<<< HEAD
             "run-1",
             "check-policy",
             "D2",
             "ananta.sentinel",
+=======
+            "run-1", "check-policy", "D2", "ananta.sentinel",
+>>>>>>> 4b60ced (docs: update README)
             Verdict::Pass,
             serde_json::json!({"drift": 0.0}),
             serde_json::json!({"drift": 0.01}),
@@ -436,10 +460,14 @@ mod tests {
     #[test]
     fn evidence_builder_pattern() {
         let ev = Evidence::fail(
+<<<<<<< HEAD
             "run-2",
             "jailbreak-detection",
             "D1",
             "threat",
+=======
+            "run-2", "jailbreak-detection", "D1", "threat",
+>>>>>>> 4b60ced (docs: update README)
             Severity::Critical,
             serde_json::json!({"blocked": true}),
             serde_json::json!({"blocked": false}),
@@ -452,10 +480,14 @@ mod tests {
 
         assert_eq!(ev.rings.len(), 2);
         assert_eq!(ev.attack_category.as_deref(), Some("jailbreak"));
+<<<<<<< HEAD
         assert_eq!(
             ev.mutation_applied.as_deref(),
             Some("unicode_normalization")
         );
+=======
+        assert_eq!(ev.mutation_applied.as_deref(), Some("unicode_normalization"));
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(ev.duration_us, 142);
     }
 
@@ -486,9 +518,13 @@ mod tests {
     #[test]
     fn replay_data_creation() {
         let replay = ReplayData::new(
+<<<<<<< HEAD
             "run-5",
             "D1",
             "SQLi attack with base64 encoding",
+=======
+            "run-5", "D1", "SQLi attack with base64 encoding",
+>>>>>>> 4b60ced (docs: update README)
             serde_json::json!({"payload": "c2VsZWN0ICogZnJvbSB1c2Vycw=="}),
             serde_json::json!({"waf_enabled": true, "mode": "strict"}),
             Verdict::Fail,
@@ -502,6 +538,7 @@ mod tests {
     #[test]
     fn evidence_serialization_roundtrip() {
         let ev = Evidence::pass(
+<<<<<<< HEAD
             "run-1",
             "test",
             "D0",
@@ -510,6 +547,12 @@ mod tests {
             serde_json::json!(true),
         )
         .with_tags(vec!["unit".to_string()]);
+=======
+            "run-1", "test", "D0", "verification",
+            serde_json::json!(true),
+            serde_json::json!(true),
+        ).with_tags(vec!["unit".to_string()]);
+>>>>>>> 4b60ced (docs: update README)
 
         let json = serde_json::to_string(&ev).unwrap();
         let restored: Evidence = serde_json::from_str(&json).unwrap();

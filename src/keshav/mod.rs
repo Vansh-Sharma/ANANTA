@@ -10,11 +10,19 @@
 // Critical Principle: Decide MUST work without Learn.
 
 pub mod anomaly_profiler;
+<<<<<<< HEAD
 pub mod decide;
 pub mod decision_logger;
 pub mod executor;
 pub mod fallback_rules;
 pub mod feedback_collector;
+=======
+pub mod executor;
+pub mod decide;
+pub mod decision_logger;
+pub mod feedback_collector;
+pub mod fallback_rules;
+>>>>>>> 4b60ced (docs: update README)
 pub mod learn;
 pub mod orchestrate;
 pub mod pattern_store;
@@ -23,6 +31,7 @@ pub mod policy_manager;
 pub mod risk;
 pub mod threshold_optimizer;
 
+<<<<<<< HEAD
 pub use decide::{AllRingVerdicts, KeshavDecide};
 pub use decision_logger::{DecisionLogEntry, DecisionLogger};
 pub use executor::{PipelineContext, PipelineExecutor, PipelineResult, ToolCallContext};
@@ -37,6 +46,17 @@ pub use risk::{
     execution_to_risk_score, threat_to_risk_score, ContextSignals, KeshavRisk, RiskConfig,
     RiskSignals,
 };
+=======
+pub use decision_logger::{DecisionLogEntry, DecisionLogger};
+pub use decide::{KeshavDecide, AllRingVerdicts};
+pub use fallback_rules::FallbackRules;
+pub use learn::{KeshavLearn, LearnConfig, LearnStatus};
+pub use executor::{PipelineContext, PipelineExecutor, PipelineResult, ToolCallContext};
+pub use orchestrate::{KeshavOrchestrate, OrchestrateConfig, OrchestrationPlan, RequestType, RingId};
+pub use policy_engine::{Policy, PolicyEngine, PolicyRule, RuleAction, RuleCondition};
+pub use policy_manager::PolicyManager;
+pub use risk::{ContextSignals, KeshavRisk, RiskConfig, RiskSignals, execution_to_risk_score, threat_to_risk_score};
+>>>>>>> 4b60ced (docs: update README)
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 pub struct KeshavConfig {

@@ -285,7 +285,13 @@ impl Scheduler {
             .unwrap_or_default()
             .as_millis() as u64;
 
+<<<<<<< HEAD
         self.tasks.values().filter(|t| t.is_due(now)).collect()
+=======
+        self.tasks.values()
+            .filter(|t| t.is_due(now))
+            .collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get all task names.
@@ -321,6 +327,7 @@ impl Scheduler {
     /// Get a summary of all tasks.
     pub fn summary(&self) -> String {
         let total = self.tasks.len();
+<<<<<<< HEAD
         let running = self
             .tasks
             .values()
@@ -331,6 +338,10 @@ impl Scheduler {
             .values()
             .filter(|t| t.consecutive_failures > 0)
             .count();
+=======
+        let running = self.tasks.values().filter(|t| t.status == TaskStatus::Running).count();
+        let failed = self.tasks.values().filter(|t| t.consecutive_failures > 0).count();
+>>>>>>> 4b60ced (docs: update README)
         format!(
             "scheduler: tasks={} running={} failed={}",
             total, running, failed,
@@ -359,7 +370,15 @@ mod tests {
     #[test]
     fn register_custom_task() {
         let mut scheduler = Scheduler::new();
+<<<<<<< HEAD
         scheduler.register(ScheduledTask::new("custom_task", 500, "A custom task"));
+=======
+        scheduler.register(ScheduledTask::new(
+            "custom_task",
+            500,
+            "A custom task",
+        ));
+>>>>>>> 4b60ced (docs: update README)
         assert!(scheduler.get("custom_task").is_some());
     }
 
@@ -453,8 +472,16 @@ mod tests {
 
     #[test]
     fn jitter_varies_interval() {
+<<<<<<< HEAD
         let task = ScheduledTask::new("test", 1000, "test").with_jitter(200);
         let intervals: Vec<u64> = (0..100).map(|_| task.effective_interval()).collect();
+=======
+        let task = ScheduledTask::new("test", 1000, "test")
+            .with_jitter(200);
+        let intervals: Vec<u64> = (0..100)
+            .map(|_| task.effective_interval())
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
         let min = *intervals.iter().min().unwrap();
         let max = *intervals.iter().max().unwrap();
         // With jitter, min and max should differ.

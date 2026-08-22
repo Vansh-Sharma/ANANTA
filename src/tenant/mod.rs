@@ -26,6 +26,13 @@ use std::sync::RwLock;
 
 use serde::{Deserialize, Serialize};
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> 4b60ced (docs: update README)
 // ---------------------------------------------------------------------------
 // TenantConfig — full configuration for a registered tenant
 // ---------------------------------------------------------------------------
@@ -269,13 +276,28 @@ mod tests {
             TenantTier::Premium,
         );
         assert_eq!(config.context.tier, TenantTier::Premium);
+<<<<<<< HEAD
         assert_eq!(config.policy_config.override_deny_threshold, Some(8.5));
+=======
+        assert_eq!(
+            config.policy_config.override_deny_threshold,
+            Some(8.5)
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(config.quota.max_requests_per_day, 100_000);
     }
 
     #[test]
     fn tenant_config_serialization() {
+<<<<<<< HEAD
         let config = TenantConfig::for_tier(TenantId("acme".to_string()), "ACME", TenantTier::Free);
+=======
+        let config = TenantConfig::for_tier(
+            TenantId("acme".to_string()),
+            "ACME",
+            TenantTier::Free,
+        );
+>>>>>>> 4b60ced (docs: update README)
         let json = serde_json::to_string(&config).unwrap();
         let decoded: TenantConfig = serde_json::from_str(&json).unwrap();
         assert_eq!(decoded.context.tenant_id.0, "acme");
@@ -285,8 +307,16 @@ mod tests {
 
     #[test]
     fn tenant_new() {
+<<<<<<< HEAD
         let config =
             TenantConfig::for_tier(TenantId("acme".to_string()), "ACME", TenantTier::Standard);
+=======
+        let config = TenantConfig::for_tier(
+            TenantId("acme".to_string()),
+            "ACME",
+            TenantTier::Standard,
+        );
+>>>>>>> 4b60ced (docs: update README)
         let tenant = Tenant::new(config);
         assert_eq!(tenant.id().0, "acme");
         assert_eq!(tenant.tier(), TenantTier::Standard);
@@ -294,8 +324,16 @@ mod tests {
 
     #[test]
     fn tenant_context_access() {
+<<<<<<< HEAD
         let mut config =
             TenantConfig::for_tier(TenantId("acme".to_string()), "ACME", TenantTier::Standard);
+=======
+        let mut config = TenantConfig::for_tier(
+            TenantId("acme".to_string()),
+            "ACME",
+            TenantTier::Standard,
+        );
+>>>>>>> 4b60ced (docs: update README)
         config.context.set_metadata("env", "production");
         let tenant = Tenant::new(config);
         assert_eq!(tenant.context().metadata.get("env").unwrap(), "production");
@@ -313,8 +351,16 @@ mod tests {
     #[test]
     fn manager_register_and_get() {
         let mgr = TenantManager::new();
+<<<<<<< HEAD
         let config =
             TenantConfig::for_tier(TenantId("acme".to_string()), "ACME", TenantTier::Standard);
+=======
+        let config = TenantConfig::for_tier(
+            TenantId("acme".to_string()),
+            "ACME",
+            TenantTier::Standard,
+        );
+>>>>>>> 4b60ced (docs: update README)
         mgr.register_tenant(config).unwrap();
         assert!(mgr.is_registered("acme"));
         assert!(!mgr.is_registered("other"));
@@ -326,23 +372,42 @@ mod tests {
     #[test]
     fn manager_register_duplicate_fails() {
         let mgr = TenantManager::new();
+<<<<<<< HEAD
         let config =
             TenantConfig::for_tier(TenantId("acme".to_string()), "ACME", TenantTier::Standard);
         assert!(mgr.register_tenant(config).is_ok());
         let config2 =
             TenantConfig::for_tier(TenantId("acme".to_string()), "ACME Dup", TenantTier::Free);
+=======
+        let config = TenantConfig::for_tier(
+            TenantId("acme".to_string()),
+            "ACME",
+            TenantTier::Standard,
+        );
+        assert!(mgr.register_tenant(config).is_ok());
+        let config2 = TenantConfig::for_tier(
+            TenantId("acme".to_string()),
+            "ACME Dup",
+            TenantTier::Free,
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert!(mgr.register_tenant(config2).is_err());
     }
 
     #[test]
     fn manager_register_with_tier() {
         let mgr = TenantManager::new();
+<<<<<<< HEAD
         mgr.register_tenant_with_tier(
             TenantId("globex".to_string()),
             "Globex",
             TenantTier::Enterprise,
         )
         .unwrap();
+=======
+        mgr.register_tenant_with_tier(TenantId("globex".to_string()), "Globex", TenantTier::Enterprise)
+            .unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let ctx = mgr.get_tenant("globex").unwrap();
         assert_eq!(ctx.tier, TenantTier::Enterprise);
     }
@@ -395,8 +460,14 @@ mod tests {
         mgr.register_tenant_with_tier(TenantId("acme".to_string()), "ACME", TenantTier::Free)
             .unwrap();
 
+<<<<<<< HEAD
         let result =
             mgr.with_quota_enforcer("acme", |enforcer| enforcer.quota().max_requests_per_day);
+=======
+        let result = mgr.with_quota_enforcer("acme", |enforcer| {
+            enforcer.quota().max_requests_per_day
+        });
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(result, Some(1_000));
     }
 }

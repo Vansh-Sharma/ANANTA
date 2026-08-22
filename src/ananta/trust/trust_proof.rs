@@ -11,9 +11,15 @@
 //   5. Timestamp and proof ID
 
 use crate::ananta::anchor::AttestationReport;
+<<<<<<< HEAD
 use crate::ananta::config::HashAlgorithm;
 use crate::ananta::crypto::hashing::{hash_combined, HashDigest};
 use crate::ananta::crypto::signing::{self, KeyPair, Signature};
+=======
+use crate::ananta::crypto::hashing::{hash_combined, HashDigest};
+use crate::ananta::crypto::signing::{self, KeyPair, Signature};
+use crate::ananta::config::HashAlgorithm;
+>>>>>>> 4b60ced (docs: update README)
 use crate::ananta::trust::trust_state::TrustState;
 use serde::{Deserialize, Serialize};
 
@@ -67,9 +73,13 @@ impl TrustProof {
         let timestamp = chrono::Utc::now().to_rfc3339();
 
         // Collect domain trust levels.
+<<<<<<< HEAD
         let domain_trust: Vec<DomainTrustEntry> = trust_state
             .domains
             .iter()
+=======
+        let domain_trust: Vec<DomainTrustEntry> = trust_state.domains.iter()
+>>>>>>> 4b60ced (docs: update README)
             .map(|(name, dt)| DomainTrustEntry {
                 domain: name.clone(),
                 level: dt.level,
@@ -143,11 +153,15 @@ impl TrustProof {
 
     /// Summary.
     pub fn summary(&self) -> String {
+<<<<<<< HEAD
         let status = if self.all_passed {
             "TRUSTED"
         } else {
             "COMPROMISED"
         };
+=======
+        let status = if self.all_passed { "TRUSTED" } else { "COMPROMISED" };
+>>>>>>> 4b60ced (docs: update README)
         format!(
             "[TRUST PROOF] {} — trust={:.3} passes={} merkle={}...",
             status,
@@ -199,7 +213,13 @@ mod tests {
         let trust_state = TrustState::new();
         let kp = KeyPair::generate_ed25519("key");
 
+<<<<<<< HEAD
         let mut proof = TrustProof::generate(&attestation, &trust_state, "head", &kp);
+=======
+        let mut proof = TrustProof::generate(
+            &attestation, &trust_state, "head", &kp,
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         proof.trust_score = 0.0; // Tamper.
         assert!(!proof.verify(kp.public_key()));
@@ -216,4 +236,8 @@ mod tests {
         let restored: TrustProof = serde_json::from_str(&json).unwrap();
         assert!(restored.verify(kp.public_key()));
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

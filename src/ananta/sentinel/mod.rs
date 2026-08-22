@@ -20,6 +20,12 @@ pub mod drift_analyzer;
 pub mod sentinel_wiring;
 pub mod trust_state_updater;
 
+<<<<<<< HEAD
 pub use drift::{DriftAlert, DriftDetector, DriftObservation, DriftType};
 pub use drift_analyzer::*;
 pub use trust_state_updater::TrustStateUpdater;
+=======
+pub use drift::{DriftDetector, DriftType, DriftObservation, DriftAlert};
+pub use drift_analyzer::*;
+pub use trust_state_updater::TrustStateUpdater;
+>>>>>>> 4b60ced (docs: update README)

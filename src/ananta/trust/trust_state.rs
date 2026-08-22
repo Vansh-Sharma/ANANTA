@@ -180,10 +180,14 @@ impl TrustState {
 
     /// Count critical alerts.
     pub fn critical_count(&self) -> usize {
+<<<<<<< HEAD
         self.alerts
             .iter()
             .filter(|a| a.severity == AlertSeverity::Critical)
             .count()
+=======
+        self.alerts.iter().filter(|a| a.severity == AlertSeverity::Critical).count()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Summary.
@@ -205,6 +209,7 @@ impl TrustDomain {
     /// All 10 trust domains.
     pub fn all() -> &'static [&'static str] {
         &[
+<<<<<<< HEAD
             "decision",      // Decision drift
             "policy",        // Policy drift
             "model",         // Model drift (ring behavior)
@@ -216,6 +221,19 @@ impl TrustDomain {
             "runtime",       // Runtime drift
             "performance",   // Performance drift
             "trust",         // Trust drift (meta)
+=======
+            "decision",       // Decision drift
+            "policy",         // Policy drift
+            "model",          // Model drift (ring behavior)
+            "orchestration",  // Orchestration drift
+            "learning",       // Learning drift
+            "memory",         // Memory drift
+            "configuration",  // Configuration drift
+            "plugin",         // Plugin drift
+            "runtime",        // Runtime drift
+            "performance",    // Performance drift
+            "trust",          // Trust drift (meta)
+>>>>>>> 4b60ced (docs: update README)
         ]
     }
 

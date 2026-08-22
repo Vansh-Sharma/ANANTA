@@ -24,11 +24,15 @@ pub enum Domain {
     /// Finite set of discrete values (e.g., {"shield", "stealth"}).
     Discrete(Vec<String>),
     /// Continuous range [min, max] with optional step.
+<<<<<<< HEAD
     Continuous {
         min: f64,
         max: f64,
         step: Option<f64>,
     },
+=======
+    Continuous { min: f64, max: f64, step: Option<f64> },
+>>>>>>> 4b60ced (docs: update README)
     /// Boolean domain.
     Boolean,
 }
@@ -202,7 +206,14 @@ pub enum Constraint {
         then_values: Vec<String>,
     },
     /// Not-equal pair: two variables must not be equal.
+<<<<<<< HEAD
     NotEqual { left: String, right: String },
+=======
+    NotEqual {
+        left: String,
+        right: String,
+    },
+>>>>>>> 4b60ced (docs: update README)
     /// Arbitrary predicate evaluated against the full assignment.
     /// The predicate receives a map of variable name → JSON value.
     Predicate {
@@ -232,7 +243,13 @@ impl Constraint {
                 s
             }
             Constraint::Dependency {
+<<<<<<< HEAD
                 if_var, then_var, ..
+=======
+                if_var,
+                then_var,
+                ..
+>>>>>>> 4b60ced (docs: update README)
             } => {
                 let mut s = HashSet::new();
                 s.insert(if_var.as_str());
@@ -276,9 +293,20 @@ pub struct ConstraintSolver {
 
 impl ConstraintSolver {
     /// Create a new solver with the given variables and constraints.
+<<<<<<< HEAD
     pub fn new(variables: Vec<ConstraintVariable>, constraints: Vec<Constraint>) -> Self {
         let var_map: HashMap<String, ConstraintVariable> =
             variables.into_iter().map(|v| (v.name.clone(), v)).collect();
+=======
+    pub fn new(
+        variables: Vec<ConstraintVariable>,
+        constraints: Vec<Constraint>,
+    ) -> Self {
+        let var_map: HashMap<String, ConstraintVariable> = variables
+            .into_iter()
+            .map(|v| (v.name.clone(), v))
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
         Self {
             variables: var_map,
             constraints,
@@ -304,12 +332,17 @@ impl ConstraintSolver {
         }
 
         while let Some((xi, xj)) = queue.pop_front() {
+<<<<<<< HEAD
             if self.revise(&xi, &xj) {
                 if self
                     .variables
                     .get(&xi)
                     .map_or(true, |v| v.domain.is_empty())
                 {
+=======
+ if self.revise(&xi, &xj) {
+                if self.variables.get(&xi).map_or(true, |v| v.domain.is_empty()) {
+>>>>>>> 4b60ced (docs: update README)
                     return false;
                 }
                 // Re-enqueue all arcs (xk, xi) where xk ≠ xj.
@@ -352,6 +385,7 @@ impl ConstraintSolver {
         if let Some(xi_var) = self.variables.get(xi) {
             if let Domain::Discrete(ref values) = xi_var.domain {
                 let original_len = values.len();
+<<<<<<< HEAD
                 let retained: Vec<_> = values
                     .iter()
                     .filter(|vi| {
@@ -371,6 +405,17 @@ impl ConstraintSolver {
                     })
                     .cloned()
                     .collect();
+=======
+                let retained: Vec<_> = values.iter().filter(|vi| {
+                    let vi_json = serde_json::json!(vi);
+                    for vj in &xj_domain {
+                        if self.values_consistent(xi, &vi_json, xj, vj, &constraints_involving_both) {
+                            return true;
+                        }
+                    }
+                    false
+                }).cloned().collect();
+>>>>>>> 4b60ced (docs: update README)
                 let retained_len = retained.len();
                 if let Some(xi_var) = self.variables.get_mut(xi) {
                     if let Domain::Discrete(ref mut values) = xi_var.domain {
@@ -418,11 +463,15 @@ impl ConstraintSolver {
                     _ => true, // unassigned → not violated yet
                 }
             }
+<<<<<<< HEAD
             Constraint::LiteralComparison {
                 variable,
                 op,
                 value,
             } => {
+=======
+            Constraint::LiteralComparison { variable, op, value } => {
+>>>>>>> 4b60ced (docs: update README)
                 if let Some(v) = assignment.get(variable) {
                     compare_values(v, value, *op)
                 } else {
@@ -506,7 +555,15 @@ impl ConstraintSolver {
         // Phase 2: Backtracking search.
         let mut assignment: HashMap<String, serde_json::Value> = HashMap::new();
         let mut backtracks = 0u64;
+<<<<<<< HEAD
         let ordered_vars: Vec<String> = self.variables.keys().cloned().collect();
+=======
+        let ordered_vars: Vec<String> = self
+            .variables
+            .keys()
+            .cloned()
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
 
         if self.backtrack(&mut assignment, &ordered_vars, 0, &mut backtracks) {
             let assigned_names: HashSet<String> = assignment.keys().cloned().collect();
@@ -551,10 +608,16 @@ impl ConstraintSolver {
             assignment.insert(var_name.clone(), value.clone());
 
             // Forward check: verify all constraints with fully-assigned variables.
+<<<<<<< HEAD
             let consistent = self
                 .constraints
                 .iter()
                 .all(|c| self.check_constraint(c, assignment));
+=======
+            let consistent = self.constraints.iter().all(|c| {
+                self.check_constraint(c, assignment)
+            });
+>>>>>>> 4b60ced (docs: update README)
 
             if consistent {
                 if self.backtrack(assignment, variables, index + 1, backtracks) {
@@ -674,6 +737,7 @@ impl Duration {
             (&s[..s.len() - 2], "ms")
         } else {
             let last = s.chars().last()?;
+<<<<<<< HEAD
             (
                 &s[..s.len() - 1],
                 match last {
@@ -684,6 +748,15 @@ impl Duration {
                     _ => return None,
                 },
             )
+=======
+            (&s[..s.len() - 1], match last {
+                's' => "s",
+                'm' => "m",
+                'h' => "h",
+                'd' => "d",
+                _ => return None,
+            })
+>>>>>>> 4b60ced (docs: update README)
         };
         let num: f64 = num_str.parse().ok()?;
         let seconds = match unit {
@@ -855,6 +928,7 @@ impl PolicyParser {
         }
 
         // Generate a deterministic ID from the raw text.
+<<<<<<< HEAD
         let id = format!(
             "pol_{:08x}",
             crate::ananta::crypto::hashing::hash_bytes(
@@ -866,6 +940,11 @@ impl PolicyParser {
             .take(4)
             .fold(0u32, |a, b| a.wrapping_mul(31).wrapping_add(*b as u32))
         );
+=======
+        let id = format!("pol_{:08x}", crate::ananta::crypto::hashing::hash_bytes(raw.as_bytes(), &crate::ananta::config::HashAlgorithm::Sha256).bytes.iter().take(4).fold(0u32, |a, b| a.wrapping_mul(31).wrapping_add(*b as u32)));
+
+
+>>>>>>> 4b60ced (docs: update README)
 
         Ok(PolicyStatement {
             id,
@@ -950,7 +1029,14 @@ impl PolicyParser {
         tokens
     }
 
+<<<<<<< HEAD
     fn parse_kind(tokens: &[String], pos: usize) -> Result<(PolicyKind, usize), PolicyParseError> {
+=======
+    fn parse_kind(
+        tokens: &[String],
+        pos: usize,
+    ) -> Result<(PolicyKind, usize), PolicyParseError> {
+>>>>>>> 4b60ced (docs: update README)
         if pos >= tokens.len() {
             return Err(PolicyParseError::IncompleteStatement(
                 "expected policy kind".into(),
@@ -970,7 +1056,14 @@ impl PolicyParser {
         Ok((kind, pos + 1))
     }
 
+<<<<<<< HEAD
     fn parse_field(tokens: &[String], pos: usize) -> Result<(String, usize), PolicyParseError> {
+=======
+    fn parse_field(
+        tokens: &[String],
+        pos: usize,
+    ) -> Result<(String, usize), PolicyParseError> {
+>>>>>>> 4b60ced (docs: update README)
         if pos >= tokens.len() {
             return Err(PolicyParseError::IncompleteStatement(
                 "expected field name".into(),
@@ -983,10 +1076,15 @@ impl PolicyParser {
         while p < tokens.len() {
             let t = &tokens[p];
             // Stop if we hit a comparison operator or keyword.
+<<<<<<< HEAD
             if [
                 ">", "<", ">=", "<=", "==", "!=", "WHEN", "UNLESS", "PRIORITY",
             ]
             .contains(&t.as_str())
+=======
+            if [">", "<", ">=", "<=", "==", "!=", "WHEN", "UNLESS", "PRIORITY"]
+                .contains(&t.as_str())
+>>>>>>> 4b60ced (docs: update README)
             {
                 break;
             }
@@ -1007,7 +1105,14 @@ impl PolicyParser {
         Ok((field_parts.join("."), p))
     }
 
+<<<<<<< HEAD
     fn parse_cmp_op(tokens: &[String], pos: usize) -> Result<(CmpOp, usize), PolicyParseError> {
+=======
+    fn parse_cmp_op(
+        tokens: &[String],
+        pos: usize,
+    ) -> Result<(CmpOp, usize), PolicyParseError> {
+>>>>>>> 4b60ced (docs: update README)
         if pos >= tokens.len() {
             return Err(PolicyParseError::InvalidComparison(
                 "expected comparison operator".into(),
@@ -1039,8 +1144,14 @@ impl PolicyParser {
                 "expected value after operator".into(),
             ));
         }
+<<<<<<< HEAD
         let val = Duration::parse_value(&tokens[pos])
             .ok_or_else(|| PolicyParseError::InvalidValue(tokens[pos].clone()))?;
+=======
+        let val = Duration::parse_value(&tokens[pos]).ok_or_else(|| {
+            PolicyParseError::InvalidValue(tokens[pos].clone())
+        })?;
+>>>>>>> 4b60ced (docs: update README)
         Ok((val, pos + 1))
     }
 
@@ -1135,11 +1246,19 @@ impl PolicyParser {
         let (op, new_pos) = Self::parse_cmp_op(tokens, pos)?;
         let pos = new_pos;
         let (value, new_pos) = Self::parse_value_token(tokens, pos)?;
+<<<<<<< HEAD
         Ok((PolicyExpr::Comparison { field, op, value }, new_pos))
+=======
+        Ok((
+            PolicyExpr::Comparison { field, op, value },
+            new_pos,
+        ))
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
 /// Evaluate a policy expression against the current system state.
+<<<<<<< HEAD
 pub fn evaluate_policy_expr(expr: &PolicyExpr, state: &HashMap<String, serde_json::Value>) -> bool {
     match expr {
         PolicyExpr::Comparison { field, op, value } => {
@@ -1147,6 +1266,15 @@ pub fn evaluate_policy_expr(expr: &PolicyExpr, state: &HashMap<String, serde_jso
                 .get(field.as_str())
                 .cloned()
                 .unwrap_or(serde_json::Value::Null);
+=======
+pub fn evaluate_policy_expr(
+    expr: &PolicyExpr,
+    state: &HashMap<String, serde_json::Value>,
+) -> bool {
+    match expr {
+        PolicyExpr::Comparison { field, op, value } => {
+            let state_val = state.get(field.as_str()).cloned().unwrap_or(serde_json::Value::Null);
+>>>>>>> 4b60ced (docs: update README)
             let policy_json = match value {
                 PolicyValue::Number(n) => serde_json::json!(*n),
                 PolicyValue::String(s) => serde_json::json!(s),
@@ -1231,11 +1359,15 @@ pub struct SemVer {
 
 impl SemVer {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
+<<<<<<< HEAD
         Self {
             major,
             minor,
             patch,
         }
+=======
+        Self { major, minor, patch }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     pub fn parse(s: &str) -> Option<Self> {
@@ -1331,10 +1463,14 @@ pub struct SchemaChange {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MigrationStep {
     /// Add a new field with a default value.
+<<<<<<< HEAD
     AddField {
         name: String,
         default: serde_json::Value,
     },
+=======
+    AddField { name: String, default: serde_json::Value },
+>>>>>>> 4b60ced (docs: update README)
     /// Remove a field.
     RemoveField { name: String },
     /// Rename a field.
@@ -1349,10 +1485,14 @@ pub enum MigrationStep {
     /// Clamp values to a new range.
     ClampValues { name: String, min: f64, max: f64 },
     /// Set a default for previously null values.
+<<<<<<< HEAD
     SetDefault {
         name: String,
         default: serde_json::Value,
     },
+=======
+    SetDefault { name: String, default: serde_json::Value },
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Validates schema evolution and computes migration paths.
@@ -1449,7 +1589,14 @@ impl SchemaEvolutionValidator {
                         old_value: Some("optional".to_string()),
                         new_value: Some("required".to_string()),
                         breaking: true,
+<<<<<<< HEAD
                         description: format!("Field '{}' changed from optional to required", name),
+=======
+                        description: format!(
+                            "Field '{}' changed from optional to required",
+                            name
+                        ),
+>>>>>>> 4b60ced (docs: update README)
                     });
                 }
                 // Check default value changes.
@@ -1457,8 +1604,19 @@ impl SchemaEvolutionValidator {
                     changes.push(SchemaChange {
                         field_name: name.clone(),
                         kind: SchemaChangeKind::DefaultChanged,
+<<<<<<< HEAD
                         old_value: old_field.default_value.as_ref().map(|v| v.to_string()),
                         new_value: new_field.default_value.as_ref().map(|v| v.to_string()),
+=======
+                        old_value: old_field
+                            .default_value
+                            .as_ref()
+                            .map(|v| v.to_string()),
+                        new_value: new_field
+                            .default_value
+                            .as_ref()
+                            .map(|v| v.to_string()),
+>>>>>>> 4b60ced (docs: update README)
                         breaking: false,
                         description: format!("Field '{}' default changed", name),
                     });
@@ -1486,7 +1644,13 @@ impl SchemaEvolutionValidator {
         // Handle removed fields.
         for name in old.fields.keys() {
             if !new.fields.contains_key(name) {
+<<<<<<< HEAD
                 steps.push(MigrationStep::RemoveField { name: name.clone() });
+=======
+                steps.push(MigrationStep::RemoveField {
+                    name: name.clone(),
+                });
+>>>>>>> 4b60ced (docs: update README)
             }
         }
 
@@ -1510,10 +1674,16 @@ impl SchemaEvolutionValidator {
         // Handle constraint changes via clamping.
         for (name, new_field) in &new.fields {
             if let Some(old_field) = old.fields.get(name) {
+<<<<<<< HEAD
                 let needs_clamp = (new_field.min_value.is_some()
                     && new_field.min_value != old_field.min_value)
                     || (new_field.max_value.is_some()
                         && new_field.max_value != old_field.max_value);
+=======
+                let needs_clamp =
+                    (new_field.min_value.is_some() && new_field.min_value != old_field.min_value)
+ || (new_field.max_value.is_some() && new_field.max_value != old_field.max_value);
+>>>>>>> 4b60ced (docs: update README)
                 if needs_clamp {
                     steps.push(MigrationStep::ClampValues {
                         name: name.clone(),
@@ -1550,7 +1720,14 @@ impl SchemaEvolutionValidator {
     }
 
     /// Validate that a data record conforms to the given schema.
+<<<<<<< HEAD
     pub fn validate_data(schema: &SchemaVersion, data: &serde_json::Value) -> Vec<String> {
+=======
+    pub fn validate_data(
+        schema: &SchemaVersion,
+        data: &serde_json::Value,
+    ) -> Vec<String> {
+>>>>>>> 4b60ced (docs: update README)
         let mut errors = Vec::new();
         let obj = match data.as_object() {
             Some(o) => o,
@@ -1569,7 +1746,13 @@ impl SchemaEvolutionValidator {
                 if !Self::check_type(value, &field.field_type) {
                     errors.push(format!(
                         "field '{}' has wrong type: expected {:?}, got {}",
+<<<<<<< HEAD
                         name, field.field_type, value
+=======
+                        name,
+                        field.field_type,
+                        value
+>>>>>>> 4b60ced (docs: update README)
                     ));
                 }
                 if let Some(n) = value.as_f64() {
@@ -1603,8 +1786,13 @@ impl SchemaEvolutionValidator {
             FieldType::Duration => value.is_string() || value.is_number(),
             FieldType::Enum(variants) => value
                 .as_str()
+<<<<<<< HEAD
                 .map(|s| variants.iter().any(|v| v == s))
                 .unwrap_or(false),
+=======
+                        .map(|s| variants.iter().any(|v| v == s))
+                        .unwrap_or(false),
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -1667,7 +1855,13 @@ impl PolicyConflictDetector {
         let mut conflicts = Vec::new();
         for i in 0..policies.len() {
             for j in (i + 1)..policies.len() {
+<<<<<<< HEAD
                 if let Some(conflict) = Self::check_pair(&policies[i], &policies[j]) {
+=======
+                if let Some(conflict) =
+                    Self::check_pair(&policies[i], &policies[j])
+                {
+>>>>>>> 4b60ced (docs: update README)
                     conflicts.push(conflict);
                 }
             }
@@ -1723,12 +1917,17 @@ impl PolicyConflictDetector {
             if Self::constraints_incompatible(a, b) {
                 return Some(format!(
                     "Contradictory REQUIRE: {} {} {} vs {} {} {}",
+<<<<<<< HEAD
                     a.target,
                     a.constraint,
                     Self::value_str(&a.threshold),
                     b.target,
                     b.constraint,
                     Self::value_str(&b.threshold)
+=======
+                    a.target, a.constraint, Self::value_str(&a.threshold),
+                    b.target, b.constraint, Self::value_str(&b.threshold)
+>>>>>>> 4b60ced (docs: update README)
                 ));
             }
         }
@@ -1736,12 +1935,17 @@ impl PolicyConflictDetector {
             if Self::forbid_ranges_overlap(a, b) {
                 return Some(format!(
                     "Overlapping FORBID: {} {} {} and {} {} {}",
+<<<<<<< HEAD
                     a.target,
                     a.constraint,
                     Self::value_str(&a.threshold),
                     b.target,
                     b.constraint,
                     Self::value_str(&b.threshold)
+=======
+                    a.target, a.constraint, Self::value_str(&a.threshold),
+                    b.target, b.constraint, Self::value_str(&b.threshold)
+>>>>>>> 4b60ced (docs: update README)
                 ));
             }
         }
@@ -1757,11 +1961,16 @@ impl PolicyConflictDetector {
             if Self::require_forbids_require(req, fbd) {
                 return Some(format!(
                     "REQUIRE and FORBID conflict on {}: REQUIRE {} {}, FORBID {} {}",
+<<<<<<< HEAD
                     req.target,
                     req.constraint,
                     Self::value_str(&req.threshold),
                     fbd.constraint,
                     Self::value_str(&fbd.threshold)
+=======
+                    req.target, req.constraint, Self::value_str(&req.threshold),
+                    fbd.constraint, Self::value_str(&fbd.threshold)
+>>>>>>> 4b60ced (docs: update README)
                 ));
             }
         }
@@ -1866,6 +2075,7 @@ impl PolicyConflictDetector {
                         if an >= bn {
                             return Some(format!(
                                 "Policy {} ({}) {} {} is subsumed by {} ({}) {} {}",
+<<<<<<< HEAD
                                 b.id,
                                 b.kind,
                                 b.target,
@@ -1874,6 +2084,10 @@ impl PolicyConflictDetector {
                                 a.kind,
                                 a.target,
                                 Self::value_str(&a.threshold)
+=======
+                                b.id, b.kind, b.target, Self::value_str(&b.threshold),
+                                a.id, a.kind, a.target, Self::value_str(&a.threshold)
+>>>>>>> 4b60ced (docs: update README)
                             ));
                         }
                     }
@@ -1881,6 +2095,7 @@ impl PolicyConflictDetector {
                         if an <= bn {
                             return Some(format!(
                                 "Policy {} ({}) {} {} is subsumed by {} ({}) {} {}",
+<<<<<<< HEAD
                                 b.id,
                                 b.kind,
                                 b.target,
@@ -1889,6 +2104,10 @@ impl PolicyConflictDetector {
                                 a.kind,
                                 a.target,
                                 Self::value_str(&a.threshold)
+=======
+                                b.id, b.kind, b.target, Self::value_str(&b.threshold),
+                                a.id, a.kind, a.target, Self::value_str(&a.threshold)
+>>>>>>> 4b60ced (docs: update README)
                             ));
                         }
                     }
@@ -2054,8 +2273,16 @@ impl BlueprintValidator {
         let mut issues = Vec::new();
 
         // Build node lookup.
+<<<<<<< HEAD
         let node_map: HashMap<&str, &BlueprintNode> =
             blueprint.nodes.iter().map(|n| (n.id.as_str(), n)).collect();
+=======
+        let node_map: HashMap<&str, &BlueprintNode> = blueprint
+            .nodes
+            .iter()
+            .map(|n| (n.id.as_str(), n))
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
 
         // 1. Check for duplicate node IDs.
         let mut seen_ids = HashSet::new();
@@ -2116,9 +2343,13 @@ impl BlueprintValidator {
 
         // 5. Check per-node resource requirements.
         for node in &blueprint.nodes {
+<<<<<<< HEAD
             let violations = node
                 .resource_requirements
                 .exceeds(&blueprint.resource_limits);
+=======
+            let violations = node.resource_requirements.exceeds(&blueprint.resource_limits);
+>>>>>>> 4b60ced (docs: update README)
             for v in &violations {
                 issues.push(BlueprintIssue {
                     severity: IssueSeverity::Warning,
@@ -2148,7 +2379,14 @@ impl BlueprintValidator {
         let depth = Self::compute_max_depth(&blueprint.nodes);
 
         // 8. Check for nodes with no dependents (leaf nodes) and no dependencies (root nodes).
+<<<<<<< HEAD
         let has_roots = blueprint.nodes.iter().any(|n| n.dependencies.is_empty());
+=======
+        let has_roots = blueprint
+            .nodes
+            .iter()
+            .any(|n| n.dependencies.is_empty());
+>>>>>>> 4b60ced (docs: update README)
         if !has_roots && !blueprint.nodes.is_empty() {
             issues.push(BlueprintIssue {
                 severity: IssueSeverity::Warning,
@@ -2158,9 +2396,15 @@ impl BlueprintValidator {
             });
         }
 
+<<<<<<< HEAD
         let valid = !issues
             .iter()
             .any(|i| i.severity == IssueSeverity::Error || i.severity == IssueSeverity::Critical);
+=======
+        let valid = !issues.iter().any(|i| {
+            i.severity == IssueSeverity::Error || i.severity == IssueSeverity::Critical
+        });
+>>>>>>> 4b60ced (docs: update README)
 
         BlueprintValidationResult {
             valid,
@@ -2279,7 +2523,14 @@ impl BlueprintValidator {
     ) -> Vec<BlueprintIssue> {
         let mut issues = Vec::new();
         for node in &blueprint.nodes {
+<<<<<<< HEAD
             let node_trust = trust_levels.get(&node.id).copied().unwrap_or(0.0);
+=======
+            let node_trust = trust_levels
+                .get(&node.id)
+                .copied()
+                .unwrap_or(0.0);
+>>>>>>> 4b60ced (docs: update README)
             if node_trust < node.min_trust_level {
                 issues.push(BlueprintIssue {
                     severity: IssueSeverity::Error,
@@ -2393,9 +2644,15 @@ impl OrchestrationValidator {
         if let Some(ref schema) = self.schema {
             // Self-validation: check schema has at least one field.
             if schema.fields.is_empty() {
+<<<<<<< HEAD
                 report
                     .schema_issues
                     .push("Schema has no fields defined".to_string());
+=======
+                report.schema_issues.push(
+                    "Schema has no fields defined".to_string(),
+                );
+>>>>>>> 4b60ced (docs: update README)
             }
         }
 
@@ -2421,12 +2678,17 @@ impl OrchestrationValidator {
                 violations.push(PolicyViolation {
                     policy_id: policy.id.clone(),
                     target: policy.target.clone(),
+<<<<<<< HEAD
                     expected: format!(
                         "{} {} {}",
                         policy.kind,
                         policy.constraint,
                         PolicyConflictDetector::value_str(&policy.threshold)
                     ),
+=======
+                    expected: format!("{} {} {}", policy.kind, policy.constraint,
+                        PolicyConflictDetector::value_str(&policy.threshold)),
+>>>>>>> 4b60ced (docs: update README)
                     actual: state
                         .get(policy.target.as_str())
                         .cloned()
@@ -2458,6 +2720,7 @@ mod tests {
         let vars = vec![
             ConstraintVariable::new(
                 "ring.shield.trust",
+<<<<<<< HEAD
                 Domain::Continuous {
                     min: 0.0,
                     max: 1.0,
@@ -2471,6 +2734,13 @@ mod tests {
                     max: 1.0,
                     step: Some(0.1),
                 },
+=======
+                Domain::Continuous { min: 0.0, max: 1.0, step: Some(0.1) },
+            ),
+            ConstraintVariable::new(
+                "ring.learning.trust",
+                Domain::Continuous { min: 0.0, max: 1.0, step: Some(0.1) },
+>>>>>>> 4b60ced (docs: update README)
             ),
             ConstraintVariable::new(
                 "pipeline.mode",
@@ -2510,18 +2780,30 @@ mod tests {
 
     #[test]
     fn test_domain_narrow() {
+<<<<<<< HEAD
         let mut d = Domain::Continuous {
             min: 0.0,
             max: 1.0,
             step: None,
         };
+=======
+        let mut d = Domain::Continuous { min: 0.0, max: 1.0, step: None };
+>>>>>>> 4b60ced (docs: update README)
         assert!(d.narrow(0.3, 0.7));
         assert!(!d.narrow(0.8, 0.9)); // 0.7 < 0.8 → empty
     }
 
     #[test]
     fn test_domain_remove_discrete() {
+<<<<<<< HEAD
         let mut d = Domain::Discrete(vec!["a".to_string(), "b".to_string(), "c".to_string()]);
+=======
+        let mut d = Domain::Discrete(vec![
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string(),
+        ]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(d.remove_discrete("b"));
         assert!(!d.remove_discrete("z"));
         assert_eq!(d.size(), 2);
@@ -2529,6 +2811,7 @@ mod tests {
 
     #[test]
     fn test_compare_values_numeric() {
+<<<<<<< HEAD
         assert!(compare_values(
             &serde_json::json!(5.0),
             &serde_json::json!(3.0),
@@ -2554,10 +2837,18 @@ mod tests {
             &serde_json::json!(2.0),
             CmpOp::Neq
         ));
+=======
+        assert!(compare_values(&serde_json::json!(5.0), &serde_json::json!(3.0), CmpOp::Gt));
+        assert!(compare_values(&serde_json::json!(3.0), &serde_json::json!(3.0), CmpOp::Gte));
+        assert!(!compare_values(&serde_json::json!(3.0), &serde_json::json!(5.0), CmpOp::Gte));
+        assert!(compare_values(&serde_json::json!(1.0), &serde_json::json!(1.0), CmpOp::Eq));
+        assert!(compare_values(&serde_json::json!(1.0), &serde_json::json!(2.0), CmpOp::Neq));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn test_compare_values_string() {
+<<<<<<< HEAD
         assert!(compare_values(
             &serde_json::json!("b"),
             &serde_json::json!("a"),
@@ -2568,10 +2859,15 @@ mod tests {
             &serde_json::json!("a"),
             CmpOp::Eq
         ));
+=======
+        assert!(compare_values(&serde_json::json!("b"), &serde_json::json!("a"), CmpOp::Gt));
+        assert!(compare_values(&serde_json::json!("a"), &serde_json::json!("a"), CmpOp::Eq));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn test_compare_values_boolean() {
+<<<<<<< HEAD
         assert!(compare_values(
             &serde_json::json!(true),
             &serde_json::json!(false),
@@ -2582,6 +2878,10 @@ mod tests {
             &serde_json::json!(true),
             CmpOp::Gt
         ));
+=======
+        assert!(compare_values(&serde_json::json!(true), &serde_json::json!(false), CmpOp::Gt));
+        assert!(!compare_values(&serde_json::json!(false), &serde_json::json!(true), CmpOp::Gt));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2595,11 +2895,15 @@ mod tests {
     fn test_solver_unsatisfiable() {
         let vars = vec![ConstraintVariable::new(
             "x",
+<<<<<<< HEAD
             Domain::Continuous {
                 min: 0.0,
                 max: 0.5,
                 step: Some(0.1),
             },
+=======
+            Domain::Continuous { min: 0.0, max: 0.5, step: Some(0.1) },
+>>>>>>> 4b60ced (docs: update README)
         )];
         let constraints = vec![Constraint::LiteralComparison {
             variable: "x".to_string(),
@@ -2616,6 +2920,7 @@ mod tests {
     #[test]
     fn test_solver_not_equal() {
         let vars = vec![
+<<<<<<< HEAD
             ConstraintVariable::new(
                 "a",
                 Domain::Discrete(vec!["x".to_string(), "y".to_string()]),
@@ -2624,6 +2929,10 @@ mod tests {
                 "b",
                 Domain::Discrete(vec!["x".to_string(), "y".to_string()]),
             ),
+=======
+            ConstraintVariable::new("a", Domain::Discrete(vec!["x".to_string(), "y".to_string()])),
+            ConstraintVariable::new("b", Domain::Discrete(vec!["x".to_string(), "y".to_string()])),
+>>>>>>> 4b60ced (docs: update README)
         ];
         let constraints = vec![Constraint::NotEqual {
             left: "a".to_string(),
@@ -2640,10 +2949,14 @@ mod tests {
     #[test]
     fn test_ac3_removes_inconsistent() {
         let vars = vec![
+<<<<<<< HEAD
             ConstraintVariable::new(
                 "a",
                 Domain::Discrete(vec!["x".to_string(), "y".to_string()]),
             ),
+=======
+            ConstraintVariable::new("a", Domain::Discrete(vec!["x".to_string(), "y".to_string()])),
+>>>>>>> 4b60ced (docs: update README)
             ConstraintVariable::new("b", Domain::Discrete(vec!["x".to_string()])),
         ];
         let constraints = vec![Constraint::NotEqual {
@@ -2665,8 +2978,14 @@ mod tests {
 
     #[test]
     fn test_parse_require() {
+<<<<<<< HEAD
         let stmt =
             PolicyParser::parse("REQUIRE ring.shield.trust > 0.8 WHEN risk.level >= 0.5").unwrap();
+=======
+        let stmt = PolicyParser::parse(
+            "REQUIRE ring.shield.trust > 0.8 WHEN risk.level >= 0.5"
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(stmt.kind, PolicyKind::Require);
         assert_eq!(stmt.target, "ring.shield.trust");
         assert_eq!(stmt.constraint, CmpOp::Gt);
@@ -2676,24 +2995,41 @@ mod tests {
     #[test]
     fn test_parse_forbid_unless() {
         let stmt = PolicyParser::parse(
+<<<<<<< HEAD
             "FORBID ring.learning.data_retention > 86400 UNLESS compliance.gdpr.granted == true",
         )
         .unwrap();
+=======
+            "FORBID ring.learning.data_retention > 86400 UNLESS compliance.gdpr.granted == true"
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(stmt.kind, PolicyKind::Forbid);
         assert!(stmt.unless.is_some());
     }
 
     #[test]
     fn test_parse_ensure_priority() {
+<<<<<<< HEAD
         let stmt = PolicyParser::parse("ENSURE anomaly_detection.sensitivity >= 0.9 PRIORITY high")
             .unwrap();
+=======
+        let stmt = PolicyParser::parse(
+            "ENSURE anomaly_detection.sensitivity >= 0.9 PRIORITY high"
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(stmt.kind, PolicyKind::Ensure);
         assert_eq!(stmt.priority, PolicyPriority::High);
     }
 
     #[test]
     fn test_parse_duration_value() {
+<<<<<<< HEAD
         let stmt = PolicyParser::parse("REQUIRE session.timeout > 24h").unwrap();
+=======
+        let stmt = PolicyParser::parse(
+            "REQUIRE session.timeout > 24h"
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         match stmt.threshold {
             PolicyValue::Duration(d) => assert_eq!(d.seconds, 86400),
             _ => panic!("Expected duration value"),
@@ -2703,7 +3039,14 @@ mod tests {
     #[test]
     fn test_evaluate_policy_expr_comparison() {
         let mut state = HashMap::new();
+<<<<<<< HEAD
         state.insert("ring.shield.trust".to_string(), serde_json::json!(0.9));
+=======
+        state.insert(
+            "ring.shield.trust".to_string(),
+            serde_json::json!(0.9),
+        );
+>>>>>>> 4b60ced (docs: update README)
         let expr = PolicyExpr::Comparison {
             field: "ring.shield.trust".to_string(),
             op: CmpOp::Gt,
@@ -2747,7 +3090,13 @@ mod tests {
 
     #[test]
     fn test_evaluate_policy_when_condition() {
+<<<<<<< HEAD
         let stmt = PolicyParser::parse("REQUIRE x > 0.8 WHEN y >= 1.0").unwrap();
+=======
+        let stmt = PolicyParser::parse(
+            "REQUIRE x > 0.8 WHEN y >= 1.0"
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let mut state = HashMap::new();
         state.insert("x".to_string(), serde_json::json!(0.5));
         state.insert("y".to_string(), serde_json::json!(0.5));
@@ -2821,10 +3170,14 @@ mod tests {
         let v1 = make_v1_schema();
         let v2 = make_v2_schema();
         let changes = SchemaEvolutionValidator::diff(&v1, &v2);
+<<<<<<< HEAD
         let added: Vec<_> = changes
             .iter()
             .filter(|c| c.kind == SchemaChangeKind::FieldAdded)
             .collect();
+=======
+        let added: Vec<_> = changes.iter().filter(|c| c.kind == SchemaChangeKind::FieldAdded).collect();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(added.len(), 1);
         assert_eq!(added[0].field_name, "data_retention_hours");
     }
@@ -2847,9 +3200,13 @@ mod tests {
         let v2 = make_v2_schema();
         let steps = SchemaEvolutionValidator::compute_migration(&v1, &v2);
         assert!(!steps.is_empty());
+<<<<<<< HEAD
         let has_add = steps
             .iter()
             .any(|s| matches!(s, MigrationStep::AddField { .. }));
+=======
+        let has_add = steps.iter().any(|s| matches!(s, MigrationStep::AddField { .. }));
+>>>>>>> 4b60ced (docs: update README)
         assert!(has_add);
     }
 
@@ -3018,7 +3375,14 @@ mod tests {
         };
         let result = BlueprintValidator::validate(&bp);
         assert!(!result.valid);
+<<<<<<< HEAD
         let has_resource = result.issues.iter().any(|i| i.category == "resource_limit");
+=======
+        let has_resource = result
+            .issues
+            .iter()
+            .any(|i| i.category == "resource_limit");
+>>>>>>> 4b60ced (docs: update README)
         assert!(has_resource);
     }
 
@@ -3036,9 +3400,18 @@ mod tests {
     #[test]
     fn test_orchestration_validator_full() {
         let solver = make_simple_solver();
+<<<<<<< HEAD
         let policies = vec![PolicyParser::parse("REQUIRE ring.shield.trust > 0.5").unwrap()];
         let bp = make_simple_blueprint();
         let validator = OrchestrationValidator::new(solver, policies).with_blueprint(bp);
+=======
+        let policies = vec![
+            PolicyParser::parse("REQUIRE ring.shield.trust > 0.5").unwrap(),
+        ];
+        let bp = make_simple_blueprint();
+        let validator = OrchestrationValidator::new(solver, policies)
+            .with_blueprint(bp);
+>>>>>>> 4b60ced (docs: update README)
         let mut validator = validator;
         let report = validator.validate();
         assert!(report.constraint_satisfiable);

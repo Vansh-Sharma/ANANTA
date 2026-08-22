@@ -71,11 +71,15 @@ impl ComparisonResult {
     pub fn from_records(records: &[PredictionRecord]) -> Self {
         let total = records.len() as u64;
         let correct = records.iter().filter(|r| r.correct).count() as u64;
+<<<<<<< HEAD
         let accuracy = if total > 0 {
             correct as f64 / total as f64
         } else {
             1.0
         };
+=======
+        let accuracy = if total > 0 { correct as f64 / total as f64 } else { 1.0 };
+>>>>>>> 4b60ced (docs: update README)
 
         let mut discrepancies = Vec::new();
         let mut false_positives = Vec::new();
@@ -112,11 +116,15 @@ impl ComparisonResult {
         let category_accuracy: HashMap<String, f64> = category_correct
             .into_iter()
             .map(|(cat, (correct, total))| {
+<<<<<<< HEAD
                 let acc = if total > 0 {
                     correct as f64 / total as f64
                 } else {
                     1.0
                 };
+=======
+                let acc = if total > 0 { correct as f64 / total as f64 } else { 1.0 };
+>>>>>>> 4b60ced (docs: update README)
                 (cat, acc)
             })
             .collect();
@@ -135,11 +143,15 @@ impl ComparisonResult {
     /// Get the most dangerous discrepancies (sorted by confidence descending).
     pub fn most_dangerous(&self, limit: usize) -> Vec<&TwinDiscrepancy> {
         let mut fps: Vec<_> = self.false_positives.iter().collect();
+<<<<<<< HEAD
         fps.sort_by(|a, b| {
             b.twin_confidence
                 .partial_cmp(&a.twin_confidence)
                 .unwrap_or(std::cmp::Ordering::Equal)
         });
+=======
+        fps.sort_by(|a, b| b.twin_confidence.partial_cmp(&a.twin_confidence).unwrap_or(std::cmp::Ordering::Equal));
+>>>>>>> 4b60ced (docs: update README)
         fps.truncate(limit);
         fps
     }
@@ -165,7 +177,14 @@ impl ComparisonResult {
     }
 
     fn worst_category_accuracy(&self) -> f64 {
+<<<<<<< HEAD
         self.category_accuracy.values().copied().fold(1.0, f64::min)
+=======
+        self.category_accuracy
+            .values()
+            .copied()
+            .fold(1.0, f64::min)
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -184,9 +203,13 @@ fn classify_discrepancy(predicted: PredictionType, actual: PredictionType) -> Di
     match (predicted, actual) {
         (PredictionType::Blocked, PredictionType::Allowed) => DiscrepancyType::FalsePositive,
         (PredictionType::Allowed, PredictionType::Blocked) => DiscrepancyType::FalseNegative,
+<<<<<<< HEAD
         (PredictionType::Escalated, _) | (_, PredictionType::Escalated) => {
             DiscrepancyType::WrongEscalation
         }
+=======
+        (PredictionType::Escalated, _) | (_, PredictionType::Escalated) => DiscrepancyType::WrongEscalation,
+>>>>>>> 4b60ced (docs: update README)
         (PredictionType::Uncertain, PredictionType::Blocked) => DiscrepancyType::MissedUncertain,
         _ => DiscrepancyType::None,
     }
@@ -196,6 +219,7 @@ fn classify_discrepancy(predicted: PredictionType, actual: PredictionType) -> Di
 mod tests {
     use super::*;
 
+<<<<<<< HEAD
     fn make_record(
         payload: &str,
         predicted: PredictionType,
@@ -210,17 +234,25 @@ mod tests {
             vec!["shield".to_string()],
             cat,
         )
+=======
+    fn make_record(payload: &str, predicted: PredictionType, actual: PredictionType, cat: &str) -> PredictionRecord {
+        PredictionRecord::new(payload, predicted, actual, 0.9, vec!["shield".to_string()], cat)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn perfect_accuracy() {
         let records = vec![
+<<<<<<< HEAD
             make_record(
                 "a",
                 PredictionType::Blocked,
                 PredictionType::Blocked,
                 "sqli",
             ),
+=======
+            make_record("a", PredictionType::Blocked, PredictionType::Blocked, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
             make_record("b", PredictionType::Allowed, PredictionType::Allowed, "xss"),
         ];
         let result = ComparisonResult::from_records(&records);
@@ -230,6 +262,7 @@ mod tests {
 
     #[test]
     fn false_positive_detection() {
+<<<<<<< HEAD
         let records = vec![make_record(
             "sqli",
             PredictionType::Blocked,
@@ -243,11 +276,21 @@ mod tests {
             result.false_positives[0].discrepancy_type,
             DiscrepancyType::FalsePositive
         );
+=======
+        let records = vec![
+            make_record("sqli", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+        ];
+        let result = ComparisonResult::from_records(&records);
+        assert_eq!(result.accuracy, 0.0);
+        assert_eq!(result.false_positives.len(), 1);
+        assert_eq!(result.false_positives[0].discrepancy_type, DiscrepancyType::FalsePositive);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn category_accuracy() {
         let records = vec![
+<<<<<<< HEAD
             make_record(
                 "a",
                 PredictionType::Blocked,
@@ -260,6 +303,10 @@ mod tests {
                 PredictionType::Allowed,
                 "sqli",
             ),
+=======
+            make_record("a", PredictionType::Blocked, PredictionType::Blocked, "sqli"),
+            make_record("b", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
             make_record("c", PredictionType::Blocked, PredictionType::Blocked, "xss"),
         ];
         let result = ComparisonResult::from_records(&records);
@@ -270,6 +317,7 @@ mod tests {
     #[test]
     fn summary_output() {
         let records = vec![
+<<<<<<< HEAD
             make_record(
                 "a",
                 PredictionType::Blocked,
@@ -282,6 +330,10 @@ mod tests {
                 PredictionType::Allowed,
                 "sqli",
             ),
+=======
+            make_record("a", PredictionType::Blocked, PredictionType::Blocked, "sqli"),
+            make_record("b", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
         ];
         let result = ComparisonResult::from_records(&records);
         let summary = result.summary();
@@ -292,6 +344,7 @@ mod tests {
     #[test]
     fn most_dangerous_sorting() {
         let records = vec![
+<<<<<<< HEAD
             make_record(
                 "low-conf-fp",
                 PredictionType::Blocked,
@@ -304,6 +357,10 @@ mod tests {
                 PredictionType::Allowed,
                 "b",
             ),
+=======
+            make_record("low-conf-fp", PredictionType::Blocked, PredictionType::Allowed, "a"),
+            make_record("high-conf-fp", PredictionType::Blocked, PredictionType::Allowed, "b"),
+>>>>>>> 4b60ced (docs: update README)
         ];
         let mut result = ComparisonResult::from_records(&records);
         // Set confidence values

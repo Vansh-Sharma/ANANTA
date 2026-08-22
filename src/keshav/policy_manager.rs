@@ -65,9 +65,13 @@ impl PolicyManager {
     /// Returns Ok with the new version on success, Err on failure.
     /// On failure, the old policy continues to serve requests.
     pub fn reload_from_file(&self) -> Result<String, String> {
+<<<<<<< HEAD
         let path = self
             .policy_path
             .as_ref()
+=======
+        let path = self.policy_path.as_ref()
+>>>>>>> 4b60ced (docs: update README)
             .ok_or_else(|| "no policy_path configured".to_string())?;
 
         let content = std::fs::read_to_string(path)
@@ -168,6 +172,7 @@ mod tests {
     use crate::shield::ShieldVerdict;
 
     fn shield_allow() -> crate::shield::ShieldVerdict {
+<<<<<<< HEAD
         ShieldVerdict {
             decision: Decision::Allow,
             engine_results: vec![],
@@ -178,6 +183,13 @@ mod tests {
     fn make_all_verdicts() -> crate::keshav::decide::AllRingVerdicts<'static> {
         static SHIELD: std::sync::OnceLock<crate::shield::ShieldVerdict> =
             std::sync::OnceLock::new();
+=======
+        ShieldVerdict { decision: Decision::Allow, engine_results: vec![], latency_ms: 0.5 }
+    }
+
+    fn make_all_verdicts() -> crate::keshav::decide::AllRingVerdicts<'static> {
+        static SHIELD: std::sync::OnceLock<crate::shield::ShieldVerdict> = std::sync::OnceLock::new();
+>>>>>>> 4b60ced (docs: update README)
         let shield = SHIELD.get_or_init(|| crate::shield::ShieldVerdict {
             decision: Decision::Allow,
             engine_results: vec![],

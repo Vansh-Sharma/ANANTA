@@ -104,8 +104,12 @@ impl PipelineStage {
 
     /// Deserialize a stage from a JSON string.
     pub fn from_json(json: &str) -> Result<Self, String> {
+<<<<<<< HEAD
         serde_json::from_str(json)
             .map_err(|e| format!("failed to deserialize PipelineStage: {}", e))
+=======
+        serde_json::from_str(json).map_err(|e| format!("failed to deserialize PipelineStage: {}", e))
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -185,12 +189,22 @@ impl PipelineConfig {
         // Serialize to Value (serde_json::Map uses BTreeMap by default when
         // the `preserve_order` feature is not enabled), giving deterministic
         // key ordering regardless of HashMap fields in nested structs.
+<<<<<<< HEAD
         let mut val = serde_json::to_value(self).unwrap_or_else(|_| serde_json::json!("corrupt"));
+=======
+        let mut val = serde_json::to_value(self)
+            .unwrap_or_else(|_| serde_json::json!("corrupt"));
+>>>>>>> 4b60ced (docs: update README)
         // Remove the checksum field to avoid circularity.
         if let Some(obj) = val.as_object_mut() {
             obj.remove("checksum");
         }
+<<<<<<< HEAD
         let json = serde_json::to_string(&val).unwrap_or_else(|_| "corrupt".to_string());
+=======
+        let json = serde_json::to_string(&val)
+            .unwrap_or_else(|_| "corrupt".to_string());
+>>>>>>> 4b60ced (docs: update README)
         let hash = Sha256::digest(json.as_bytes());
         let val = u64::from_be_bytes(hash[0..8].try_into().unwrap_or([0u8; 8]));
         format!("{:016x}", val)
@@ -251,16 +265,24 @@ impl PipelineConfig {
 
     /// Find a stage by its `stage_id` or `name`.
     pub fn find_stage(&self, stage_id: &str) -> Option<&PipelineStage> {
+<<<<<<< HEAD
         self.stages
             .iter()
             .find(|s| s.stage_id == stage_id || s.name == stage_id)
+=======
+        self.stages.iter().find(|s| s.stage_id == stage_id || s.name == stage_id)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Find a mutable stage by its `stage_id` or `name`.
     pub fn find_stage_mut(&mut self, stage_id: &str) -> Option<&mut PipelineStage> {
+<<<<<<< HEAD
         self.stages
             .iter_mut()
             .find(|s| s.stage_id == stage_id || s.name == stage_id)
+=======
+        self.stages.iter_mut().find(|s| s.stage_id == stage_id || s.name == stage_id)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Return all critical stages.
@@ -330,9 +352,13 @@ pub struct ValidationResult {
 impl ValidationResult {
     /// Create a validation result from a list of issues.
     pub fn from_issues(issues: Vec<ValidationIssue>) -> Self {
+<<<<<<< HEAD
         let is_valid = !issues
             .iter()
             .any(|i| i.severity == ValidationSeverity::Error);
+=======
+        let is_valid = !issues.iter().any(|i| i.severity == ValidationSeverity::Error);
+>>>>>>> 4b60ced (docs: update README)
         // Start at 1.0 and deduct per issue.
         let mut score: f64 = 1.0;
         for issue in &issues {
@@ -455,9 +481,13 @@ impl PipelineValidator {
                                 "Consecutive disabled stages detected near '{}'",
                                 stage.name
                             ),
+<<<<<<< HEAD
                             suggestion: Some(
                                 "Enable one of the consecutive disabled stages".into(),
                             ),
+=======
+                            suggestion: Some("Enable one of the consecutive disabled stages".into()),
+>>>>>>> 4b60ced (docs: update README)
                         });
                     }
                     prev_disabled = true;
@@ -583,7 +613,14 @@ impl PipelineValidator {
                             issues.push(ValidationIssue {
                                 severity: ValidationSeverity::Error,
                                 field: format!("{}.enabled", proposal.target),
+<<<<<<< HEAD
                                 message: format!("Cannot disable critical stage '{}'", stage.name),
+=======
+                                message: format!(
+                                    "Cannot disable critical stage '{}'",
+                                    stage.name
+                                ),
+>>>>>>> 4b60ced (docs: update README)
                                 suggestion: Some(
                                     "Disable non-critical stages or add a replacement".into(),
                                 ),
@@ -688,10 +725,16 @@ impl PipelineValidator {
             .collect();
 
         if !enrich_names.is_empty() {
+<<<<<<< HEAD
             let first_decide_idx = config
                 .stages
                 .iter()
                 .position(|s| s.stage_type == StageType::Decide && s.enabled);
+=======
+            let first_decide_idx = config.stages.iter().position(|s| {
+                s.stage_type == StageType::Decide && s.enabled
+            });
+>>>>>>> 4b60ced (docs: update README)
             if let Some(decide_idx) = first_decide_idx {
                 for (i, stage) in config.stages.iter().enumerate() {
                     if stage.stage_type == StageType::Enrich && stage.enabled && i >= decide_idx {
@@ -891,7 +934,12 @@ impl PipelineExecutor {
         let error_msg = if changes_failed_count > 0 {
             Some(format!(
                 "{} of {} changes failed",
+<<<<<<< HEAD
                 changes_failed_count, changes_total
+=======
+                changes_failed_count,
+                changes_total
+>>>>>>> 4b60ced (docs: update README)
             ))
         } else {
             None
@@ -924,11 +972,17 @@ impl PipelineExecutor {
             Some(s) => s,
             None => {
                 // If no exact match, try to find a stage whose name contains the target
+<<<<<<< HEAD
                 let idx = config
                     .stages
                     .iter()
                     .position(|s| s.name.contains(target) || s.stage_id == target)
                     .ok_or_else(|| format!("target stage '{}' not found", target))?;
+=======
+                let idx = config.stages.iter().position(|s| {
+                    s.name.contains(target) || s.stage_id == target
+                }).ok_or_else(|| format!("target stage '{}' not found", target))?;
+>>>>>>> 4b60ced (docs: update README)
                 &mut config.stages[idx]
             }
         };
@@ -940,7 +994,14 @@ impl PipelineExecutor {
                     .as_bool()
                     .ok_or_else(|| "enabled must be a boolean".to_string())?;
                 if stage.is_critical() && !val {
+<<<<<<< HEAD
                     return Err(format!("cannot disable critical stage '{}'", stage.name));
+=======
+                    return Err(format!(
+                        "cannot disable critical stage '{}'",
+                        stage.name
+                    ));
+>>>>>>> 4b60ced (docs: update README)
                 }
                 stage.enabled = val;
             }
@@ -1272,7 +1333,14 @@ impl DynamicPipelineManager {
     }
 
     /// Revert a previously applied proposal.
+<<<<<<< HEAD
     pub fn revert_proposal(&mut self, proposal_id: &str) -> Result<ExecutionResult, String> {
+=======
+    pub fn revert_proposal(
+        &mut self,
+        proposal_id: &str,
+    ) -> Result<ExecutionResult, String> {
+>>>>>>> 4b60ced (docs: update README)
         let proposal = self
             .active_proposals
             .remove(proposal_id)
@@ -1284,9 +1352,13 @@ impl DynamicPipelineManager {
         );
 
         let _pre_snapshot = self.snapshot("pre-rollback");
+<<<<<<< HEAD
         let result = self
             .executor
             .revert_adaptation(&mut self.config, &proposal)?;
+=======
+        let result = self.executor.revert_adaptation(&mut self.config, &proposal)?;
+>>>>>>> 4b60ced (docs: update README)
         let _post_snapshot = self.snapshot("post-rollback");
 
         Ok(result)
@@ -1375,7 +1447,16 @@ impl DynamicPipelineManager {
             .routing_rules
             .iter()
             .filter(|r| r.enabled)
+<<<<<<< HEAD
             .map(|r| format!("  {} -> {}", r.condition, r.target_stage))
+=======
+            .map(|r| {
+                format!(
+                    "  {} -> {}",
+                    r.condition, r.target_stage
+                )
+            })
+>>>>>>> 4b60ced (docs: update README)
             .collect();
 
         let active = self.active_proposals.len();
@@ -1392,11 +1473,15 @@ impl DynamicPipelineManager {
             self.config.version,
             self.config.stages.len(),
             stages_summary.join("\n"),
+<<<<<<< HEAD
             self.config
                 .routing_rules
                 .iter()
                 .filter(|r| r.enabled)
                 .count(),
+=======
+            self.config.routing_rules.iter().filter(|r| r.enabled).count(),
+>>>>>>> 4b60ced (docs: update README)
             if rules_summary.is_empty() {
                 "  (none)".to_string()
             } else {
@@ -1443,43 +1528,65 @@ mod tests {
         let mut monitor = PipelineStage::new("security_monitor", StageType::Monitor);
         monitor.priority = 1;
         monitor.timeout_ms = 1_000;
+<<<<<<< HEAD
         config
             .add_stage(monitor)
             .unwrap_or_else(|e| panic!("add monitor: {}", e));
+=======
+        config.add_stage(monitor).unwrap_or_else(|e| panic!("add monitor: {}", e));
+>>>>>>> 4b60ced (docs: update README)
 
         let mut filter = PipelineStage::new("shield_rate_limit", StageType::Filter);
         filter.priority = 10;
         filter.timeout_ms = 2_000;
+<<<<<<< HEAD
         filter
             .config
             .insert("max_rps".into(), serde_json::json!(1000));
         config
             .add_stage(filter)
             .unwrap_or_else(|e| panic!("add filter: {}", e));
+=======
+        filter.config.insert("max_rps".into(), serde_json::json!(1000));
+        config.add_stage(filter).unwrap_or_else(|e| panic!("add filter: {}", e));
+>>>>>>> 4b60ced (docs: update README)
 
         let mut enrich = PipelineStage::new("context_enricher", StageType::Enrich);
         enrich.priority = 20;
         enrich.timeout_ms = 5_000;
+<<<<<<< HEAD
         config
             .add_stage(enrich)
             .unwrap_or_else(|e| panic!("add enrich: {}", e));
+=======
+        config.add_stage(enrich).unwrap_or_else(|e| panic!("add enrich: {}", e));
+>>>>>>> 4b60ced (docs: update README)
 
         let mut decide = PipelineStage::new("threat_decider", StageType::Decide);
         decide.priority = 30;
         decide.timeout_ms = 3_000;
+<<<<<<< HEAD
         decide
             .config
             .insert("threshold".into(), serde_json::json!(0.5));
         config
             .add_stage(decide)
             .unwrap_or_else(|e| panic!("add decide: {}", e));
+=======
+        decide.config.insert("threshold".into(), serde_json::json!(0.5));
+        config.add_stage(decide).unwrap_or_else(|e| panic!("add decide: {}", e));
+>>>>>>> 4b60ced (docs: update README)
 
         let mut act = PipelineStage::new("block_actor", StageType::Act);
         act.priority = 40;
         act.timeout_ms = 1_000;
+<<<<<<< HEAD
         config
             .add_stage(act)
             .unwrap_or_else(|e| panic!("add act: {}", e));
+=======
+        config.add_stage(act).unwrap_or_else(|e| panic!("add act: {}", e));
+>>>>>>> 4b60ced (docs: update README)
 
         config
     }
@@ -1531,9 +1638,13 @@ mod tests {
     #[test]
     fn stage_json_roundtrip() {
         let mut stage = PipelineStage::new("json_test", StageType::Transform);
+<<<<<<< HEAD
         stage
             .config
             .insert("key".into(), serde_json::json!("value"));
+=======
+        stage.config.insert("key".into(), serde_json::json!("value"));
+>>>>>>> 4b60ced (docs: update README)
 
         let json = stage.to_json().expect("to_json failed");
         let restored = PipelineStage::from_json(&json).expect("from_json failed");
@@ -1747,11 +1858,15 @@ mod tests {
             s.enabled = false;
         }
         // find the second stage — shield_rate_limit
+<<<<<<< HEAD
         if let Some(s) = config
             .stages
             .iter_mut()
             .find(|s| s.name == "shield_rate_limit")
         {
+=======
+        if let Some(s) = config.stages.iter_mut().find(|s| s.name == "shield_rate_limit") {
+>>>>>>> 4b60ced (docs: update README)
             s.enabled = false;
         }
         // Recompute checksum after direct mutations.
@@ -2114,7 +2229,11 @@ mod tests {
 
         // Should not exceed max
         assert!(manager.execution_history().len() <= 100); // snapshots != exec history
+<<<<<<< HEAD
                                                            // We only track max_snapshots on the snapshots vec — access via public API indirectly
+=======
+        // We only track max_snapshots on the snapshots vec — access via public API indirectly
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // =========================================================================
@@ -2145,10 +2264,14 @@ mod tests {
         assert_eq!(result.status, ExecutionStatus::Applied);
 
         // Step 4: Verify change
+<<<<<<< HEAD
         let stage = manager
             .current_config()
             .find_stage("threat_decider")
             .unwrap();
+=======
+        let stage = manager.current_config().find_stage("threat_decider").unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(stage.config.get("threshold"), Some(&serde_json::json!(0.7)));
 
         // Step 5: History
@@ -2179,10 +2302,14 @@ mod tests {
         assert_eq!(rollback_result.status, ExecutionStatus::RolledBack);
 
         // Verify state restored
+<<<<<<< HEAD
         let stage = manager
             .current_config()
             .find_stage("threat_decider")
             .unwrap();
+=======
+        let stage = manager.current_config().find_stage("threat_decider").unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(stage.config.get("threshold"), Some(&serde_json::json!(0.5)));
     }
 
@@ -2214,6 +2341,7 @@ mod tests {
         manager.propose_and_apply(&p2).unwrap();
 
         // Verify both changes
+<<<<<<< HEAD
         let decider = manager
             .current_config()
             .find_stage("threat_decider")
@@ -2222,6 +2350,10 @@ mod tests {
             decider.config.get("threshold"),
             Some(&serde_json::json!(0.3))
         );
+=======
+        let decider = manager.current_config().find_stage("threat_decider").unwrap();
+        assert_eq!(decider.config.get("threshold"), Some(&serde_json::json!(0.3)));
+>>>>>>> 4b60ced (docs: update README)
 
         let filter = manager
             .current_config()
@@ -2243,9 +2375,16 @@ mod tests {
         assert_eq!(manager.current_config().stages.len(), 6);
 
         // Add routing rule
+<<<<<<< HEAD
         manager
             .config_mut()
             .add_routing_rule(RoutingRule::new("source.geo == 'unknown'", "geo_fence"));
+=======
+        manager.config_mut().add_routing_rule(RoutingRule::new(
+            "source.geo == 'unknown'",
+            "geo_fence",
+        ));
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(manager.current_config().routing_rules.len(), 1);
 
         // Validate the reconfigured pipeline

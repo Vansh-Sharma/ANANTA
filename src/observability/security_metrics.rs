@@ -57,11 +57,16 @@ impl ReservoirHistogram {
 
     /// Record a value into the histogram.
     pub fn record(&mut self, value: f64) {
+<<<<<<< HEAD
         let idx = match self
             .buckets
             .binary_search_by(|b| b.partial_cmp(&value).unwrap_or(std::cmp::Ordering::Greater))
         {
             Ok(i) => i + 1,                         // value == boundary → goes into next bucket
+=======
+        let idx = match self.buckets.binary_search_by(|b| b.partial_cmp(&value).unwrap_or(std::cmp::Ordering::Greater)) {
+            Ok(i) => i + 1,          // value == boundary → goes into next bucket
+>>>>>>> 4b60ced (docs: update README)
             Err(i) => i.min(self.counts.len() - 1), // underflow if before first, overflow if after last
         };
         self.counts[idx] = self.counts[idx].saturating_add(1);
@@ -361,7 +366,13 @@ impl SecurityMetricsCollector {
             let ring_counts = counters
                 .entry(ring.to_string())
                 .or_insert_with(HashMap::new);
+<<<<<<< HEAD
             let entry = ring_counts.entry(normalized_outcome.clone()).or_insert(0);
+=======
+            let entry = ring_counts
+                .entry(normalized_outcome.clone())
+                .or_insert(0);
+>>>>>>> 4b60ced (docs: update README)
             *entry = entry.saturating_add(1);
         }
     }
@@ -458,10 +469,14 @@ impl SecurityMetricsCollector {
             }
         }
 
+<<<<<<< HEAD
         let total = allow
             .saturating_add(deny)
             .saturating_add(challenge)
             .saturating_add(escalate);
+=======
+        let total = allow.saturating_add(deny).saturating_add(challenge).saturating_add(escalate);
+>>>>>>> 4b60ced (docs: update README)
         let allow_pct = if total > 0 {
             (allow as f64 / total as f64) * 100.0
         } else {
@@ -559,6 +574,7 @@ impl SecurityMetricsCollector {
             let cutoff = now - self.retention_window_secs as f64;
             // Count entries within the window
             let count = buf.iter().filter(|&&t| t > cutoff).count();
+<<<<<<< HEAD
             let window_secs = (now
                 - buf
                     .iter()
@@ -567,6 +583,9 @@ impl SecurityMetricsCollector {
                     .min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
                     .unwrap_or(now))
             .max(1.0);
+=======
+            let window_secs = (now - buf.iter().cloned().filter(|&t| t > cutoff).min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)).unwrap_or(now)).max(1.0);
+>>>>>>> 4b60ced (docs: update README)
             count as f64 / window_secs
         } else {
             0.0
@@ -713,11 +732,15 @@ mod tests {
             h.record(3.0);
         }
         let p50 = h.p50();
+<<<<<<< HEAD
         assert!(
             p50 > 1.0 && p50 <= 5.0,
             "p50 should be in (1, 5] range, got {}",
             p50
         );
+=======
+        assert!(p50 > 1.0 && p50 <= 5.0, "p50 should be in (1, 5] range, got {}", p50);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -737,12 +760,16 @@ mod tests {
         let p95 = h.p95();
         let p99 = h.p99();
         assert!(p95 > 1.0, "p95 should be above 1ms, got {}", p95);
+<<<<<<< HEAD
         assert!(
             p99 > p95,
             "p99 should be above p95: p99={}, p95={}",
             p99,
             p95
         );
+=======
+        assert!(p99 > p95, "p99 should be above p95: p99={}, p95={}", p99, p95);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -800,12 +827,16 @@ mod tests {
         h.record(7.0); // bucket [5, 10), midpoint 7.5
         let mean = h.mean();
         let expected = (2.5 + 7.5) / 2.0;
+<<<<<<< HEAD
         assert!(
             (mean - expected).abs() < 0.01,
             "mean={}, expected={}",
             mean,
             expected
         );
+=======
+        assert!((mean - expected).abs() < 0.01, "mean={}, expected={}", mean, expected);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -835,11 +866,15 @@ mod tests {
         }
         let sd = h.std_dev();
         // All values same bucket midpoint → std_dev should be very small
+<<<<<<< HEAD
         assert!(
             sd < 1.0,
             "std_dev should be near 0 for uniform values, got {}",
             sd
         );
+=======
+        assert!(sd < 1.0, "std_dev should be near 0 for uniform values, got {}", sd);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -972,11 +1007,15 @@ mod tests {
 
         let rate = c.false_positive_rate();
         // FP = 2, deny = 10, rate = 2 / (2 + 10) = 0.1666...
+<<<<<<< HEAD
         assert!(
             (rate - 2.0 / 12.0).abs() < 0.001,
             "FP rate={}, expected~0.1667",
             rate
         );
+=======
+        assert!((rate - 2.0 / 12.0).abs() < 0.001, "FP rate={}, expected~0.1667", rate);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1051,12 +1090,16 @@ mod tests {
         let rate = c.error_rate();
         // 3 errors, 5 total
         let expected = 3.0 / 5.0;
+<<<<<<< HEAD
         assert!(
             (rate - expected).abs() < 0.01,
             "error_rate={}, expected={}",
             rate,
             expected
         );
+=======
+        assert!((rate - expected).abs() < 0.01, "error_rate={}, expected={}", rate, expected);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

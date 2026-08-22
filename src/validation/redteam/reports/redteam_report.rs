@@ -104,6 +104,7 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
 
         let is_detected = ev.verdict == Verdict::Pass;
         let category = ev.attack_category.clone().unwrap_or_default();
+<<<<<<< HEAD
         let mutation = ev
             .mutation_applied
             .clone()
@@ -112,6 +113,10 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
             .encoding_applied
             .clone()
             .unwrap_or_else(|| "unknown".to_string());
+=======
+        let mutation = ev.mutation_applied.clone().unwrap_or_else(|| "unknown".to_string());
+        let encoding = ev.encoding_applied.clone().unwrap_or_else(|| "unknown".to_string());
+>>>>>>> 4b60ced (docs: update README)
 
         // Per-ring.
         for ring in &ev.rings {
@@ -167,11 +172,15 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
         .iter()
         .map(|(ring, total)| {
             let blocked = per_ring_blocked.get(ring).copied().unwrap_or(0);
+<<<<<<< HEAD
             let rate = if *total > 0 {
                 blocked as f64 / *total as f64
             } else {
                 1.0
             };
+=======
+            let rate = if *total > 0 { blocked as f64 / *total as f64 } else { 1.0 };
+>>>>>>> 4b60ced (docs: update README)
             (ring.clone(), rate)
         })
         .collect();
@@ -180,11 +189,15 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
         .iter()
         .map(|(cat, total)| {
             let blocked = per_cat_blocked.get(cat).copied().unwrap_or(0);
+<<<<<<< HEAD
             let rate = if *total > 0 {
                 blocked as f64 / *total as f64
             } else {
                 1.0
             };
+=======
+            let rate = if *total > 0 { blocked as f64 / *total as f64 } else { 1.0 };
+>>>>>>> 4b60ced (docs: update README)
             (cat.clone(), rate)
         })
         .collect();
@@ -201,6 +214,7 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
             mutation_name: name,
             total: tot,
             detected: det,
+<<<<<<< HEAD
             detection_rate: if tot > 0 {
                 det as f64 / tot as f64
             } else {
@@ -213,6 +227,12 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
             .partial_cmp(&b.detection_rate)
             .unwrap_or(std::cmp::Ordering::Equal)
     });
+=======
+            detection_rate: if tot > 0 { det as f64 / tot as f64 } else { 1.0 },
+        })
+        .collect();
+    mutation_effectiveness.sort_by(|a, b| a.detection_rate.partial_cmp(&b.detection_rate).unwrap_or(std::cmp::Ordering::Equal));
+>>>>>>> 4b60ced (docs: update README)
 
     let mut encoding_effectiveness: Vec<EncodingEffectiveness> = per_encoding
         .into_iter()
@@ -220,6 +240,7 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
             encoding_name: name,
             total: tot,
             detected: det,
+<<<<<<< HEAD
             detection_rate: if tot > 0 {
                 det as f64 / tot as f64
             } else {
@@ -232,6 +253,12 @@ pub fn generate_report(evidence: &[Evidence]) -> RedTeamReportSummary {
             .partial_cmp(&b.detection_rate)
             .unwrap_or(std::cmp::Ordering::Equal)
     });
+=======
+            detection_rate: if tot > 0 { det as f64 / tot as f64 } else { 1.0 },
+        })
+        .collect();
+    encoding_effectiveness.sort_by(|a, b| a.detection_rate.partial_cmp(&b.detection_rate).unwrap_or(std::cmp::Ordering::Equal));
+>>>>>>> 4b60ced (docs: update README)
 
     RedTeamReportSummary {
         generated_at,
@@ -269,19 +296,27 @@ mod tests {
         let _verdict = if passed { Verdict::Pass } else { Verdict::Fail };
         let mut ev = if passed {
             Evidence::pass(
+<<<<<<< HEAD
                 "run-1",
                 "test",
                 "D1",
                 ring,
+=======
+                "run-1", "test", "D1", ring,
+>>>>>>> 4b60ced (docs: update README)
                 serde_json::json!({"blocked": true}),
                 serde_json::json!({"blocked": true}),
             )
         } else {
             Evidence::fail(
+<<<<<<< HEAD
                 "run-1",
                 "test",
                 "D1",
                 ring,
+=======
+                "run-1", "test", "D1", ring,
+>>>>>>> 4b60ced (docs: update README)
                 severity,
                 serde_json::json!({"blocked": true}),
                 serde_json::json!({"blocked": false}),

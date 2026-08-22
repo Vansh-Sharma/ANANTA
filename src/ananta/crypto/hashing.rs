@@ -35,12 +35,16 @@ impl HashDigest {
 
 impl std::fmt::Display for HashDigest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+<<<<<<< HEAD
         write!(
             f,
             "{}:{}",
             format!("{:?}", self.algorithm).to_lowercase(),
             &self.hex[..16]
         )
+=======
+        write!(f, "{}:{}", format!("{:?}", self.algorithm).to_lowercase(), &self.hex[..16])
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -53,24 +57,42 @@ pub fn hash(data: &str, algorithm: &HashAlgorithm) -> HashDigest {
 pub fn hash_bytes(data: &[u8], algorithm: &HashAlgorithm) -> HashDigest {
     let digest = match algorithm {
         HashAlgorithm::Sha256 => {
+<<<<<<< HEAD
             use sha2::{Digest, Sha256};
+=======
+            use sha2::{Sha256, Digest};
+>>>>>>> 4b60ced (docs: update README)
             let mut hasher = Sha256::new();
             hasher.update(data);
             hasher.finalize().to_vec()
         }
         HashAlgorithm::Sha384 => {
+<<<<<<< HEAD
             use sha2::{Digest, Sha384};
+=======
+            use sha2::{Sha384, Digest};
+>>>>>>> 4b60ced (docs: update README)
             let mut hasher = Sha384::new();
             hasher.update(data);
             hasher.finalize().to_vec()
         }
         HashAlgorithm::Sha512 => {
+<<<<<<< HEAD
             use sha2::{Digest, Sha512};
+=======
+            use sha2::{Sha512, Digest};
+>>>>>>> 4b60ced (docs: update README)
             let mut hasher = Sha512::new();
             hasher.update(data);
             hasher.finalize().to_vec()
         }
+<<<<<<< HEAD
         HashAlgorithm::Blake3 => blake3::hash(data).as_bytes().to_vec(),
+=======
+        HashAlgorithm::Blake3 => {
+            blake3::hash(data).as_bytes().to_vec()
+        }
+>>>>>>> 4b60ced (docs: update README)
     };
 
     let hex: String = digest.iter().map(|b| format!("{:02x}", b)).collect();
@@ -171,4 +193,8 @@ mod tests {
         assert!(!constant_time_eq(b"abc", b"abd"));
         assert!(!constant_time_eq(b"abc", b"ab"));
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

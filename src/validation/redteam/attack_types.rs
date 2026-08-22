@@ -259,12 +259,17 @@ mod tests {
         .target_ring("memory")
         .build();
 
+<<<<<<< HEAD
         let json = serde_json::to_string(&p)
             .map_err(|e| e.to_string())
             .unwrap();
         let restored: AttackPayload = serde_json::from_str(&json)
             .map_err(|e| e.to_string())
             .unwrap();
+=======
+        let json = serde_json::to_string(&p).map_err(|e| e.to_string()).unwrap();
+        let restored: AttackPayload = serde_json::from_str(&json).map_err(|e| e.to_string()).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(restored.id, p.id);
         assert_eq!(restored.category, p.category);
         assert_eq!(restored.raw_payload, p.raw_payload);

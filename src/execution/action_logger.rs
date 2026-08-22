@@ -178,10 +178,17 @@ impl ActionLogger {
             wtr.serialize(entry)
                 .map_err(|e| crate::error::Error::Serialization(e.to_string()))?;
         }
+<<<<<<< HEAD
         let data = wtr
             .into_inner()
             .map_err(|e| crate::error::Error::Serialization(e.to_string()))?;
         String::from_utf8(data).map_err(|e| crate::error::Error::Serialization(e.to_string()))
+=======
+        let data = wtr.into_inner()
+            .map_err(|e| crate::error::Error::Serialization(e.to_string()))?;
+        String::from_utf8(data)
+            .map_err(|e| crate::error::Error::Serialization(e.to_string()))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Verify chain integrity (all hashes link correctly).
@@ -213,7 +220,11 @@ fn compute_chain_hash(
     tool_name: &str,
     decision: &str,
 ) -> String {
+<<<<<<< HEAD
     use sha2::{Digest, Sha256};
+=======
+    use sha2::{Sha256, Digest};
+>>>>>>> 4b60ced (docs: update README)
     let mut hasher = Sha256::new();
     hasher.update(prev_hash.as_bytes());
     hasher.update(log_id.to_le_bytes());
@@ -227,11 +238,15 @@ fn compute_chain_hash(
 // Small hex encode helper (we don't want to add the hex crate just for this).
 mod hex {
     pub fn encode(bytes: impl AsRef<[u8]>) -> String {
+<<<<<<< HEAD
         bytes
             .as_ref()
             .iter()
             .map(|b| format!("{:02x}", b))
             .collect()
+=======
+        bytes.as_ref().iter().map(|b| format!("{:02x}", b)).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -243,12 +258,18 @@ mod tests {
     fn log_and_retrieve() {
         let logger = ActionLogger::in_memory();
         logger.log(
+<<<<<<< HEAD
             "req-1",
             "web_search",
             &serde_json::json!({"query": "test"}),
             "allowed",
             "1.2.3.4",
             0.5,
+=======
+            "req-1", "web_search",
+            &serde_json::json!({"query": "test"}),
+            "allowed", "1.2.3.4", 0.5,
+>>>>>>> 4b60ced (docs: update README)
         );
         let entries = logger.entries();
         assert_eq!(entries.len(), 1);
@@ -261,12 +282,18 @@ mod tests {
         let logger = ActionLogger::in_memory();
         for i in 0..10 {
             logger.log(
+<<<<<<< HEAD
                 &format!("req-{}", i),
                 "tool",
                 &serde_json::json!({"i": i}),
                 "allowed",
                 "1.2.3.4",
                 0.1,
+=======
+                &format!("req-{}", i), "tool",
+                &serde_json::json!({"i": i}),
+                "allowed", "1.2.3.4", 0.1,
+>>>>>>> 4b60ced (docs: update README)
             );
         }
         assert!(logger.verify_chain());
@@ -281,12 +308,18 @@ mod tests {
         let logger = ActionLogger::new(&config).unwrap();
         for i in 0..10 {
             logger.log(
+<<<<<<< HEAD
                 &format!("req-{}", i),
                 "tool",
                 &serde_json::json!({}),
                 "allowed",
                 "1.2.3.4",
                 0.1,
+=======
+                &format!("req-{}", i), "tool",
+                &serde_json::json!({}),
+                "allowed", "1.2.3.4", 0.1,
+>>>>>>> 4b60ced (docs: update README)
             );
         }
         let entries = logger.entries();
@@ -296,6 +329,7 @@ mod tests {
     #[test]
     fn export_json_works() {
         let logger = ActionLogger::in_memory();
+<<<<<<< HEAD
         logger.log(
             "req-1",
             "tool",
@@ -304,6 +338,9 @@ mod tests {
             "1.2.3.4",
             0.1,
         );
+=======
+        logger.log("req-1", "tool", &serde_json::json!({}), "allowed", "1.2.3.4", 0.1);
+>>>>>>> 4b60ced (docs: update README)
         let json = logger.export_json().unwrap();
         assert!(json.contains("req-1"));
     }

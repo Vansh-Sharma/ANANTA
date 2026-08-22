@@ -26,10 +26,17 @@ pub struct PerformanceTargets {
 impl Default for PerformanceTargets {
     fn default() -> Self {
         Self {
+<<<<<<< HEAD
             p99_latency_us: 50_000, // 50ms
             p95_latency_us: 10_000, // 10ms
             target_rps: 1000,
             max_error_rate: 0.01, // 1%
+=======
+            p99_latency_us: 50_000,   // 50ms
+            p95_latency_us: 10_000,   // 10ms
+            target_rps: 1000,
+            max_error_rate: 0.01,      // 1%
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 }
@@ -134,10 +141,14 @@ pub fn generate_report(
 
     let targets_met = check_targets(&report, targets);
 
+<<<<<<< HEAD
     PerformanceReport {
         targets_met,
         ..report
     }
+=======
+    PerformanceReport { targets_met, ..report }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Check whether the report meets all performance targets.
@@ -183,6 +194,7 @@ impl PerformanceReport {
 
         // Load configuration.
         lines.push("── Load Configuration ──────────────────────────────────────".to_string());
+<<<<<<< HEAD
         lines.push(format!(
             "  Target RPS:      {}",
             self.load_config.target_rps
@@ -203,11 +215,19 @@ impl PerformanceReport {
             "  Payload range:    {}–{} bytes",
             self.load_config.payload_size_range.0, self.load_config.payload_size_range.1
         ));
+=======
+        lines.push(format!("  Target RPS:      {}", self.load_config.target_rps));
+        lines.push(format!("  Duration:         {}s", self.load_config.duration_secs));
+        lines.push(format!("  Ramp-up:          {}s", self.load_config.ramp_up_secs));
+        lines.push(format!("  Request types:    {}", self.load_config.request_mix.len()));
+        lines.push(format!("  Payload range:    {}–{} bytes", self.load_config.payload_size_range.0, self.load_config.payload_size_range.1));
+>>>>>>> 4b60ced (docs: update README)
         lines.push(String::new());
 
         // Overall results.
         lines.push("── Overall Results ──────────────────────────────────────────".to_string());
         lines.push(format!("  Total requests:   {}", self.total_requests));
+<<<<<<< HEAD
         lines.push(format!(
             "  Duration:         {:.2}s",
             self.duration_us as f64 / 1_000_000.0
@@ -216,6 +236,10 @@ impl PerformanceReport {
             "  Error rate:       {:.2}%",
             self.error_rate * 100.0
         ));
+=======
+        lines.push(format!("  Duration:         {:.2}s", self.duration_us as f64 / 1_000_000.0));
+        lines.push(format!("  Error rate:       {:.2}%", self.error_rate * 100.0));
+>>>>>>> 4b60ced (docs: update README)
         lines.push(String::new());
 
         // Latency.
@@ -233,6 +257,7 @@ impl PerformanceReport {
         // Target results.
         lines.push("── Target Results ───────────────────────────────────────────".to_string());
         let status = |met: bool| -> &str {
+<<<<<<< HEAD
             if met {
                 "PASS"
             } else {
@@ -259,6 +284,15 @@ impl PerformanceReport {
             "  ALL TARGETS:      {}",
             status(self.targets_met.all_met)
         ));
+=======
+            if met { "PASS" } else { "FAIL" }
+        };
+        lines.push(format!("  P99 latency:      {}", status(self.targets_met.p99_met)));
+        lines.push(format!("  P95 latency:      {}", status(self.targets_met.p95_met)));
+        lines.push(format!("  RPS target:       {}", status(self.targets_met.rps_met)));
+        lines.push(format!("  Error rate:       {}", status(self.targets_met.error_rate_met)));
+        lines.push(format!("  ALL TARGETS:      {}", status(self.targets_met.all_met)));
+>>>>>>> 4b60ced (docs: update README)
         lines.push(String::new());
 
         // Per-ring breakdown.
@@ -318,8 +352,13 @@ impl PerformanceReport {
 
 #[cfg(test)]
 mod tests {
+<<<<<<< HEAD
     use super::super::metrics_collector::{MetricsConfig, PerformanceSample};
     use super::*;
+=======
+    use super::*;
+    use super::super::metrics_collector::{MetricsConfig, PerformanceSample};
+>>>>>>> 4b60ced (docs: update README)
 
     fn make_collector_with_samples() -> MetricsCollector {
         let mut collector = MetricsCollector::new(MetricsConfig {
@@ -327,7 +366,11 @@ mod tests {
             percentile_buckets: vec![0.50, 0.90, 0.95, 0.99],
         });
         for i in 0..100u64 {
+<<<<<<< HEAD
             let mut sample = PerformanceSample {
+=======
+ let mut sample = PerformanceSample {
+>>>>>>> 4b60ced (docs: update README)
                 request_id: format!("r{}", i),
                 timestamp_us: i * 10_000, // 10ms apart
                 latency_us: 100 + i,

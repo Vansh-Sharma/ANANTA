@@ -143,19 +143,27 @@ impl ValidationReport {
 
     /// Get evidence for a specific subsystem.
     pub fn evidence_for_subsystem(&self, subsystem: &str) -> Vec<&Evidence> {
+<<<<<<< HEAD
         self.evidence
             .iter()
             .filter(|e| e.subsystem == subsystem)
             .collect()
+=======
+        self.evidence.iter().filter(|e| e.subsystem == subsystem).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get only failed evidence, sorted by severity (highest first).
     pub fn failures(&self) -> Vec<&Evidence> {
+<<<<<<< HEAD
         let mut fails: Vec<&Evidence> = self
             .evidence
             .iter()
             .filter(|e| e.verdict == Verdict::Fail)
             .collect();
+=======
+        let mut fails: Vec<&Evidence> = self.evidence.iter().filter(|e| e.verdict == Verdict::Fail).collect();
+>>>>>>> 4b60ced (docs: update README)
         fails.sort_by(|a, b| b.severity.cmp(&a.severity));
         fails
     }
@@ -185,6 +193,7 @@ impl ValidationReport {
         out.push_str(&format!("Phases: {}\n", self.phases.join(", ")));
         out.push_str(&format!(
             "Verdicts: {} pass, {} fail, {} skip, {} error (total: {})\n",
+<<<<<<< HEAD
             self.verdicts.pass,
             self.verdicts.fail,
             self.verdicts.skip,
@@ -198,6 +207,15 @@ impl ValidationReport {
                 self.severities.high,
                 self.severities.medium,
                 self.severities.low
+=======
+            self.verdicts.pass, self.verdicts.fail,
+            self.verdicts.skip, self.verdicts.error, self.verdicts.total
+        ));
+        if self.severities.critical > 0 {
+            out.push_str(&format!("CRITICAL: {}  HIGH: {}  MEDIUM: {}  LOW: {}\n",
+                self.severities.critical, self.severities.high,
+                self.severities.medium, self.severities.low
+>>>>>>> 4b60ced (docs: update README)
             ));
         }
         out.push_str(&format!("Duration: {} us\n", self.duration_us));
@@ -264,6 +282,7 @@ pub struct ChainStatus {
 
 fn collect_report_env() -> HashMap<String, String> {
     let mut env = HashMap::new();
+<<<<<<< HEAD
     env.insert(
         "crate_version".to_string(),
         env!("CARGO_PKG_VERSION").to_string(),
@@ -276,6 +295,11 @@ fn collect_report_env() -> HashMap<String, String> {
         "target_arch".to_string(),
         std::env::consts::ARCH.to_string(),
     );
+=======
+    env.insert("crate_version".to_string(), env!("CARGO_PKG_VERSION").to_string());
+    env.insert("rust_version".to_string(), env!("CARGO_PKG_RUST_VERSION").to_string());
+    env.insert("target_arch".to_string(), std::env::consts::ARCH.to_string());
+>>>>>>> 4b60ced (docs: update README)
     env.insert("target_os".to_string(), std::env::consts::OS.to_string());
     env
 }
@@ -291,6 +315,7 @@ mod tests {
         assert_eq!(report.status, RunStatus::Running);
 
         report.record_evidence(Evidence::pass(
+<<<<<<< HEAD
             "ignored",
             "check-1",
             "D0",
@@ -305,6 +330,14 @@ mod tests {
             "verification",
             serde_json::json!(true),
             serde_json::json!(true),
+=======
+            "ignored", "check-1", "D0", "verification",
+            serde_json::json!(true), serde_json::json!(true),
+        ));
+        report.record_evidence(Evidence::pass(
+            "ignored", "check-2", "D0", "verification",
+            serde_json::json!(true), serde_json::json!(true),
+>>>>>>> 4b60ced (docs: update README)
         ));
 
         report.finalize();
@@ -319,10 +352,14 @@ mod tests {
         let mut report = ValidationReport::new("fail-run", vec!["D1".to_string()]);
 
         report.record_evidence(Evidence::fail(
+<<<<<<< HEAD
             "ignored",
             "sqli-check",
             "D1",
             "shield",
+=======
+            "ignored", "sqli-check", "D1", "shield",
+>>>>>>> 4b60ced (docs: update README)
             Severity::Critical,
             serde_json::json!({"blocked": true}),
             serde_json::json!({"blocked": false}),
@@ -339,6 +376,7 @@ mod tests {
     fn evidence_chain_integrity() {
         let mut report = ValidationReport::new("chain-test", vec!["D0".to_string()]);
         report.record_evidence(Evidence::pass(
+<<<<<<< HEAD
             "ignored",
             "a",
             "D0",
@@ -361,6 +399,18 @@ mod tests {
             "x",
             serde_json::json!(3),
             serde_json::json!(3),
+=======
+            "ignored", "a", "D0", "x",
+            serde_json::json!(1), serde_json::json!(1),
+        ));
+        report.record_evidence(Evidence::pass(
+            "ignored", "b", "D0", "x",
+            serde_json::json!(2), serde_json::json!(2),
+        ));
+        report.record_evidence(Evidence::pass(
+            "ignored", "c", "D0", "x",
+            serde_json::json!(3), serde_json::json!(3),
+>>>>>>> 4b60ced (docs: update README)
         ));
 
         let chain = report.chain_status();
@@ -374,12 +424,17 @@ mod tests {
     fn text_summary_non_empty() {
         let mut report = ValidationReport::new("summary-test", vec!["D0".to_string()]);
         report.record_evidence(Evidence::pass(
+<<<<<<< HEAD
             "ignored",
             "test",
             "D0",
             "v",
             serde_json::json!(true),
             serde_json::json!(true),
+=======
+            "ignored", "test", "D0", "v",
+            serde_json::json!(true), serde_json::json!(true),
+>>>>>>> 4b60ced (docs: update README)
         ));
         report.finalize();
         let text = report.to_text_summary();
@@ -391,12 +446,17 @@ mod tests {
     fn json_roundtrip() {
         let mut report = ValidationReport::new("json-test", vec!["D0".to_string()]);
         report.record_evidence(Evidence::pass(
+<<<<<<< HEAD
             "ignored",
             "j",
             "D0",
             "k",
             serde_json::json!(true),
             serde_json::json!(true),
+=======
+            "ignored", "j", "D0", "k",
+            serde_json::json!(true), serde_json::json!(true),
+>>>>>>> 4b60ced (docs: update README)
         ));
         report.finalize();
 
@@ -408,6 +468,7 @@ mod tests {
 
     #[test]
     fn filter_evidence() {
+<<<<<<< HEAD
         let mut report =
             ValidationReport::new("filter-test", vec!["D0".to_string(), "D1".to_string()]);
         report.record_evidence(Evidence::pass(
@@ -433,6 +494,20 @@ mod tests {
             "sub-x",
             serde_json::json!(true),
             serde_json::json!(true),
+=======
+        let mut report = ValidationReport::new("filter-test", vec!["D0".to_string(), "D1".to_string()]);
+        report.record_evidence(Evidence::pass(
+            "ignored", "a", "D0", "sub-x",
+            serde_json::json!(true), serde_json::json!(true),
+        ));
+        report.record_evidence(Evidence::pass(
+            "ignored", "b", "D1", "sub-y",
+            serde_json::json!(true), serde_json::json!(true),
+        ));
+        report.record_evidence(Evidence::pass(
+            "ignored", "c", "D1", "sub-x",
+            serde_json::json!(true), serde_json::json!(true),
+>>>>>>> 4b60ced (docs: update README)
         ));
 
         assert_eq!(report.evidence_for_phase("D0").len(), 1);
@@ -440,4 +515,8 @@ mod tests {
         assert_eq!(report.evidence_for_subsystem("sub-x").len(), 2);
         assert_eq!(report.evidence_for_subsystem("sub-y").len(), 1);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

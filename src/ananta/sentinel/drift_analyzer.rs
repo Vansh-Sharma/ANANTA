@@ -16,8 +16,13 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
 
+<<<<<<< HEAD
 use crate::ananta::distributed::partition_detector::ln_gamma;
 use crate::ananta::TrendDirection;
+=======
+use crate::ananta::TrendDirection;
+use crate::ananta::distributed::partition_detector::ln_gamma;
+>>>>>>> 4b60ced (docs: update README)
 
 // ────────────────────────────────────────────────────────────────────────
 // Core types shared across modules
@@ -144,11 +149,15 @@ impl Distribution {
         let min = values.iter().cloned().fold(f64::INFINITY, f64::min);
         let max = values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
         let range = max - min;
+<<<<<<< HEAD
         let bin_width = if range.abs() < 1e-12 {
             1.0
         } else {
             range / num_bins as f64
         };
+=======
+        let bin_width = if range.abs() < 1e-12 { 1.0 } else { range / num_bins as f64 };
+>>>>>>> 4b60ced (docs: update README)
 
         let mut bins: HashMap<usize, f64> = HashMap::new();
         for &v in values {
@@ -164,6 +173,7 @@ impl Distribution {
         for prob in bins.values_mut() {
             *prob /= total;
         }
+<<<<<<< HEAD
         Self {
             bins,
             count: values.len(),
@@ -171,10 +181,14 @@ impl Distribution {
             max,
             num_bins,
         }
+=======
+        Self { bins, count: values.len(), min, max, num_bins }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Build a histogram distribution from raw observations using shared bounds.
     /// This ensures two distributions are binned on the same scale for fair comparison.
+<<<<<<< HEAD
     pub fn from_values_with_bounds(
         values: &[f64],
         num_bins: usize,
@@ -196,13 +210,25 @@ impl Distribution {
         } else {
             range / num_bins as f64
         };
+=======
+    pub fn from_values_with_bounds(values: &[f64], num_bins: usize, shared_min: f64, shared_max: f64) -> Self {
+        if values.is_empty() {
+            return Self { bins: HashMap::new(), count: 0, min: shared_min, max: shared_max, num_bins };
+        }
+        let range = shared_max - shared_min;
+        let bin_width = if range.abs() < 1e-12 { 1.0 } else { range / num_bins as f64 };
+>>>>>>> 4b60ced (docs: update README)
         let mut bins: HashMap<usize, f64> = HashMap::new();
         for &v in values {
             let idx = if bin_width > 0.0 {
                 ((v - shared_min) / bin_width).floor() as usize
+<<<<<<< HEAD
             } else {
                 0
             };
+=======
+            } else { 0 };
+>>>>>>> 4b60ced (docs: update README)
             let idx = idx.min(num_bins - 1);
             *bins.entry(idx).or_insert(0.0) += 1.0;
         }
@@ -210,6 +236,7 @@ impl Distribution {
         for prob in bins.values_mut() {
             *prob /= total;
         }
+<<<<<<< HEAD
         Self {
             bins,
             count: values.len(),
@@ -217,6 +244,9 @@ impl Distribution {
             max: shared_max,
             num_bins,
         }
+=======
+        Self { bins, count: values.len(), min: shared_min, max: shared_max, num_bins }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get the probability for a bin, defaulting to 0.0.
@@ -226,6 +256,7 @@ impl Distribution {
 
     /// Compute the empirical CDF value at a given point.
     pub fn cdf_at(&self, x: f64) -> f64 {
+<<<<<<< HEAD
         if x <= self.min {
             return 0.0;
         }
@@ -238,6 +269,12 @@ impl Distribution {
         } else {
             range / self.num_bins as f64
         };
+=======
+        if x <= self.min { return 0.0; }
+        if x >= self.max { return 1.0; }
+        let range = self.max - self.min;
+        let bin_width = if range.abs() < 1e-12 { 1.0 } else { range / self.num_bins as f64 };
+>>>>>>> 4b60ced (docs: update README)
         let target_bin = if bin_width > 0.0 {
             ((x - self.min) / bin_width).floor() as usize
         } else {
@@ -269,20 +306,28 @@ pub struct StatisticalDriftDetector {
 impl StatisticalDriftDetector {
     /// Create a new detector with default settings.
     pub fn new() -> Self {
+<<<<<<< HEAD
         Self {
             num_bins: 10,
             epsilon: 1e-10,
             alpha: 0.05,
         }
+=======
+        Self { num_bins: 10, epsilon: 1e-10, alpha: 0.05 }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Create with custom parameters.
     pub fn with_params(num_bins: usize, epsilon: f64, alpha: f64) -> Self {
+<<<<<<< HEAD
         Self {
             num_bins,
             epsilon,
             alpha,
         }
+=======
+        Self { num_bins, epsilon, alpha }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── Kolmogorov-Smirnov Test ──────────────────────────────────────
@@ -298,12 +343,17 @@ impl StatisticalDriftDetector {
     /// where λ = D * sqrt(n_eff)
     pub fn ks_test(&self, reference: &[f64], current: &[f64]) -> DriftResult {
         if reference.is_empty() || current.is_empty() {
+<<<<<<< HEAD
             return DriftResult::new(
                 0.0,
                 1.0,
                 DriftSeverity::None,
                 "Insufficient data for KS test".into(),
             );
+=======
+            return DriftResult::new(0.0, 1.0, DriftSeverity::None,
+                "Insufficient data for KS test".into());
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let mut sorted_ref = reference.to_vec();
@@ -342,6 +392,7 @@ impl StatisticalDriftDetector {
         };
 
         let desc = if p_value < self.alpha {
+<<<<<<< HEAD
             format!(
                 "KS test: D={:.6}, p={:.6} < alpha={:.2} — distributions differ",
                 d_statistic, p_value, self.alpha
@@ -351,6 +402,13 @@ impl StatisticalDriftDetector {
                 "KS test: D={:.6}, p={:.6} — no significant drift",
                 d_statistic, p_value
             )
+=======
+            format!("KS test: D={:.6}, p={:.6} < alpha={:.2} — distributions differ",
+                d_statistic, p_value, self.alpha)
+        } else {
+            format!("KS test: D={:.6}, p={:.6} — no significant drift",
+                d_statistic, p_value)
+>>>>>>> 4b60ced (docs: update README)
         };
 
         DriftResult::new(d_statistic, p_value, severity, desc)
@@ -368,6 +426,7 @@ impl StatisticalDriftDetector {
     ///   PSI ≥ 0.25   → Significant change
     pub fn psi(&self, reference: &[f64], current: &[f64]) -> DriftResult {
         if reference.is_empty() || current.is_empty() {
+<<<<<<< HEAD
             return DriftResult::new(
                 0.0,
                 1.0,
@@ -392,6 +451,18 @@ impl StatisticalDriftDetector {
         } else {
             range / self.num_bins as f64
         };
+=======
+            return DriftResult::new(0.0, 1.0, DriftSeverity::None,
+                "Insufficient data for PSI".into());
+        }
+
+        let all_min = reference.iter().chain(current.iter())
+            .cloned().fold(f64::INFINITY, f64::min);
+        let all_max = reference.iter().chain(current.iter())
+            .cloned().fold(f64::NEG_INFINITY, f64::max);
+        let range = all_max - all_min;
+        let bin_width = if range.abs() < 1e-12 { 1.0 } else { range / self.num_bins as f64 };
+>>>>>>> 4b60ced (docs: update README)
 
         let ref_dist = histogram_probs(reference, all_min, bin_width, self.num_bins);
         let cur_dist = histogram_probs(current, all_min, bin_width, self.num_bins);
@@ -416,17 +487,25 @@ impl StatisticalDriftDetector {
         };
 
         let p_value = (1.0 - psi_value.min(1.0)).max(0.0);
+<<<<<<< HEAD
         let desc = format!(
             "PSI={:.6} — {}",
             psi_value,
+=======
+        let desc = format!("PSI={:.6} — {}", psi_value,
+>>>>>>> 4b60ced (docs: update README)
             match &severity {
                 DriftSeverity::None => "stable population",
                 DriftSeverity::Low => "minor shift",
                 DriftSeverity::Medium => "moderate shift, investigate",
                 DriftSeverity::High => "significant shift, action recommended",
                 DriftSeverity::Critical => "severe population change",
+<<<<<<< HEAD
             }
         );
+=======
+            });
+>>>>>>> 4b60ced (docs: update README)
         DriftResult::new(psi_value, p_value, severity, desc)
     }
 
@@ -438,6 +517,7 @@ impl StatisticalDriftDetector {
     /// Bounded in [0, ln(2)]; normalized via sqrt(JSD/ln(2)) → [0,1].
     pub fn jensen_shannon(&self, reference: &[f64], current: &[f64]) -> DriftResult {
         if reference.is_empty() || current.is_empty() {
+<<<<<<< HEAD
             return DriftResult::new(
                 0.0,
                 1.0,
@@ -461,6 +541,19 @@ impl StatisticalDriftDetector {
             Distribution::from_values_with_bounds(reference, self.num_bins, shared_min, shared_max);
         let cur_dist =
             Distribution::from_values_with_bounds(current, self.num_bins, shared_min, shared_max);
+=======
+            return DriftResult::new(0.0, 1.0, DriftSeverity::None,
+                "Insufficient data for JSD".into());
+        }
+
+        // Compute shared bounds so both distributions use the same bin edges.
+        let shared_min = reference.iter().cloned().fold(f64::INFINITY, f64::min)
+            .min(current.iter().cloned().fold(f64::INFINITY, f64::min));
+        let shared_max = reference.iter().cloned().fold(f64::NEG_INFINITY, f64::max)
+            .max(current.iter().cloned().fold(f64::NEG_INFINITY, f64::max));
+        let ref_dist = Distribution::from_values_with_bounds(reference, self.num_bins, shared_min, shared_max);
+        let cur_dist = Distribution::from_values_with_bounds(current, self.num_bins, shared_min, shared_max);
+>>>>>>> 4b60ced (docs: update README)
 
         let mut jsd = 0.0;
         for i in 0..self.num_bins {
@@ -471,6 +564,7 @@ impl StatisticalDriftDetector {
         }
         jsd = jsd.max(0.0);
         let ln2 = 2.0_f64.ln();
+<<<<<<< HEAD
         let jsd_normalized = if ln2 > 0.0 {
             (jsd / ln2).sqrt().min(1.0)
         } else {
@@ -493,6 +587,18 @@ impl StatisticalDriftDetector {
                 "large"
             }
         );
+=======
+        let jsd_normalized = if ln2 > 0.0 { (jsd / ln2).sqrt().min(1.0) } else { 0.0 };
+
+        let severity = DriftSeverity::from_score_default(jsd_normalized);
+        let p_value = 1.0 - jsd_normalized;
+        let desc = format!("JSD={:.6} (normalized={:.4}) — {} divergence",
+            jsd, jsd_normalized,
+            if jsd_normalized < 0.1 { "negligible" }
+            else if jsd_normalized < 0.25 { "small" }
+            else if jsd_normalized < 0.5 { "moderate" }
+            else { "large" });
+>>>>>>> 4b60ced (docs: update README)
         DriftResult::new(jsd_normalized, p_value, severity, desc)
     }
 
@@ -504,6 +610,7 @@ impl StatisticalDriftDetector {
     /// Asymmetric and unbounded; normalized via 1 - exp(-KL).
     pub fn kl_divergence(&self, reference: &[f64], current: &[f64]) -> DriftResult {
         if reference.is_empty() || current.is_empty() {
+<<<<<<< HEAD
             return DriftResult::new(
                 0.0,
                 1.0,
@@ -527,6 +634,19 @@ impl StatisticalDriftDetector {
             Distribution::from_values_with_bounds(reference, self.num_bins, shared_min, shared_max);
         let cur_dist =
             Distribution::from_values_with_bounds(current, self.num_bins, shared_min, shared_max);
+=======
+            return DriftResult::new(0.0, 1.0, DriftSeverity::None,
+                "Insufficient data for KL divergence".into());
+        }
+
+        // Compute shared bounds so both distributions use the same bin edges.
+        let shared_min = reference.iter().cloned().fold(f64::INFINITY, f64::min)
+            .min(current.iter().cloned().fold(f64::INFINITY, f64::min));
+        let shared_max = reference.iter().cloned().fold(f64::NEG_INFINITY, f64::max)
+            .max(current.iter().cloned().fold(f64::NEG_INFINITY, f64::max));
+        let ref_dist = Distribution::from_values_with_bounds(reference, self.num_bins, shared_min, shared_max);
+        let cur_dist = Distribution::from_values_with_bounds(current, self.num_bins, shared_min, shared_max);
+>>>>>>> 4b60ced (docs: update README)
 
         let mut kl = 0.0;
         for i in 0..self.num_bins {
@@ -539,10 +659,15 @@ impl StatisticalDriftDetector {
         let kl_normalized = (1.0 - (-kl).exp()).min(1.0);
         let severity = DriftSeverity::from_score_default(kl_normalized);
         let p_value = 1.0 - kl_normalized;
+<<<<<<< HEAD
         let desc = format!(
             "KL(P||Q)={:.6} (normalized={:.4}) — divergence from reference to current",
             kl, kl_normalized
         );
+=======
+        let desc = format!("KL(P||Q)={:.6} (normalized={:.4}) — divergence from reference to current",
+            kl, kl_normalized);
+>>>>>>> 4b60ced (docs: update README)
         DriftResult::new(kl_normalized, p_value, severity, desc)
     }
 
@@ -553,6 +678,7 @@ impl StatisticalDriftDetector {
     /// χ² = Σ (O_i - E_i)² / E_i
     pub fn chi_squared_test(&self, reference: &[f64], current: &[f64]) -> DriftResult {
         if reference.is_empty() || current.is_empty() {
+<<<<<<< HEAD
             return DriftResult::new(
                 0.0,
                 1.0,
@@ -577,6 +703,18 @@ impl StatisticalDriftDetector {
         } else {
             range / self.num_bins as f64
         };
+=======
+            return DriftResult::new(0.0, 1.0, DriftSeverity::None,
+                "Insufficient data for chi-squared test".into());
+        }
+
+        let all_min = reference.iter().chain(current.iter())
+            .cloned().fold(f64::INFINITY, f64::min);
+        let all_max = reference.iter().chain(current.iter())
+            .cloned().fold(f64::NEG_INFINITY, f64::max);
+        let range = all_max - all_min;
+        let bin_width = if range.abs() < 1e-12 { 1.0 } else { range / self.num_bins as f64 };
+>>>>>>> 4b60ced (docs: update README)
 
         let ref_counts = raw_histogram_counts(reference, all_min, bin_width, self.num_bins);
         let cur_counts = raw_histogram_counts(current, all_min, bin_width, self.num_bins);
@@ -597,12 +735,17 @@ impl StatisticalDriftDetector {
         }
 
         if df == 0 {
+<<<<<<< HEAD
             return DriftResult::new(
                 0.0,
                 1.0,
                 DriftSeverity::None,
                 "No valid bins for chi-squared test".into(),
             );
+=======
+            return DriftResult::new(0.0, 1.0, DriftSeverity::None,
+                "No valid bins for chi-squared test".into());
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let p_value = chi_squared_p_value_approx(chi_sq, df as f64);
@@ -613,6 +756,7 @@ impl StatisticalDriftDetector {
         };
 
         let desc = if p_value < self.alpha {
+<<<<<<< HEAD
             format!(
                 "Chi-squared: χ²={:.4}, df={}, p={:.6} — significant change",
                 chi_sq, df, p_value
@@ -622,6 +766,13 @@ impl StatisticalDriftDetector {
                 "Chi-squared: χ²={:.4}, df={}, p={:.6} — no significant change",
                 chi_sq, df, p_value
             )
+=======
+            format!("Chi-squared: χ²={:.4}, df={}, p={:.6} — significant change",
+                chi_sq, df, p_value)
+        } else {
+            format!("Chi-squared: χ²={:.4}, df={}, p={:.6} — no significant change",
+                chi_sq, df, p_value)
+>>>>>>> 4b60ced (docs: update README)
         };
         DriftResult::new(chi_sq, p_value, severity, desc)
     }
@@ -639,9 +790,13 @@ impl StatisticalDriftDetector {
 }
 
 impl Default for StatisticalDriftDetector {
+<<<<<<< HEAD
     fn default() -> Self {
         Self::new()
     }
+=======
+    fn default() -> Self { Self::new() }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Aggregate result of all five statistical drift tests.
@@ -669,8 +824,12 @@ impl AllTestsResult {
             + self.psi.severity.to_score()
             + self.jsd.severity.to_score()
             + self.kl.severity.to_score()
+<<<<<<< HEAD
             + self.chi_squared.severity.to_score())
             / 5.0;
+=======
+            + self.chi_squared.severity.to_score()) / 5.0;
+>>>>>>> 4b60ced (docs: update README)
         DriftSeverity::from_score_default(avg)
     }
 }
@@ -753,6 +912,7 @@ impl AdwinDetector {
     }
 
     /// Current window size.
+<<<<<<< HEAD
     pub fn window_size(&self) -> usize {
         self.window.len()
     }
@@ -764,22 +924,37 @@ impl AdwinDetector {
         } else {
             self.total_sum / self.window.len() as f64
         }
+=======
+    pub fn window_size(&self) -> usize { self.window.len() }
+
+    /// Current mean of the window.
+    pub fn window_mean(&self) -> f64 {
+        if self.window.is_empty() { 0.0 } else { self.total_sum / self.window.len() as f64 }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Current variance of the window.
     pub fn window_variance(&self) -> f64 {
         let n = self.window.len();
+<<<<<<< HEAD
         if n < 2 {
             return 0.0;
         }
+=======
+        if n < 2 { return 0.0; }
+>>>>>>> 4b60ced (docs: update README)
         let mean = self.window_mean();
         self.total_sum_sq / n as f64 - mean * mean
     }
 
     /// Get a reference to the drift history.
+<<<<<<< HEAD
     pub fn drift_history(&self) -> &[AdwinDriftEvent] {
         &self.drift_history
     }
+=======
+    pub fn drift_history(&self) -> &[AdwinDriftEvent] { &self.drift_history }
+>>>>>>> 4b60ced (docs: update README)
 
     /// Process a new observation. Returns the drift event if drift was detected.
     pub fn update(&mut self, value: f64, stream_index: usize) -> Option<AdwinDriftEvent> {
@@ -839,8 +1014,12 @@ impl AdwinDetector {
             // high, producing a larger epsilon that prevents false positives.
             let left_var = (prefix_sq[pos] / n0 - (prefix_sum[pos] / n0).powi(2)).max(0.0);
             let right_var = ((prefix_sq[n] - prefix_sq[pos]) / n1
+<<<<<<< HEAD
                 - ((prefix_sum[n] - prefix_sum[pos]) / n1).powi(2))
             .max(0.0);
+=======
+                - ((prefix_sum[n] - prefix_sum[pos]) / n1).powi(2)).max(0.0);
+>>>>>>> 4b60ced (docs: update README)
             let se = (left_var / n0 + right_var / n1).sqrt();
             let variance_eps = se * delta_log.sqrt().max(0.001);
 
@@ -850,11 +1029,15 @@ impl AdwinDetector {
                 best_diff = diff;
                 best_cut = Some(pos);
             }
+<<<<<<< HEAD
             pos = if pos < 100 {
                 pos + 1
             } else {
                 pos + (pos / 10).max(1)
             };
+=======
+            pos = if pos < 100 { pos + 1 } else { pos + (pos / 10).max(1) };
+>>>>>>> 4b60ced (docs: update README)
         }
 
         if let Some(cutpoint) = best_cut {
@@ -906,7 +1089,12 @@ impl AdwinDetector {
         if self.drift_history.is_empty() {
             return DriftPattern::Stable;
         }
+<<<<<<< HEAD
         let recent: Vec<&AdwinDriftEvent> = self.drift_history.iter().rev().take(10).collect();
+=======
+        let recent: Vec<&AdwinDriftEvent> =
+            self.drift_history.iter().rev().take(10).collect();
+>>>>>>> 4b60ced (docs: update README)
         let recent_rev: Vec<&AdwinDriftEvent> = recent.into_iter().rev().collect();
 
         if recent_rev.len() == 1 {
@@ -929,17 +1117,26 @@ impl AdwinDetector {
         }
 
         // Gradual: consistent direction of change.
+<<<<<<< HEAD
         let signs: Vec<f64> = recent_rev
             .windows(2)
             .map(|w| w[1].new_mean - w[0].new_mean)
             .collect();
+=======
+        let signs: Vec<f64> = recent_rev.windows(2)
+            .map(|w| w[1].new_mean - w[0].new_mean).collect();
+>>>>>>> 4b60ced (docs: update README)
         if signs.is_empty() {
             return DriftPattern::Sudden;
         }
         let first_sign = signs[0].signum();
+<<<<<<< HEAD
         let same_dir = signs
             .iter()
             .all(|s| s.signum() == first_sign || s.abs() < 1e-9);
+=======
+        let same_dir = signs.iter().all(|s| s.signum() == first_sign || s.abs() < 1e-9);
+>>>>>>> 4b60ced (docs: update README)
         if same_dir && recent_rev.len() >= 3 {
             return DriftPattern::Gradual;
         }
@@ -956,9 +1153,13 @@ impl AdwinDetector {
 }
 
 impl Default for AdwinDetector {
+<<<<<<< HEAD
     fn default() -> Self {
         Self::new()
     }
+=======
+    fn default() -> Self { Self::new() }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -1034,6 +1235,7 @@ pub struct DriftPatternClassifier {
 
 impl DriftPatternClassifier {
     pub fn new() -> Self {
+<<<<<<< HEAD
         Self {
             min_segment_size: 5,
             slope_threshold: 0.01,
@@ -1047,6 +1249,13 @@ impl DriftPatternClassifier {
             slope_threshold: slope_thresh,
             trend_alpha: alpha,
         }
+=======
+        Self { min_segment_size: 5, slope_threshold: 0.01, trend_alpha: 0.05 }
+    }
+
+    pub fn with_params(min_segment: usize, slope_thresh: f64, alpha: f64) -> Self {
+        Self { min_segment_size: min_segment, slope_threshold: slope_thresh, trend_alpha: alpha }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Detect change-points via recursive binary segmentation.
@@ -1107,12 +1316,17 @@ impl DriftPatternClassifier {
     /// Analyze the linear trend via least-squares regression.
     pub fn analyze_trend(&self, data: &[f64]) -> TrendAnalysis {
         if data.len() < 2 {
+<<<<<<< HEAD
             return TrendAnalysis {
                 slope: 0.0,
                 direction: TrendDirection::Stable,
                 r_squared: 0.0,
                 significant: false,
             };
+=======
+            return TrendAnalysis { slope: 0.0, direction: TrendDirection::Stable,
+                r_squared: 0.0, significant: false };
+>>>>>>> 4b60ced (docs: update README)
         }
         let n = data.len() as f64;
         let x_mean = (n - 1.0) / 2.0;
@@ -1128,6 +1342,7 @@ impl DriftPatternClassifier {
         let slope = if sxx > 1e-12 { sxy / sxx } else { 0.0 };
         let r_squared = if syy > 1e-12 && sxx > 1e-12 {
             (sxy * sxy) / (sxx * syy)
+<<<<<<< HEAD
         } else {
             0.0
         };
@@ -1145,6 +1360,15 @@ impl DriftPatternClassifier {
         } else {
             f64::INFINITY
         };
+=======
+        } else { 0.0 };
+        let direction = if slope.abs() < self.slope_threshold {
+            TrendDirection::Stable
+        } else if slope > 0.0 { TrendDirection::Improving } else { TrendDirection::Degrading };
+
+        let ss_res = syy - sxy * sxy / sxx.max(1e-12);
+        let residual_se = if n > 2.0 && ss_res > 0.0 { (ss_res / (n - 2.0)).sqrt() } else { f64::INFINITY };
+>>>>>>> 4b60ced (docs: update README)
         let slope_se = residual_se / sxx.sqrt().max(1e-12);
         let t_stat = if slope_se > 0.0 && slope_se.is_finite() {
             slope.abs() / slope_se
@@ -1155,12 +1379,16 @@ impl DriftPatternClassifier {
         };
         let significant = t_stat > 2.0 && r_squared > 0.1;
 
+<<<<<<< HEAD
         TrendAnalysis {
             slope,
             direction,
             r_squared,
             significant,
         }
+=======
+        TrendAnalysis { slope, direction, r_squared, significant }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Classify the drift pattern in a data series.
@@ -1182,11 +1410,15 @@ impl DriftPatternClassifier {
         }
 
         if change_points.is_empty() {
+<<<<<<< HEAD
             return if trend.significant {
                 DriftPattern::Gradual
             } else {
                 DriftPattern::Stable
             };
+=======
+            return if trend.significant { DriftPattern::Gradual } else { DriftPattern::Stable };
+>>>>>>> 4b60ced (docs: update README)
         }
         if trend.significant && trend.r_squared > 0.7 {
             return DriftPattern::Gradual;
@@ -1206,10 +1438,15 @@ impl DriftPatternClassifier {
             let avg_mag = mean_f64(&magnitudes);
             let max_mag = magnitudes.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
             if max_mag < avg_mag * 4.0 {
+<<<<<<< HEAD
                 let directions: Vec<f64> = change_points
                     .iter()
                     .map(|cp| cp.mean_after - cp.mean_before)
                     .collect();
+=======
+                let directions: Vec<f64> = change_points.iter()
+                    .map(|cp| cp.mean_after - cp.mean_before).collect();
+>>>>>>> 4b60ced (docs: update README)
                 let pos_count = directions.iter().filter(|&&d| d > 0.0).count();
                 if pos_count == 0 || pos_count == directions.len() {
                     return DriftPattern::Incremental;
@@ -1217,11 +1454,15 @@ impl DriftPatternClassifier {
             }
         }
 
+<<<<<<< HEAD
         if change_points.len() >= 2 {
             DriftPattern::Gradual
         } else {
             DriftPattern::Sudden
         }
+=======
+        if change_points.len() >= 2 { DriftPattern::Gradual } else { DriftPattern::Sudden }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     fn extract_segments<'a>(&self, data: &'a [f64], cps: &[ChangePoint]) -> Vec<&'a [f64]> {
@@ -1233,21 +1474,30 @@ impl DriftPatternClassifier {
                 prev = cp.index;
             }
         }
+<<<<<<< HEAD
         if prev < data.len() {
             segments.push(&data[prev..]);
         }
+=======
+        if prev < data.len() { segments.push(&data[prev..]); }
+>>>>>>> 4b60ced (docs: update README)
         segments
     }
 }
 
 impl Default for DriftPatternClassifier {
+<<<<<<< HEAD
     fn default() -> Self {
         Self::new()
     }
+=======
+    fn default() -> Self { Self::new() }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Check if a sequence of means shows a recurring (cyclical) pattern.
 fn is_recurring_pattern(means: &[f64]) -> bool {
+<<<<<<< HEAD
     if means.len() < 4 {
         return false;
     }
@@ -1257,13 +1507,24 @@ fn is_recurring_pattern(means: &[f64]) -> bool {
     if above == 0 || below == 0 {
         return false;
     }
+=======
+    if means.len() < 4 { return false; }
+    let overall_mean = mean_f64(means);
+    let above = means.iter().filter(|&&m| m > overall_mean).count();
+    let below = means.len() - above;
+    if above == 0 || below == 0 { return false; }
+>>>>>>> 4b60ced (docs: update README)
     let mut transitions = 0;
     for w in means.windows(2) {
         let a_above = w[0] > overall_mean;
         let b_above = w[1] > overall_mean;
+<<<<<<< HEAD
         if a_above != b_above {
             transitions += 1;
         }
+=======
+        if a_above != b_above { transitions += 1; }
+>>>>>>> 4b60ced (docs: update README)
     }
     transitions > means.len() / 2
 }
@@ -1356,6 +1617,7 @@ impl MultiDimDriftDetector {
         for dim in &all_dims {
             let ref_vals = reference_data.get(*dim).cloned().unwrap_or_default();
             let cur_vals = current_data.get(*dim).cloned().unwrap_or_default();
+<<<<<<< HEAD
             if ref_vals.is_empty() || cur_vals.is_empty() {
                 continue;
             }
@@ -1374,11 +1636,21 @@ impl MultiDimDriftDetector {
                 tests,
                 severity,
                 weight,
+=======
+            if ref_vals.is_empty() || cur_vals.is_empty() { continue; }
+
+            let tests = self.statistical_detector.run_all_tests(&ref_vals, &cur_vals);
+            let severity = tests.aggregate_severity();
+            let weight = self.dimension_weights.get(*dim).copied().unwrap_or(self.default_weight);
+            dim_results.push(DimensionDriftResult {
+                dimension: (*dim).clone(), tests, severity, weight,
+>>>>>>> 4b60ced (docs: update README)
                 weighted_score: severity.to_score() * weight,
             });
         }
 
         let total_weight: f64 = dim_results.iter().map(|d| d.weight).sum::<f64>().max(1e-12);
+<<<<<<< HEAD
         let overall_score: f64 = dim_results
             .iter()
             .map(|d| (d.severity.to_score() * d.weight) / total_weight)
@@ -1393,10 +1665,21 @@ impl MultiDimDriftDetector {
             .iter()
             .map(|d| (d.dimension.clone(), d.severity.to_score()))
             .collect();
+=======
+        let overall_score: f64 = dim_results.iter()
+            .map(|d| (d.severity.to_score() * d.weight) / total_weight).sum();
+        let overall_severity = DriftSeverity::from_score_default(overall_score);
+        let significant_count = dim_results.iter()
+            .filter(|d| d.tests.significant_count(self.alpha) >= 3).count();
+
+        let mut ranked: Vec<(String, f64)> = dim_results.iter()
+            .map(|d| (d.dimension.clone(), d.severity.to_score())).collect();
+>>>>>>> 4b60ced (docs: update README)
         ranked.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
 
         let total_dimensions = ranked.len();
         MultiDimDriftResult {
+<<<<<<< HEAD
             dimensions: dim_results,
             overall_severity,
             overall_score,
@@ -1404,11 +1687,17 @@ impl MultiDimDriftDetector {
             significant_count,
             total_dimensions,
             timestamp: Utc::now(),
+=======
+            dimensions: dim_results, overall_severity, overall_score,
+            ranked_dimensions: ranked, significant_count,
+            total_dimensions, timestamp: Utc::now(),
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
     /// Identify the top-N most drifting dimensions.
     pub fn top_drifting(
+<<<<<<< HEAD
         &self,
         result: &MultiDimDriftResult,
         n: usize,
@@ -1426,13 +1715,25 @@ impl MultiDimDriftDetector {
             })
             .take(n)
             .collect()
+=======
+        &self, result: &MultiDimDriftResult, n: usize,
+    ) -> Vec<(String, f64, DriftSeverity)> {
+        result.dimensions.iter()
+            .filter(|d| d.severity != DriftSeverity::None)
+            .map(|d| (d.dimension.clone(), d.severity.to_score(), d.severity.clone()))
+            .take(n).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
 impl Default for MultiDimDriftDetector {
+<<<<<<< HEAD
     fn default() -> Self {
         Self::new()
     }
+=======
+    fn default() -> Self { Self::new() }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -1474,16 +1775,23 @@ pub struct DriftImpactAssessor {
 impl DriftImpactAssessor {
     pub fn new() -> Self {
         Self {
+<<<<<<< HEAD
             low_impact_factor: 0.02,
             medium_impact_factor: 0.08,
             high_impact_factor: 0.20,
             critical_impact_factor: 0.40,
             max_trust_reduction: 0.5,
             trust_floor: 0.05,
+=======
+            low_impact_factor: 0.02, medium_impact_factor: 0.08,
+            high_impact_factor: 0.20, critical_impact_factor: 0.40,
+            max_trust_reduction: 0.5, trust_floor: 0.05,
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
     pub fn with_params(
+<<<<<<< HEAD
         low: f64,
         medium: f64,
         high: f64,
@@ -1499,6 +1807,14 @@ impl DriftImpactAssessor {
             max_trust_reduction: max_reduction,
             trust_floor: floor,
         }
+=======
+        low: f64, medium: f64, high: f64, critical: f64,
+        max_reduction: f64, floor: f64,
+    ) -> Self {
+        Self { low_impact_factor: low, medium_impact_factor: medium,
+            high_impact_factor: high, critical_impact_factor: critical,
+            max_trust_reduction: max_reduction, trust_floor: floor }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Assess the impact of a drift event on a trust score.
@@ -1507,9 +1823,13 @@ impl DriftImpactAssessor {
     /// trust_adjustment = -min(base_adjustment, max_trust_reduction)
     /// adjusted_trust = max(current_trust + trust_adjustment, trust_floor)
     pub fn assess(
+<<<<<<< HEAD
         &self,
         drift_result: &DriftResult,
         current_trust: f64,
+=======
+        &self, drift_result: &DriftResult, current_trust: f64,
+>>>>>>> 4b60ced (docs: update README)
         component_criticality: f64,
     ) -> DriftTrustImpact {
         let base_factor = match &drift_result.severity {
@@ -1530,6 +1850,7 @@ impl DriftImpactAssessor {
             drift_result.severity, drift_result.score, component_criticality,
             trust_adjustment, current_trust, adjusted_trust);
 
+<<<<<<< HEAD
         DriftTrustImpact {
             drift_result: drift_result.clone(),
             trust_adjustment,
@@ -1537,10 +1858,15 @@ impl DriftImpactAssessor {
             component_criticality,
             explanation,
         }
+=======
+        DriftTrustImpact { drift_result: drift_result.clone(), trust_adjustment,
+            adjusted_trust, component_criticality, explanation }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Assess multi-dimensional drift impact on trust using worst dimension.
     pub fn assess_multi_dim(
+<<<<<<< HEAD
         &self,
         multi_result: &MultiDimDriftResult,
         current_trust: f64,
@@ -1550,10 +1876,18 @@ impl DriftImpactAssessor {
             a.severity
                 .to_score()
                 .partial_cmp(&b.severity.to_score())
+=======
+        &self, multi_result: &MultiDimDriftResult, current_trust: f64,
+        component_criticalities: &HashMap<String, f64>,
+    ) -> DriftTrustImpact {
+        let worst_dim = multi_result.dimensions.iter().max_by(|a, b| {
+            a.severity.to_score().partial_cmp(&b.severity.to_score())
+>>>>>>> 4b60ced (docs: update README)
                 .unwrap_or(std::cmp::Ordering::Equal)
         });
         let (drift_result, criticality) = match worst_dim {
             Some(dim) => {
+<<<<<<< HEAD
                 let candidates = [
                     &dim.tests.ks,
                     &dim.tests.psi,
@@ -1580,15 +1914,31 @@ impl DriftImpactAssessor {
                 DriftResult::new(0.0, 1.0, DriftSeverity::None, "No drift".into()),
                 0.0,
             ),
+=======
+                let candidates = [&dim.tests.ks, &dim.tests.psi, &dim.tests.jsd,
+                    &dim.tests.kl, &dim.tests.chi_squared];
+                let best = candidates.iter().max_by(|a, b| {
+                    a.severity.to_score().partial_cmp(&b.severity.to_score())
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                }).unwrap();
+                let crit = component_criticalities.get(&dim.dimension).copied().unwrap_or(0.5);
+                ((*best).clone(), crit)
+            }
+            None => (DriftResult::new(0.0, 1.0, DriftSeverity::None, "No drift".into()), 0.0),
+>>>>>>> 4b60ced (docs: update README)
         };
         self.assess(&drift_result, current_trust, criticality)
     }
 }
 
 impl Default for DriftImpactAssessor {
+<<<<<<< HEAD
     fn default() -> Self {
         Self::new()
     }
+=======
+    fn default() -> Self { Self::new() }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -1637,6 +1987,7 @@ impl BaselineSummary {
     /// Compute summary statistics from a slice of observations.
     pub fn from_values(values: &[f64]) -> Self {
         if values.is_empty() {
+<<<<<<< HEAD
             return Self {
                 count: 0,
                 mean: 0.0,
@@ -1647,6 +1998,10 @@ impl BaselineSummary {
                 p25: 0.0,
                 p75: 0.0,
             };
+=======
+            return Self { count: 0, mean: 0.0, std_dev: 0.0,
+                min: 0.0, max: 0.0, median: 0.0, p25: 0.0, p75: 0.0 };
+>>>>>>> 4b60ced (docs: update README)
         }
         let mut sorted = values.to_vec();
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
@@ -1658,6 +2013,7 @@ impl BaselineSummary {
         let median = percentile(&sorted, 0.5);
         let p25 = percentile(&sorted, 0.25);
         let p75 = percentile(&sorted, 0.75);
+<<<<<<< HEAD
         Self {
             count: n,
             mean,
@@ -1668,6 +2024,9 @@ impl BaselineSummary {
             p25,
             p75,
         }
+=======
+        Self { count: n, mean, std_dev: variance.sqrt(), min, max, median, p25, p75 }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -1721,6 +2080,7 @@ impl BaselineManager {
 
     /// Create with custom parameters.
     pub fn with_params(refresh_threshold: f64, max_baselines: usize) -> Self {
+<<<<<<< HEAD
         Self {
             refresh_threshold,
             max_baselines,
@@ -1730,6 +2090,16 @@ impl BaselineManager {
 
     /// Register a new baseline from observed data.
     pub fn create_baseline(&mut self, label: String, data: HashMap<String, Vec<f64>>) -> String {
+=======
+        Self { refresh_threshold, max_baselines, ..Self::new() }
+    }
+
+    /// Register a new baseline from observed data.
+    pub fn create_baseline(
+        &mut self, label: String,
+        data: HashMap<String, Vec<f64>>,
+    ) -> String {
+>>>>>>> 4b60ced (docs: update README)
         let id = format!("baseline_{}", self.next_id);
         self.next_id += 1;
 
@@ -1740,40 +2110,58 @@ impl BaselineManager {
         }
 
         let baseline = Baseline {
+<<<<<<< HEAD
             id: id.clone(),
             label,
             reference_data: data,
             created_at: Utc::now(),
             observation_count: total_obs,
             summaries,
+=======
+            id: id.clone(), label, reference_data: data,
+            created_at: Utc::now(), observation_count: total_obs, summaries,
+>>>>>>> 4b60ced (docs: update README)
         };
         self.baselines.insert(id.clone(), baseline);
         self.active_baseline_id = Some(id.clone());
 
         // Enforce max baselines by removing the oldest.
         while self.baselines.len() > self.max_baselines {
+<<<<<<< HEAD
             if let Some(oldest_id) = self
                 .baselines
                 .iter()
                 .min_by_key(|(_, b)| b.created_at)
                 .map(|(k, _)| k.clone())
             {
+=======
+            if let Some(oldest_id) = self.baselines.iter()
+                .min_by_key(|(_, b)| b.created_at).map(|(k, _)| k.clone()) {
+>>>>>>> 4b60ced (docs: update README)
                 self.baselines.remove(&oldest_id);
                 if self.active_baseline_id.as_deref() == Some(&oldest_id) {
                     self.active_baseline_id = None;
                 }
+<<<<<<< HEAD
             } else {
                 break;
             }
+=======
+            } else { break; }
+>>>>>>> 4b60ced (docs: update README)
         }
         id
     }
 
     /// Get the currently active baseline.
     pub fn active_baseline(&self) -> Option<&Baseline> {
+<<<<<<< HEAD
         self.active_baseline_id
             .as_ref()
             .and_then(|id| self.baselines.get(id))
+=======
+        self.active_baseline_id.as_ref().and_then(|id| self.baselines.get(id))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Set the active baseline by ID.
@@ -1781,18 +2169,27 @@ impl BaselineManager {
         if self.baselines.contains_key(id) {
             self.active_baseline_id = Some(id.to_string());
             true
+<<<<<<< HEAD
         } else {
             false
         }
+=======
+        } else { false }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// List all baseline IDs and labels.
     pub fn list_baselines(&self) -> Vec<(String, String, DateTime<Utc>)> {
+<<<<<<< HEAD
         let mut list: Vec<_> = self
             .baselines
             .values()
             .map(|b| (b.id.clone(), b.label.clone(), b.created_at))
             .collect();
+=======
+        let mut list: Vec<_> = self.baselines.values()
+            .map(|b| (b.id.clone(), b.label.clone(), b.created_at)).collect();
+>>>>>>> 4b60ced (docs: update README)
         list.sort_by(|a, b| a.2.cmp(&b.2));
         list
     }
@@ -1800,8 +2197,12 @@ impl BaselineManager {
     /// Compare current data against the active baseline.
     /// Returns per-dimension drift results.
     pub fn compare_against_active(
+<<<<<<< HEAD
         &self,
         current_data: &HashMap<String, Vec<f64>>,
+=======
+        &self, current_data: &HashMap<String, Vec<f64>>,
+>>>>>>> 4b60ced (docs: update README)
     ) -> HashMap<String, AllTestsResult> {
         let mut results = HashMap::new();
         if let Some(baseline) = self.active_baseline() {
@@ -1816,14 +2217,19 @@ impl BaselineManager {
 
     /// Determine whether a new baseline should be established.
     pub fn recommend_baseline_refresh(
+<<<<<<< HEAD
         &self,
         current_data: &HashMap<String, Vec<f64>>,
+=======
+        &self, current_data: &HashMap<String, Vec<f64>>,
+>>>>>>> 4b60ced (docs: update README)
     ) -> BaselineRecommendation {
         let comparisons = self.compare_against_active(current_data);
         if comparisons.is_empty() {
             return BaselineRecommendation {
                 should_create: true,
                 reason: "No active baseline exists".into(),
+<<<<<<< HEAD
                 drift_score: 1.0,
                 severity: DriftSeverity::Critical,
             };
@@ -1833,25 +2239,42 @@ impl BaselineManager {
             .values()
             .map(|r| r.aggregate_severity().to_score())
             .sum::<f64>()
+=======
+                drift_score: 1.0, severity: DriftSeverity::Critical,
+            };
+        }
+
+        let total_severity: f64 = comparisons.values()
+            .map(|r| r.aggregate_severity().to_score()).sum::<f64>()
+>>>>>>> 4b60ced (docs: update README)
             / comparisons.len().max(1) as f64;
         let severity = DriftSeverity::from_score_default(total_severity);
         let should_create = total_severity > self.refresh_threshold;
 
         let reason = if should_create {
+<<<<<<< HEAD
             format!(
                 "Drift score {:.4} exceeds refresh threshold {:.4}; new baseline recommended",
                 total_severity, self.refresh_threshold
             )
+=======
+            format!("Drift score {:.4} exceeds refresh threshold {:.4}; new baseline recommended",
+                total_severity, self.refresh_threshold)
+>>>>>>> 4b60ced (docs: update README)
         } else {
             format!("Drift score {:.4} within acceptable range", total_severity)
         };
 
+<<<<<<< HEAD
         BaselineRecommendation {
             should_create,
             reason,
             drift_score: total_severity,
             severity,
         }
+=======
+        BaselineRecommendation { should_create, reason, drift_score: total_severity, severity }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Remove a baseline by ID.
@@ -1864,6 +2287,7 @@ impl BaselineManager {
     }
 
     /// Number of registered baselines.
+<<<<<<< HEAD
     pub fn baseline_count(&self) -> usize {
         self.baselines.len()
     }
@@ -1873,6 +2297,13 @@ impl Default for BaselineManager {
     fn default() -> Self {
         Self::new()
     }
+=======
+    pub fn baseline_count(&self) -> usize { self.baselines.len() }
+}
+
+impl Default for BaselineManager {
+    fn default() -> Self { Self::new() }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -1884,6 +2315,7 @@ fn merge_sorted(a: &[f64], b: &[f64]) -> Vec<f64> {
     let mut result = Vec::with_capacity(a.len() + b.len());
     let (mut i, mut j) = (0, 0);
     while i < a.len() && j < b.len() {
+<<<<<<< HEAD
         if a[i] <= b[j] {
             result.push(a[i]);
             i += 1;
@@ -1900,19 +2332,31 @@ fn merge_sorted(a: &[f64], b: &[f64]) -> Vec<f64> {
         result.push(b[j]);
         j += 1;
     }
+=======
+        if a[i] <= b[j] { result.push(a[i]); i += 1; }
+        else { result.push(b[j]); j += 1; }
+    }
+    while i < a.len() { result.push(a[i]); i += 1; }
+    while j < b.len() { result.push(b[j]); j += 1; }
+>>>>>>> 4b60ced (docs: update README)
     result
 }
 
 /// Kolmogorov asymptotic p-value.
 /// p ≈ 2 * Σ_{k=1}^{∞} (-1)^{k+1} * exp(-2 * k² * λ²)
 fn kolmogorov_p_value(lambda: f64) -> f64 {
+<<<<<<< HEAD
     if lambda <= 0.0 {
         return 1.0;
     }
+=======
+    if lambda <= 0.0 { return 1.0; }
+>>>>>>> 4b60ced (docs: update README)
     let mut sum = 0.0;
     let mut sign = 1.0;
     for k in 1..=100 {
         let term = 2.0 * (k as f64).powi(2) * lambda * lambda;
+<<<<<<< HEAD
         if term > 700.0 {
             break;
         } // exp overflow guard
@@ -1920,6 +2364,11 @@ fn kolmogorov_p_value(lambda: f64) -> f64 {
         if contribution.abs() < 1e-15 {
             break;
         }
+=======
+        if term > 700.0 { break; } // exp overflow guard
+        let contribution = sign * (-term).exp();
+        if contribution.abs() < 1e-15 { break; }
+>>>>>>> 4b60ced (docs: update README)
         sum += contribution;
         sign *= -1.0;
     }
@@ -1928,42 +2377,62 @@ fn kolmogorov_p_value(lambda: f64) -> f64 {
 
 /// Build a probability histogram with shared binning.
 fn histogram_probs(
+<<<<<<< HEAD
     values: &[f64],
     min: f64,
     bin_width: f64,
     num_bins: usize,
+=======
+    values: &[f64], min: f64, bin_width: f64, num_bins: usize,
+>>>>>>> 4b60ced (docs: update README)
 ) -> HashMap<usize, f64> {
     let mut counts: HashMap<usize, f64> = HashMap::new();
     for &v in values {
         let idx = if bin_width > 0.0 {
             ((v - min) / bin_width).floor() as usize
+<<<<<<< HEAD
         } else {
             0
         };
+=======
+        } else { 0 };
+>>>>>>> 4b60ced (docs: update README)
         let idx = idx.min(num_bins - 1);
         *counts.entry(idx).or_insert(0.0) += 1.0;
     }
     let total = values.len() as f64;
+<<<<<<< HEAD
     for prob in counts.values_mut() {
         *prob /= total;
     }
+=======
+    for prob in counts.values_mut() { *prob /= total; }
+>>>>>>> 4b60ced (docs: update README)
     counts
 }
 
 /// Build a raw count histogram.
 fn raw_histogram_counts(
+<<<<<<< HEAD
     values: &[f64],
     min: f64,
     bin_width: f64,
     num_bins: usize,
+=======
+    values: &[f64], min: f64, bin_width: f64, num_bins: usize,
+>>>>>>> 4b60ced (docs: update README)
 ) -> HashMap<usize, f64> {
     let mut counts: HashMap<usize, f64> = HashMap::new();
     for &v in values {
         let idx = if bin_width > 0.0 {
             ((v - min) / bin_width).floor() as usize
+<<<<<<< HEAD
         } else {
             0
         };
+=======
+        } else { 0 };
+>>>>>>> 4b60ced (docs: update README)
         let idx = idx.min(num_bins - 1);
         *counts.entry(idx).or_insert(0.0) += 1.0;
     }
@@ -1974,12 +2443,17 @@ fn raw_histogram_counts(
 /// Uses the regularized lower incomplete gamma function for small x/df,
 /// and the continued fraction (Legendre) for the upper tail when x/df is large.
 fn chi_squared_p_value_approx(chi_sq: f64, df: f64) -> f64 {
+<<<<<<< HEAD
     if chi_sq <= 0.0 {
         return 1.0;
     }
     if df <= 0.0 {
         return 0.0;
     }
+=======
+    if chi_sq <= 0.0 { return 1.0; }
+    if df <= 0.0 { return 0.0; }
+>>>>>>> 4b60ced (docs: update README)
     let half_df = df / 2.0;
     let half_chi = chi_sq / 2.0;
 
@@ -1999,9 +2473,13 @@ fn chi_squared_p_value_approx(chi_sq: f64, df: f64) -> f64 {
     for k in 1..=10000 {
         term *= half_chi / (half_df + k as f64);
         sum += term;
+<<<<<<< HEAD
         if term.abs() < sum * 1e-15 {
             break;
         }
+=======
+        if term.abs() < sum * 1e-15 { break; }
+>>>>>>> 4b60ced (docs: update README)
     }
     let p_lower = (prefix * sum).min(1.0);
     // p_value = upper tail probability (1 - CDF).
@@ -2020,9 +2498,13 @@ fn chi_squared_cf_upper(a: f64, x: f64) -> f64 {
     // Using modified Lentz's method with b_0 = x+1-a, a_n = -n*(n-a), b_n = x + 2n + 1 - a.
     let tiny = 1e-30;
     let mut b = x + 1.0 - a;
+<<<<<<< HEAD
     if b.abs() < tiny {
         b = tiny;
     }
+=======
+    if b.abs() < tiny { b = tiny; }
+>>>>>>> 4b60ced (docs: update README)
     let mut c = b;
     let mut d = 0.0;
     let mut f = 1.0 / b;
@@ -2031,6 +2513,7 @@ fn chi_squared_cf_upper(a: f64, x: f64) -> f64 {
         let an = -(n as f64) * (n as f64 - a);
         let bn = x + 2.0 * n as f64 + 1.0 - a;
         d = bn + an * d;
+<<<<<<< HEAD
         if d.abs() < tiny {
             d = tiny;
         }
@@ -2044,6 +2527,15 @@ fn chi_squared_cf_upper(a: f64, x: f64) -> f64 {
         if (delta - 1.0).abs() < 1e-15 {
             break;
         }
+=======
+        if d.abs() < tiny { d = tiny; }
+        d = 1.0 / d;
+        c = bn + an / c;
+        if c.abs() < tiny { c = tiny; }
+        let delta = d * c;
+        f *= delta;
+        if (delta - 1.0).abs() < 1e-15 { break; }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     let q = (f * prefix).min(1.0);
@@ -2052,13 +2544,18 @@ fn chi_squared_cf_upper(a: f64, x: f64) -> f64 {
 
 /// Mean of a slice.
 fn mean_slice(data: &[f64]) -> f64 {
+<<<<<<< HEAD
     if data.is_empty() {
         return 0.0;
     }
+=======
+    if data.is_empty() { return 0.0; }
+>>>>>>> 4b60ced (docs: update README)
     data.iter().sum::<f64>() / data.len() as f64
 }
 
 /// Mean of a Vec<f64>.
+<<<<<<< HEAD
 fn mean_f64(data: &[f64]) -> f64 {
     mean_slice(data)
 }
@@ -2071,6 +2568,14 @@ fn percentile(sorted: &[f64], p: f64) -> f64 {
     if sorted.len() == 1 {
         return sorted[0];
     }
+=======
+fn mean_f64(data: &[f64]) -> f64 { mean_slice(data) }
+
+/// Approximate percentile from sorted data (linear interpolation).
+fn percentile(sorted: &[f64], p: f64) -> f64 {
+    if sorted.is_empty() { return 0.0; }
+    if sorted.len() == 1 { return sorted[0]; }
+>>>>>>> 4b60ced (docs: update README)
     let idx = p * (sorted.len() - 1) as f64;
     let lo = idx.floor() as usize;
     let hi = (lo + 1).min(sorted.len() - 1);
@@ -2092,6 +2597,7 @@ mod tests {
         let mut seed = 42u64;
         for _ in 0..n {
             // Simple LCG pseudo-random for deterministic tests.
+<<<<<<< HEAD
             seed = seed
                 .wrapping_mul(6364136223846793005)
                 .wrapping_add(1442695040888963407);
@@ -2099,6 +2605,11 @@ mod tests {
             seed = seed
                 .wrapping_mul(6364136223846793005)
                 .wrapping_add(1442695040888963407);
+=======
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            let u1 = ((seed >> 33) as f64) / ((1u64 << 31) as f64);
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+>>>>>>> 4b60ced (docs: update README)
             let u2 = ((seed >> 33) as f64) / ((1u64 << 31) as f64);
             let z0 = (-2.0 * u1.max(1e-10).ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos();
             samples.push(mean + z0 * std);
@@ -2119,6 +2630,7 @@ mod tests {
 
     #[test]
     fn test_severity_from_score() {
+<<<<<<< HEAD
         assert_eq!(
             DriftSeverity::from_score(0.05, 0.1, 0.25, 0.5),
             DriftSeverity::None
@@ -2139,6 +2651,13 @@ mod tests {
             DriftSeverity::from_score(1.0, 0.1, 0.25, 0.5),
             DriftSeverity::Critical
         );
+=======
+        assert_eq!(DriftSeverity::from_score(0.05, 0.1, 0.25, 0.5), DriftSeverity::None);
+        assert_eq!(DriftSeverity::from_score(0.15, 0.1, 0.25, 0.5), DriftSeverity::Low);
+        assert_eq!(DriftSeverity::from_score(0.3, 0.1, 0.25, 0.5), DriftSeverity::Medium);
+        assert_eq!(DriftSeverity::from_score(0.6, 0.1, 0.25, 0.5), DriftSeverity::High);
+        assert_eq!(DriftSeverity::from_score(1.0, 0.1, 0.25, 0.5), DriftSeverity::Critical);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── KS test tests ─────────────────────────────────────────────────
@@ -2148,11 +2667,15 @@ mod tests {
         let det = StatisticalDriftDetector::new();
         let data = normal_samples(0.0, 1.0, 200);
         let result = det.ks_test(&data[..100], &data[100..]);
+<<<<<<< HEAD
         assert!(
             result.p_value > 0.01,
             "Same dist should have high p-value, got {}",
             result.p_value
         );
+=======
+        assert!(result.p_value > 0.01, "Same dist should have high p-value, got {}", result.p_value);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(result.severity, DriftSeverity::None);
     }
 
@@ -2162,6 +2685,7 @@ mod tests {
         let ref_data = normal_samples(0.0, 1.0, 200);
         let cur_data = normal_samples(5.0, 1.0, 200);
         let result = det.ks_test(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.score > 0.3,
             "Different dists should have large D, got {}",
@@ -2172,6 +2696,10 @@ mod tests {
             "p-value should be small, got {}",
             result.p_value
         );
+=======
+        assert!(result.score > 0.3, "Different dists should have large D, got {}", result.score);
+        assert!(result.p_value < 0.05, "p-value should be small, got {}", result.p_value);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2189,11 +2717,15 @@ mod tests {
         let ref_data = normal_samples(0.0, 1.0, 500);
         let cur_data = normal_samples(0.0, 1.0, 500);
         let result = det.psi(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.score < 0.2,
             "PSI should be low for stable data, got {}",
             result.score
         );
+=======
+        assert!(result.score < 0.2, "PSI should be low for stable data, got {}", result.score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2202,11 +2734,15 @@ mod tests {
         let ref_data = normal_samples(0.0, 1.0, 500);
         let cur_data = normal_samples(3.0, 1.0, 500);
         let result = det.psi(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.score > 0.25,
             "PSI should be high for drifted data, got {}",
             result.score
         );
+=======
+        assert!(result.score > 0.25, "PSI should be high for drifted data, got {}", result.score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── JSD test tests ────────────────────────────────────────────────
@@ -2216,11 +2752,15 @@ mod tests {
         let det = StatisticalDriftDetector::new();
         let data = normal_samples(0.0, 1.0, 200);
         let result = det.jensen_shannon(&data[..100], &data[100..]);
+<<<<<<< HEAD
         assert!(
             result.score < 0.3,
             "JSD should be low for same dist, got {}",
             result.score
         );
+=======
+        assert!(result.score < 0.3, "JSD should be low for same dist, got {}", result.score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2229,11 +2769,15 @@ mod tests {
         let ref_data = normal_samples(0.0, 0.5, 200);
         let cur_data = normal_samples(4.0, 0.5, 200);
         let result = det.jensen_shannon(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.score > 0.3,
             "JSD should be high for different dists, got {}",
             result.score
         );
+=======
+        assert!(result.score > 0.3, "JSD should be high for different dists, got {}", result.score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── KL divergence tests ───────────────────────────────────────────
@@ -2243,11 +2787,15 @@ mod tests {
         let det = StatisticalDriftDetector::new();
         let data = normal_samples(0.0, 1.0, 200);
         let result = det.kl_divergence(&data[..100], &data[100..]);
+<<<<<<< HEAD
         assert!(
             result.score < 0.3,
             "KL should be low for same dist, got {}",
             result.score
         );
+=======
+        assert!(result.score < 0.3, "KL should be low for same dist, got {}", result.score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2256,11 +2804,15 @@ mod tests {
         let ref_data = normal_samples(0.0, 1.0, 300);
         let cur_data = normal_samples(5.0, 1.0, 300);
         let result = det.kl_divergence(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.score > 0.3,
             "KL should be high for different dists, got {}",
             result.score
         );
+=======
+        assert!(result.score > 0.3, "KL should be high for different dists, got {}", result.score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── Chi-squared tests ─────────────────────────────────────────────
@@ -2270,11 +2822,15 @@ mod tests {
         let det = StatisticalDriftDetector::new();
         let data = normal_samples(0.0, 1.0, 300);
         let result = det.chi_squared_test(&data[..150], &data[150..]);
+<<<<<<< HEAD
         assert!(
             result.p_value > 0.01,
             "Same dist p-value should be high, got {}",
             result.p_value
         );
+=======
+        assert!(result.p_value > 0.01, "Same dist p-value should be high, got {}", result.p_value);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2283,11 +2839,15 @@ mod tests {
         let ref_data = normal_samples(0.0, 0.5, 300);
         let cur_data = normal_samples(4.0, 0.5, 300);
         let result = det.chi_squared_test(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.p_value < 0.05,
             "p-value should be small, got {}",
             result.p_value
         );
+=======
+        assert!(result.p_value < 0.05, "p-value should be small, got {}", result.p_value);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── All tests aggregate ───────────────────────────────────────────
@@ -2298,11 +2858,16 @@ mod tests {
         let ref_data = normal_samples(0.0, 1.0, 200);
         let cur_data = normal_samples(3.0, 1.0, 200);
         let results = det.run_all_tests(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             results.significant_count(0.05) >= 2,
             "Expected at least 2 significant tests, got {}",
             results.significant_count(0.05)
         );
+=======
+        assert!(results.significant_count(0.05) >= 2,
+            "Expected at least 2 significant tests, got {}", results.significant_count(0.05));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── ADWIN tests ───────────────────────────────────────────────────
@@ -2313,6 +2878,7 @@ mod tests {
         let data = normal_samples(5.0, 0.5, 200);
         let mut drift_count = 0;
         for (i, &v) in data.iter().enumerate() {
+<<<<<<< HEAD
             if det.update(v, i).is_some() {
                 drift_count += 1;
             }
@@ -2322,6 +2888,11 @@ mod tests {
             "Stable stream should have ≤ 1 drift, got {}",
             drift_count
         );
+=======
+            if det.update(v, i).is_some() { drift_count += 1; }
+        }
+        assert!(drift_count <= 1, "Stable stream should have ≤ 1 drift, got {}", drift_count);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2331,6 +2902,7 @@ mod tests {
         let shifted = normal_samples(5.0, 0.5, 100);
         let mut drift_found = false;
         let mut idx = 0;
+<<<<<<< HEAD
         for &v in &stable {
             det.update(v, idx);
             idx += 1;
@@ -2343,6 +2915,14 @@ mod tests {
                     "Shift magnitude should be large, got {}",
                     event.shift_magnitude
                 );
+=======
+        for &v in &stable { det.update(v, idx); idx += 1; }
+        for &v in &shifted {
+            if let Some(event) = det.update(v, idx) {
+                drift_found = true;
+                assert!(event.shift_magnitude > 2.0,
+                    "Shift magnitude should be large, got {}", event.shift_magnitude);
+>>>>>>> 4b60ced (docs: update README)
                 break;
             }
             idx += 1;
@@ -2353,9 +2933,13 @@ mod tests {
     #[test]
     fn test_adwin_window_mean_variance() {
         let mut det = AdwinDetector::new();
+<<<<<<< HEAD
         for v in &[1.0, 2.0, 3.0, 4.0, 5.0] {
             det.update(*v, 0);
         }
+=======
+        for v in &[1.0, 2.0, 3.0, 4.0, 5.0] { det.update(*v, 0); }
+>>>>>>> 4b60ced (docs: update README)
         assert!((det.window_mean() - 3.0).abs() < 0.01);
         assert!(det.window_variance() > 0.0);
     }
@@ -2410,11 +2994,16 @@ mod tests {
         data.extend(vec![10.0; 50]);
         let cps = cls.detect_change_points(&data);
         assert!(!cps.is_empty(), "Should detect at least one change-point");
+<<<<<<< HEAD
         assert!(
             cps[0].index > 40 && cps[0].index <= 55,
             "Change-point should be near index 50, got {}",
             cps[0].index
         );
+=======
+        assert!(cps[0].index > 40 && cps[0].index <= 55,
+            "Change-point should be near index 50, got {}", cps[0].index);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2448,11 +3037,15 @@ mod tests {
         cur_data.insert("b".to_string(), normal_samples(5.0, 1.0, 200));
         let result = det.analyze(&ref_data, &cur_data);
         assert_eq!(result.total_dimensions, 2);
+<<<<<<< HEAD
         assert!(
             result.overall_score < 0.5,
             "Overall score should be low, got {}",
             result.overall_score
         );
+=======
+        assert!(result.overall_score < 0.5, "Overall score should be low, got {}", result.overall_score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2463,11 +3056,15 @@ mod tests {
         ref_data.insert("x".to_string(), normal_samples(0.0, 1.0, 300));
         cur_data.insert("x".to_string(), normal_samples(6.0, 1.0, 300));
         let result = det.analyze(&ref_data, &cur_data);
+<<<<<<< HEAD
         assert!(
             result.overall_score > 0.25,
             "Score should be high with drift, got {}",
             result.overall_score
         );
+=======
+        assert!(result.overall_score > 0.25, "Score should be high with drift, got {}", result.overall_score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2520,10 +3117,15 @@ mod tests {
         let result = DriftResult::new(0.5, 0.01, DriftSeverity::High, "high".into());
         let low_crit = assessor.assess(&result, 0.9, 0.0);
         let high_crit = assessor.assess(&result, 0.9, 1.0);
+<<<<<<< HEAD
         assert!(
             low_crit.trust_adjustment > high_crit.trust_adjustment,
             "Higher criticality → larger negative adjustment"
         );
+=======
+        assert!(low_crit.trust_adjustment > high_crit.trust_adjustment,
+            "Higher criticality → larger negative adjustment");
+>>>>>>> 4b60ced (docs: update README)
         assert!(high_crit.adjusted_trust < low_crit.adjusted_trust);
     }
 

@@ -385,11 +385,24 @@ where
 }
 
 /// Helper: apply a string operation between the field value and target.
+<<<<<<< HEAD
 fn string_op<F>(field_val: Option<&serde_json::Value>, target: &serde_json::Value, op: F) -> bool
 where
     F: Fn(&str, &str) -> bool,
 {
     if let (Some(serde_json::Value::String(h)), serde_json::Value::String(n)) = (field_val, target)
+=======
+fn string_op<F>(
+    field_val: Option<&serde_json::Value>,
+    target: &serde_json::Value,
+    op: F,
+) -> bool
+where
+    F: Fn(&str, &str) -> bool,
+{
+    if let (Some(serde_json::Value::String(h)), serde_json::Value::String(n)) =
+        (field_val, target)
+>>>>>>> 4b60ced (docs: update README)
     {
         op(h, n)
     } else {
@@ -438,8 +451,13 @@ impl EvaluationContext {
 
     /// Set a numeric field.
     pub fn with_f64(mut self, key: &str, value: f64) -> Self {
+<<<<<<< HEAD
         let num =
             serde_json::Number::from_f64(value).unwrap_or_else(|| serde_json::Number::from(0));
+=======
+        let num = serde_json::Number::from_f64(value)
+            .unwrap_or_else(|| serde_json::Number::from(0));
+>>>>>>> 4b60ced (docs: update README)
         self.fields
             .insert(key.to_string(), serde_json::Value::Number(num));
         self
@@ -934,7 +952,14 @@ pub fn diff_policies(p1: &Policy, p2: &Policy) -> Vec<String> {
     let added: Vec<_> = t2.difference(t1).collect();
     let removed: Vec<_> = t1.difference(t2).collect();
     if !added.is_empty() || !removed.is_empty() {
+<<<<<<< HEAD
         diffs.push(format!("tags: +{:?} -{:?}", added, removed));
+=======
+        diffs.push(format!(
+            "tags: +{:?} -{:?}",
+            added, removed
+        ));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     if diffs.is_empty() {
@@ -1101,7 +1126,14 @@ impl AuditTrail {
 
     /// Query audit records by entity.
     pub fn query_by_entity(&self, entity: &str) -> Vec<&AuditRecord> {
+<<<<<<< HEAD
         self.records.iter().filter(|r| r.entity == entity).collect()
+=======
+        self.records
+            .iter()
+            .filter(|r| r.entity == entity)
+            .collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Query audit records by decision.
@@ -1114,7 +1146,14 @@ impl AuditTrail {
 
     /// Query audit records by action.
     pub fn query_by_action(&self, action: &str) -> Vec<&AuditRecord> {
+<<<<<<< HEAD
         self.records.iter().filter(|r| r.action == action).collect()
+=======
+        self.records
+            .iter()
+            .filter(|r| r.action == action)
+            .collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get all records.
@@ -1341,10 +1380,14 @@ impl PolicyExecutor {
             cache_key,
             CachedDecision {
                 decision: decision.clone(),
+<<<<<<< HEAD
                 effects: effects
                     .iter()
                     .map(|e| (e.policy_id.clone(), e.effect.clone()))
                     .collect(),
+=======
+                effects: effects.iter().map(|e| (e.policy_id.clone(), e.effect.clone())).collect(),
+>>>>>>> 4b60ced (docs: update README)
                 computed_at: start,
                 ttl,
             },
@@ -1371,10 +1414,14 @@ impl PolicyExecutor {
     }
 
     /// Resolve conflicts and stack effects from matching policies.
+<<<<<<< HEAD
     fn resolve_and_stack(
         &mut self,
         matching: &[Policy],
     ) -> (PolicyDecision, Vec<EffectRecord>, Vec<ConflictRecord>) {
+=======
+    fn resolve_and_stack(&mut self, matching: &[Policy]) -> (PolicyDecision, Vec<EffectRecord>, Vec<ConflictRecord>) {
+>>>>>>> 4b60ced (docs: update README)
         // Check if there are conflicting decisions.
         let has_allow = matching.iter().any(|p| p.decision.is_allow());
         let has_deny = matching.iter().any(|p| p.decision.is_deny());
@@ -1527,7 +1574,12 @@ impl PolicyExecutor {
     fn evict_cache(&mut self) {
         let now = Utc::now();
         // Remove expired entries.
+<<<<<<< HEAD
         self.cache.retain(|_, v| !v.is_expired(now));
+=======
+        self.cache
+            .retain(|_, v| !v.is_expired(now));
+>>>>>>> 4b60ced (docs: update README)
 
         // If still over limit, remove oldest entries.
         if self.cache.len() > self.config.cache_max_entries {
@@ -1770,6 +1822,7 @@ mod tests {
 
     #[test]
     fn test_policy_decision_restrictions() {
+<<<<<<< HEAD
         assert!(
             PolicyDecision::Deny.restriction_score()
                 > PolicyDecision::DenyDefault.restriction_score()
@@ -1782,6 +1835,11 @@ mod tests {
             PolicyDecision::AllowDefault.restriction_score()
                 > PolicyDecision::Allow.restriction_score()
         );
+=======
+        assert!(PolicyDecision::Deny.restriction_score() > PolicyDecision::DenyDefault.restriction_score());
+        assert!(PolicyDecision::DenyDefault.restriction_score() > PolicyDecision::AllowDefault.restriction_score());
+        assert!(PolicyDecision::AllowDefault.restriction_score() > PolicyDecision::Allow.restriction_score());
+>>>>>>> 4b60ced (docs: update README)
         assert!(PolicyDecision::Allow.is_allow());
         assert!(!PolicyDecision::Allow.is_deny());
         assert!(PolicyDecision::Deny.is_deny());
@@ -1797,7 +1855,12 @@ mod tests {
 
     #[test]
     fn test_condition_leaf_evaluate_eq() {
+<<<<<<< HEAD
         let ctx = EvaluationContext::new("user1", "read", "/data").with_str("role", "admin");
+=======
+        let ctx = EvaluationContext::new("user1", "read", "/data")
+            .with_str("role", "admin");
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::Leaf(FieldCondition {
             field: "role".to_string(),
             op: ComparisonOp::Eq,
@@ -1808,7 +1871,12 @@ mod tests {
 
     #[test]
     fn test_condition_leaf_evaluate_neq() {
+<<<<<<< HEAD
         let ctx = EvaluationContext::new("user1", "read", "/data").with_str("role", "guest");
+=======
+        let ctx = EvaluationContext::new("user1", "read", "/data")
+            .with_str("role", "guest");
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::Leaf(FieldCondition {
             field: "role".to_string(),
             op: ComparisonOp::Neq,
@@ -1819,7 +1887,12 @@ mod tests {
 
     #[test]
     fn test_condition_leaf_evaluate_numeric_gt() {
+<<<<<<< HEAD
         let ctx = EvaluationContext::new("svc", "call", "/api").with_f64("trust.level", 0.85);
+=======
+        let ctx = EvaluationContext::new("svc", "call", "/api")
+            .with_f64("trust.level", 0.85);
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::Leaf(FieldCondition {
             field: "trust.level".to_string(),
             op: ComparisonOp::Gt,
@@ -1851,7 +1924,12 @@ mod tests {
 
     #[test]
     fn test_condition_or_short_circuit() {
+<<<<<<< HEAD
         let ctx = EvaluationContext::new("u1", "read", "/r").with_str("role", "guest");
+=======
+        let ctx = EvaluationContext::new("u1", "read", "/r")
+            .with_str("role", "guest");
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::or(vec![
             ConditionNode::Leaf(FieldCondition {
                 field: "role".to_string(),
@@ -1869,7 +1947,12 @@ mod tests {
 
     #[test]
     fn test_condition_not() {
+<<<<<<< HEAD
         let ctx = EvaluationContext::new("u1", "read", "/r").with_str("role", "admin");
+=======
+        let ctx = EvaluationContext::new("u1", "read", "/r")
+            .with_str("role", "admin");
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::not(ConditionNode::Leaf(FieldCondition {
             field: "role".to_string(),
             op: ComparisonOp::Eq,
@@ -1892,7 +1975,12 @@ mod tests {
 
     #[test]
     fn test_condition_in_operator() {
+<<<<<<< HEAD
         let ctx = EvaluationContext::new("u1", "read", "/data").with_str("env", "staging");
+=======
+        let ctx = EvaluationContext::new("u1", "read", "/data")
+            .with_str("env", "staging");
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::Leaf(FieldCondition {
             field: "env".to_string(),
             op: ComparisonOp::In,
@@ -1903,8 +1991,13 @@ mod tests {
 
     #[test]
     fn test_condition_matches_regex() {
+<<<<<<< HEAD
         let ctx =
             EvaluationContext::new("u1", "read", "/data").with_str("source_ip", "192.168.1.100");
+=======
+        let ctx = EvaluationContext::new("u1", "read", "/data")
+            .with_str("source_ip", "192.168.1.100");
+>>>>>>> 4b60ced (docs: update README)
         let cond = ConditionNode::Leaf(FieldCondition {
             field: "source_ip".to_string(),
             op: ComparisonOp::MatchesRegex,
@@ -1928,16 +2021,21 @@ mod tests {
             evaluated_at: Utc::now(),
         };
         assert_eq!(ctx.get_field("trust.level"), Some(&serde_json::json!(0.95)));
+<<<<<<< HEAD
         assert_eq!(
             ctx.get_field("trust.trend"),
             Some(&serde_json::json!("improving"))
         );
+=======
+        assert_eq!(ctx.get_field("trust.trend"), Some(&serde_json::json!("improving")));
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(ctx.get_field("trust.missing"), None);
     }
 
     #[test]
     fn test_single_policy_allow() {
         let mut executor = PolicyExecutor::new();
+<<<<<<< HEAD
         let policy = make_policy(
             "p1",
             "user1",
@@ -1946,6 +2044,9 @@ mod tests {
             PolicyEffect::Enforce,
             10,
         );
+=======
+        let policy = make_policy("p1", "user1", "read", PolicyDecision::Allow, PolicyEffect::Enforce, 10);
+>>>>>>> 4b60ced (docs: update README)
         executor.add_policy(policy);
         let ctx = make_ctx("user1", "read", "/data");
         let result = executor.evaluate(&ctx);
@@ -1957,6 +2058,7 @@ mod tests {
     #[test]
     fn test_single_policy_deny_enforce() {
         let mut executor = PolicyExecutor::new();
+<<<<<<< HEAD
         let policy = make_policy(
             "p1",
             "user1",
@@ -1965,6 +2067,9 @@ mod tests {
             PolicyEffect::Enforce,
             10,
         );
+=======
+        let policy = make_policy("p1", "user1", "delete", PolicyDecision::Deny, PolicyEffect::Enforce, 10);
+>>>>>>> 4b60ced (docs: update README)
         executor.add_policy(policy);
         let ctx = make_ctx("user1", "delete", "/data");
         let result = executor.evaluate(&ctx);
@@ -1979,6 +2084,7 @@ mod tests {
             default_decision: PolicyDecision::DenyDefault,
             ..ExecutorConfig::default()
         });
+<<<<<<< HEAD
         let policy = make_policy(
             "p1",
             "user1",
@@ -1987,6 +2093,9 @@ mod tests {
             PolicyEffect::Enforce,
             10,
         );
+=======
+        let policy = make_policy("p1", "user1", "read", PolicyDecision::Allow, PolicyEffect::Enforce, 10);
+>>>>>>> 4b60ced (docs: update README)
         executor.add_policy(policy);
         let ctx = make_ctx("user2", "write", "/data");
         let result = executor.evaluate(&ctx);
@@ -2001,6 +2110,7 @@ mod tests {
             ..ExecutorConfig::default()
         });
         executor.add_policy(make_policy(
+<<<<<<< HEAD
             "allow-policy",
             "svc",
             "call",
@@ -2015,6 +2125,14 @@ mod tests {
             PolicyDecision::Deny,
             PolicyEffect::Enforce,
             1,
+=======
+            "allow-policy", "svc", "call",
+            PolicyDecision::Allow, PolicyEffect::Enforce, 1,
+        ));
+        executor.add_policy(make_policy(
+            "deny-policy", "svc", "call",
+            PolicyDecision::Deny, PolicyEffect::Enforce, 1,
+>>>>>>> 4b60ced (docs: update README)
         ));
         let ctx = make_ctx("svc", "call", "/api");
         let result = executor.evaluate(&ctx);
@@ -2030,6 +2148,7 @@ mod tests {
             ..ExecutorConfig::default()
         });
         executor.add_policy(make_policy(
+<<<<<<< HEAD
             "low-priority-deny",
             "svc",
             "call",
@@ -2044,6 +2163,14 @@ mod tests {
             PolicyDecision::Allow,
             PolicyEffect::Enforce,
             100,
+=======
+            "low-priority-deny", "svc", "call",
+            PolicyDecision::Deny, PolicyEffect::Enforce, 1,
+        ));
+        executor.add_policy(make_policy(
+            "high-priority-allow", "svc", "call",
+            PolicyDecision::Allow, PolicyEffect::Enforce, 100,
+>>>>>>> 4b60ced (docs: update README)
         ));
         let ctx = make_ctx("svc", "call", "/api");
         let result = executor.evaluate(&ctx);
@@ -2055,12 +2182,17 @@ mod tests {
     fn test_deny_advisory_does_not_block() {
         let mut executor = PolicyExecutor::new();
         let policy = make_policy(
+<<<<<<< HEAD
             "p1",
             "user1",
             "read",
             PolicyDecision::Deny,
             PolicyEffect::Advisory,
             10,
+=======
+            "p1", "user1", "read",
+            PolicyDecision::Deny, PolicyEffect::Advisory, 10,
+>>>>>>> 4b60ced (docs: update README)
         );
         executor.add_policy(policy);
         let ctx = make_ctx("user1", "read", "/data");
@@ -2073,12 +2205,17 @@ mod tests {
     fn test_deny_audit_only_does_not_block() {
         let mut executor = PolicyExecutor::new();
         let policy = make_policy(
+<<<<<<< HEAD
             "p1",
             "user1",
             "read",
             PolicyDecision::Deny,
             PolicyEffect::AuditOnly,
             10,
+=======
+            "p1", "user1", "read",
+            PolicyDecision::Deny, PolicyEffect::AuditOnly, 10,
+>>>>>>> 4b60ced (docs: update README)
         );
         executor.add_policy(policy);
         let ctx = make_ctx("user1", "read", "/data");
@@ -2089,6 +2226,7 @@ mod tests {
     #[test]
     fn test_inactive_policy_does_not_match() {
         let mut executor = PolicyExecutor::new();
+<<<<<<< HEAD
         let policy = make_policy(
             "p1",
             "user1",
@@ -2098,6 +2236,10 @@ mod tests {
             10,
         )
         .with_active(false);
+=======
+        let policy = make_policy("p1", "user1", "read", PolicyDecision::Deny, PolicyEffect::Enforce, 10)
+            .with_active(false);
+>>>>>>> 4b60ced (docs: update README)
         executor.add_policy(policy);
         let ctx = make_ctx("user1", "read", "/data");
         let result = executor.evaluate(&ctx);
@@ -2121,12 +2263,22 @@ mod tests {
         executor.add_policy(policy);
 
         // High trust — should match and allow.
+<<<<<<< HEAD
         let ctx_high = EvaluationContext::new("svc", "call", "/api").with_f64("trust.level", 0.9);
+=======
+        let ctx_high = EvaluationContext::new("svc", "call", "/api")
+            .with_f64("trust.level", 0.9);
+>>>>>>> 4b60ced (docs: update README)
         let result_high = executor.evaluate(&ctx_high);
         assert_eq!(result_high.decision, PolicyDecision::Allow);
 
         // Low trust — should not match, fall to default.
+<<<<<<< HEAD
         let ctx_low = EvaluationContext::new("svc", "call", "/api").with_f64("trust.level", 0.3);
+=======
+        let ctx_low = EvaluationContext::new("svc", "call", "/api")
+            .with_f64("trust.level", 0.3);
+>>>>>>> 4b60ced (docs: update README)
         let result_low = executor.evaluate(&ctx_low);
         assert_eq!(result_low.decision, PolicyDecision::DenyDefault);
     }
@@ -2185,6 +2337,7 @@ mod tests {
     #[test]
     fn test_audit_trail_records_evaluations() {
         let mut executor = PolicyExecutor::new();
+<<<<<<< HEAD
         executor.add_policy(make_policy(
             "p1",
             "u1",
@@ -2193,6 +2346,9 @@ mod tests {
             PolicyEffect::Enforce,
             10,
         ));
+=======
+        executor.add_policy(make_policy("p1", "u1", "read", PolicyDecision::Allow, PolicyEffect::Enforce, 10));
+>>>>>>> 4b60ced (docs: update README)
         let ctx = make_ctx("u1", "read", "/data");
         executor.evaluate(&ctx);
         assert_eq!(executor.audit_trail().len(), 1);
@@ -2205,6 +2361,7 @@ mod tests {
     #[test]
     fn test_audit_trail_query_by_decision() {
         let mut executor = PolicyExecutor::new();
+<<<<<<< HEAD
         executor.add_policy(make_policy(
             "p1",
             "u1",
@@ -2221,13 +2378,21 @@ mod tests {
             PolicyEffect::Enforce,
             10,
         ));
+=======
+        executor.add_policy(make_policy("p1", "u1", "read", PolicyDecision::Allow, PolicyEffect::Enforce, 10));
+        executor.add_policy(make_policy("p2", "u1", "delete", PolicyDecision::Deny, PolicyEffect::Enforce, 10));
+>>>>>>> 4b60ced (docs: update README)
 
         executor.evaluate(&make_ctx("u1", "read", "/data"));
         executor.evaluate(&make_ctx("u1", "delete", "/data"));
 
+<<<<<<< HEAD
         let denies = executor
             .audit_trail()
             .query_by_decision(PolicyDecision::Deny);
+=======
+        let denies = executor.audit_trail().query_by_decision(PolicyDecision::Deny);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(denies.len(), 1);
     }
 
@@ -2329,10 +2494,14 @@ mod tests {
 
     #[test]
     fn test_policy_version_parse() {
+<<<<<<< HEAD
         assert_eq!(
             PolicyVersion::parse("1.2.3"),
             Some(PolicyVersion::new(1, 2, 3))
         );
+=======
+        assert_eq!(PolicyVersion::parse("1.2.3"), Some(PolicyVersion::new(1, 2, 3)));
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(PolicyVersion::parse("1.2"), None);
         assert_eq!(PolicyVersion::parse("a.b.c"), None);
     }
@@ -2358,6 +2527,7 @@ mod tests {
     #[test]
     fn test_executor_stats() {
         let mut executor = PolicyExecutor::new();
+<<<<<<< HEAD
         executor.add_policy(make_policy(
             "p1",
             "*",
@@ -2366,6 +2536,9 @@ mod tests {
             PolicyEffect::Enforce,
             1,
         ));
+=======
+        executor.add_policy(make_policy("p1", "*", "read", PolicyDecision::Allow, PolicyEffect::Enforce, 1));
+>>>>>>> 4b60ced (docs: update README)
         executor.evaluate(&make_ctx("u1", "read", "/data"));
         let stats = executor.stats();
         assert_eq!(stats.policy_count, 1);
@@ -2379,6 +2552,7 @@ mod tests {
             cache_ttl_ms: 60_000, // long TTL for test
             ..ExecutorConfig::default()
         });
+<<<<<<< HEAD
         executor.add_policy(make_policy(
             "p1",
             "u1",
@@ -2387,6 +2561,9 @@ mod tests {
             PolicyEffect::Enforce,
             10,
         ));
+=======
+        executor.add_policy(make_policy("p1", "u1", "read", PolicyDecision::Allow, PolicyEffect::Enforce, 10));
+>>>>>>> 4b60ced (docs: update README)
         let ctx = make_ctx("u1", "read", "/data");
 
         let r1 = executor.evaluate(&ctx);

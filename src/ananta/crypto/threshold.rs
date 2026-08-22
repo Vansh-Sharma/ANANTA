@@ -15,9 +15,15 @@
 // FIELD: All arithmetic is performed modulo the Mersenne prime 2^31 - 1.
 //         The generator g = 7 is used for commitment computations.
 
+<<<<<<< HEAD
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+=======
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use rand::Rng;
+>>>>>>> 4b60ced (docs: update README)
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -177,10 +183,14 @@ pub fn mod_neg(a: u64) -> u64 {
 /// Panics if fewer than 2 shares are provided, or if any two shares
 /// have the same x-coordinate.
 pub fn lagrange_interpolate_at_zero(shares: &[(u64, u64)]) -> u64 {
+<<<<<<< HEAD
     assert!(
         shares.len() >= 2,
         "Need at least 2 shares for interpolation"
     );
+=======
+    assert!(shares.len() >= 2, "Need at least 2 shares for interpolation");
+>>>>>>> 4b60ced (docs: update README)
     let mut secret: u64 = 0;
     for (i, &(xi, yi)) in shares.iter().enumerate() {
         let mut numerator: u64 = 1;
@@ -194,8 +204,13 @@ pub fn lagrange_interpolate_at_zero(shares: &[(u64, u64)]) -> u64 {
             // denominator accumulates (xi - xj) mod p
             denominator = mod_mul(denominator, mod_sub(xi, xj));
         }
+<<<<<<< HEAD
         let lagrange_coeff =
             mod_div(numerator, denominator).expect("Lagrange denominator must be invertible");
+=======
+        let lagrange_coeff = mod_div(numerator, denominator)
+            .expect("Lagrange denominator must be invertible");
+>>>>>>> 4b60ced (docs: update README)
         secret = mod_add(secret, mod_mul(yi, lagrange_coeff));
     }
     secret
@@ -215,7 +230,12 @@ pub fn lagrange_basis_coeff(x_i: u64, all_x: &[u64]) -> u64 {
         numerator = mod_mul(numerator, mod_neg(xj));
         denominator = mod_mul(denominator, mod_sub(x_i, xj));
     }
+<<<<<<< HEAD
     mod_div(numerator, denominator).expect("Lagrange basis denominator must be invertible")
+=======
+    mod_div(numerator, denominator)
+        .expect("Lagrange basis denominator must be invertible")
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Evaluate a polynomial at a given point using Horner's method.
@@ -369,7 +389,14 @@ impl ShamirScheme {
             self.threshold,
             shares.len()
         );
+<<<<<<< HEAD
         let points: Vec<(u64, u64)> = shares.iter().map(|s| (s.index, s.value)).collect();
+=======
+        let points: Vec<(u64, u64)> = shares
+            .iter()
+            .map(|s| (s.index, s.value))
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
         lagrange_interpolate_at_zero(&points)
     }
 
@@ -661,10 +688,14 @@ impl std::fmt::Display for VSSError {
             VSSError::ShareVerificationFailed { index } => {
                 write!(f, "Share verification failed for participant {}", index)
             }
+<<<<<<< HEAD
             VSSError::InvalidThreshold {
                 threshold,
                 num_shares,
             } => {
+=======
+            VSSError::InvalidThreshold { threshold, num_shares } => {
+>>>>>>> 4b60ced (docs: update README)
                 write!(
                     f,
                     "Invalid threshold {} for {} shares",
@@ -739,9 +770,20 @@ impl FeldmanDealer {
     /// Verify a received share against published commitments.
     /// This is the operation a participant performs after receiving
     /// their share from the dealer.
+<<<<<<< HEAD
     pub fn verify(commitments: &FeldmanCommitments, share: &ShamirShare) -> Result<(), VSSError> {
         if !commitments.verify_share(share.index, share.value) {
             return Err(VSSError::ShareVerificationFailed { index: share.index });
+=======
+    pub fn verify(
+        commitments: &FeldmanCommitments,
+        share: &ShamirShare,
+    ) -> Result<(), VSSError> {
+        if !commitments.verify_share(share.index, share.value) {
+            return Err(VSSError::ShareVerificationFailed {
+                index: share.index,
+            });
+>>>>>>> 4b60ced (docs: update README)
         }
         Ok(())
     }
@@ -835,11 +877,24 @@ impl DKGResult {
     /// mod-p / mod-(p-1) mismatch of the product-of-terms approach.
     pub fn verify_public_key(&self) -> bool {
         // Sort entries by participant ID for deterministic selection.
+<<<<<<< HEAD
         let mut sorted_entries: Vec<(u64, u64)> =
             self.shares.iter().map(|(&k, &v)| (k, v)).collect();
         sorted_entries.sort_by_key(|&(k, _)| k);
         let share_entries: Vec<(u64, u64)> =
             sorted_entries.into_iter().take(self.threshold).collect();
+=======
+        let mut sorted_entries: Vec<(u64, u64)> = self
+            .shares
+            .iter()
+            .map(|(&k, &v)| (k, v))
+            .collect();
+        sorted_entries.sort_by_key(|&(k, _)| k);
+        let share_entries: Vec<(u64, u64)> = sorted_entries
+            .into_iter()
+            .take(self.threshold)
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
         if share_entries.len() < self.threshold {
             return false;
         }
@@ -928,7 +983,13 @@ impl DKGParticipant {
         self.received_commitments
             .insert(sender, contribution.commitments.clone());
         if let Some(&share_value) = contribution.shares.get(&self.id) {
+<<<<<<< HEAD
             let verified = contribution.commitments.verify_share(self.id, share_value);
+=======
+            let verified = contribution
+                .commitments
+                .verify_share(self.id, share_value);
+>>>>>>> 4b60ced (docs: update README)
             if verified {
                 self.received_shares.insert(sender, share_value);
             } else {
@@ -1092,10 +1153,14 @@ pub enum KeyRefreshError {
 impl std::fmt::Display for KeyRefreshError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+<<<<<<< HEAD
             KeyRefreshError::SubShareVerificationFailed {
                 sender_id,
                 recipient_id,
             } => {
+=======
+            KeyRefreshError::SubShareVerificationFailed { sender_id, recipient_id } => {
+>>>>>>> 4b60ced (docs: update README)
                 write!(
                     f,
                     "Sub-share from {} to {} failed verification",
@@ -1133,7 +1198,16 @@ pub struct RefreshParticipant {
 
 impl RefreshParticipant {
     /// Create a new refresh participant.
+<<<<<<< HEAD
     pub fn new(id: u64, current_share: u64, threshold: usize, participant_ids: Vec<u64>) -> Self {
+=======
+    pub fn new(
+        id: u64,
+        current_share: u64,
+        threshold: usize,
+        participant_ids: Vec<u64>,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             id,
             current_share,
@@ -1182,7 +1256,13 @@ impl RefreshParticipant {
         if sub_share.recipient_id != self.id {
             return Ok(()); // Not for us.
         }
+<<<<<<< HEAD
         let verified = sub_share.commitments.verify_share(self.id, sub_share.value);
+=======
+        let verified = sub_share
+            .commitments
+            .verify_share(self.id, sub_share.value);
+>>>>>>> 4b60ced (docs: update README)
         if !verified {
             return Err(KeyRefreshError::SubShareVerificationFailed {
                 sender_id: sub_share.sender_id,
@@ -1255,7 +1335,14 @@ pub fn execute_key_refresh(
     let mut all_sub_shares: Vec<RefreshSubShare> = Vec::new();
 
     for &pid in participant_ids {
+<<<<<<< HEAD
         let current = current_shares.get(&pid).copied().unwrap_or(0);
+=======
+        let current = current_shares
+            .get(&pid)
+            .copied()
+            .unwrap_or(0);
+>>>>>>> 4b60ced (docs: update README)
         let p = RefreshParticipant::new(pid, current, threshold, participant_ids.to_vec());
         participants.insert(pid, p);
     }
@@ -1873,10 +1960,17 @@ mod tests {
         let b = vec![4u64, 5, 6, 7];
         let c = poly_add(&a, &b);
         assert_eq!(c.len(), 4);
+<<<<<<< HEAD
         assert_eq!(c[0], 5); // 1+4
         assert_eq!(c[1], 7); // 2+5
         assert_eq!(c[2], 9); // 3+6
         assert_eq!(c[3], 7); // 0+7
+=======
+        assert_eq!(c[0], 5);  // 1+4
+        assert_eq!(c[1], 7);  // 2+5
+        assert_eq!(c[2], 9);  // 3+6
+        assert_eq!(c[3], 7);  // 0+7
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

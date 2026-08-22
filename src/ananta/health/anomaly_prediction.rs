@@ -13,8 +13,13 @@
 // the small systems (up to ~10×10) encountered in coefficient
 // estimation.
 
+<<<<<<< HEAD
 use super::HealthStatus;
 use serde::{Deserialize, Serialize};
+=======
+use serde::{Deserialize, Serialize};
+use super::HealthStatus;
+>>>>>>> 4b60ced (docs: update README)
 
 // ────────────────────────────────────────────────────────────────────
 // Linear-algebra helpers
@@ -279,11 +284,21 @@ impl ArimaModel {
             target.push(differenced[t]);
         }
 
+<<<<<<< HEAD
         let ar_only: Vec<Vec<f64>> = design.iter().map(|row| row[..config.p].to_vec()).collect();
 
         let ar_coeffs = if config.p > 0 {
             least_squares(&ar_only, &target)
                 .ok_or("AR coefficient estimation failed (singular matrix)")?
+=======
+        let ar_only: Vec<Vec<f64>> = design
+            .iter()
+            .map(|row| row[..config.p].to_vec())
+            .collect();
+
+        let ar_coeffs = if config.p > 0 {
+            least_squares(&ar_only, &target).ok_or("AR coefficient estimation failed (singular matrix)")?
+>>>>>>> 4b60ced (docs: update README)
         } else {
             vec![]
         };
@@ -373,7 +388,15 @@ impl ArimaModel {
 
     /// Invert differencing: given the last `d` original-level values
     /// and a forecast of the differenced series, return the level forecast.
+<<<<<<< HEAD
     fn invert_difference(pre_diff: &[f64], diff_forecast: &[f64], d: usize) -> Vec<f64> {
+=======
+    fn invert_difference(
+        pre_diff: &[f64],
+        diff_forecast: &[f64],
+        d: usize,
+    ) -> Vec<f64> {
+>>>>>>> 4b60ced (docs: update README)
         if d == 0 {
             return diff_forecast.to_vec();
         }
@@ -442,7 +465,15 @@ impl ArimaModel {
     /// z-critical value (e.g. 1.96 for 95%).
     ///
     /// Returns `(lower, point, upper)` triples.
+<<<<<<< HEAD
     pub fn forecast_intervals(&self, steps: usize, z_crit: f64) -> Vec<PredictionInterval> {
+=======
+    pub fn forecast_intervals(
+        &self,
+        steps: usize,
+        z_crit: f64,
+    ) -> Vec<PredictionInterval> {
+>>>>>>> 4b60ced (docs: update README)
         let points = self.forecast(steps);
         let p = self.config.p;
         let q = self.config.q;
@@ -624,10 +655,17 @@ impl HoltWintersModel {
             // Update components
             let new_level = config.alpha * (y[t] - seasonal[s_idx])
                 + (1.0 - config.alpha) * (level + config.phi * trend);
+<<<<<<< HEAD
             let new_trend =
                 config.beta * (new_level - level) + (1.0 - config.beta) * config.phi * trend;
             let new_seasonal =
                 config.gamma * (y[t] - new_level) + (1.0 - config.gamma) * seasonal[s_idx];
+=======
+            let new_trend = config.beta * (new_level - level)
+                + (1.0 - config.beta) * config.phi * trend;
+            let new_seasonal = config.gamma * (y[t] - new_level)
+                + (1.0 - config.gamma) * seasonal[s_idx];
+>>>>>>> 4b60ced (docs: update README)
 
             level = new_level;
             trend = new_trend;
@@ -650,7 +688,13 @@ impl HoltWintersModel {
         let mut result = Vec::with_capacity(h);
         for i in 1..=h {
             // Trend accumulates with damping: b_T Σ_{j=0}^{h-1} φ^j
+<<<<<<< HEAD
             let phi_pow_sum: f64 = (0..i).map(|j| self.config.phi.powi(j as i32)).sum();
+=======
+            let phi_pow_sum: f64 = (0..i)
+                .map(|j| self.config.phi.powi(j as i32))
+                .sum();
+>>>>>>> 4b60ced (docs: update README)
             let s_idx = (self.seasonal.len() - m + (i - 1) % m) % m;
             let pt = self.level + self.trend * phi_pow_sum + self.seasonal[s_idx];
             result.push(pt);
@@ -663,7 +707,15 @@ impl HoltWintersModel {
     /// Uses a simplified variance model:
     ///   σ²_h = σ² [1 + α² Σ_{j=0}^{h-2} (Σ_{k=0}^{j} ψ_k)²]
     /// where ψ_k are the recursive MA weights.
+<<<<<<< HEAD
     pub fn forecast_intervals(&self, h: usize, z_crit: f64) -> Vec<PredictionInterval> {
+=======
+    pub fn forecast_intervals(
+        &self,
+        h: usize,
+        z_crit: f64,
+    ) -> Vec<PredictionInterval> {
+>>>>>>> 4b60ced (docs: update README)
         let sigma = std_dev(&self.residuals);
         let points = self.forecast(h);
         let alpha = self.config.alpha;
@@ -679,8 +731,12 @@ impl HoltWintersModel {
             psi[1] = alpha + phi * beta - alpha * phi;
         }
         for j in 2..max_psi {
+<<<<<<< HEAD
             psi[j] = alpha * phi * psi[j - 1] + phi * beta * psi[j - 1]
                 - alpha * phi * beta * psi[j - 2];
+=======
+            psi[j] = alpha * phi * psi[j - 1] + phi * beta * psi[j - 1] - alpha * phi * beta * psi[j - 2];
+>>>>>>> 4b60ced (docs: update README)
             // Simplified: for additive Holt-Winters without seasonal correction
             // in the error variance
         }
@@ -823,7 +879,13 @@ impl SeasonalDecomposition {
         } else {
             // Even window: 2×m centred MA
             // First pass: 2-period MA
+<<<<<<< HEAD
             let ma2: Vec<f64> = (0..n - 1).map(|i| (y[i] + y[i + 1]) / 2.0).collect();
+=======
+            let ma2: Vec<f64> = (0..n - 1)
+                .map(|i| (y[i] + y[i + 1]) / 2.0)
+                .collect();
+>>>>>>> 4b60ced (docs: update README)
             // Second pass: m-period MA on the 2-period MA
             let half = (m / 2) - 1;
             for i in half..ma2.len().saturating_sub(half) {
@@ -859,12 +921,16 @@ impl SeasonalDecomposition {
             .map(|(o, t)| o - t)
             .filter(|v| !v.is_nan())
             .collect();
+<<<<<<< HEAD
         let residuals: Vec<f64> = self
             .residual
             .iter()
             .filter(|v| !v.is_nan())
             .copied()
             .collect();
+=======
+        let residuals: Vec<f64> = self.residual.iter().filter(|v| !v.is_nan()).copied().collect();
+>>>>>>> 4b60ced (docs: update README)
         if detrended.len() < 2 || residuals.len() < 2 {
             return 0.0;
         }
@@ -1030,8 +1096,12 @@ impl AnomalyDetector {
         }
 
         // Aggregate by index
+<<<<<<< HEAD
         let mut by_index: std::collections::HashMap<usize, AggAnomaly> =
             std::collections::HashMap::new();
+=======
+        let mut by_index: std::collections::HashMap<usize, AggAnomaly> = std::collections::HashMap::new();
+>>>>>>> 4b60ced (docs: update README)
         for c in score_map {
             let entry = by_index.entry(c.index).or_insert_with(|| AggAnomaly {
                 index: c.index,
@@ -1283,10 +1353,14 @@ impl CusumDetector {
             return vec![];
         }
 
+<<<<<<< HEAD
         let mu0 = self
             .config
             .target_mean
             .unwrap_or_else(|| mean(&y[..self.config.warmup]));
+=======
+        let mu0 = self.config.target_mean.unwrap_or_else(|| mean(&y[..self.config.warmup]));
+>>>>>>> 4b60ced (docs: update README)
         let k = self.config.k;
         let h = self.config.h;
 
@@ -1325,10 +1399,14 @@ impl CusumDetector {
         if y.len() < self.config.warmup {
             return vec![];
         }
+<<<<<<< HEAD
         let mu0 = self
             .config
             .target_mean
             .unwrap_or_else(|| mean(&y[..self.config.warmup]));
+=======
+        let mu0 = self.config.target_mean.unwrap_or_else(|| mean(&y[..self.config.warmup]));
+>>>>>>> 4b60ced (docs: update README)
         let k = self.config.k;
 
         let mut s_plus: f64 = 0.0;
@@ -1439,6 +1517,7 @@ impl AnomalyPredictionEngine {
         };
 
         // --- ARIMA ---
+<<<<<<< HEAD
         let arima_ok = if scores.len()
             >= self.config.arima.p.max(self.config.arima.q) + self.config.arima.d + 5
         {
@@ -1447,6 +1526,13 @@ impl AnomalyPredictionEngine {
                     let fc = model.forecast(self.config.forecast_horizon);
                     let pi =
                         model.forecast_intervals(self.config.forecast_horizon, self.config.z_crit);
+=======
+        let arima_ok = if scores.len() >= self.config.arima.p.max(self.config.arima.q) + self.config.arima.d + 5 {
+            match ArimaModel::fit(scores, self.config.arima.clone()) {
+                Ok(model) => {
+                    let fc = model.forecast(self.config.forecast_horizon);
+                    let pi = model.forecast_intervals(self.config.forecast_horizon, self.config.z_crit);
+>>>>>>> 4b60ced (docs: update README)
                     result.arima_forecast = Some(fc.clone());
                     result.arima_intervals = Some(pi);
                     true
@@ -1463,8 +1549,12 @@ impl AnomalyPredictionEngine {
                 match HoltWintersModel::fit(scores, hw_cfg.clone()) {
                     Ok(model) => {
                         let fc = model.forecast(self.config.forecast_horizon);
+<<<<<<< HEAD
                         let pi = model
                             .forecast_intervals(self.config.forecast_horizon, self.config.z_crit);
+=======
+                        let pi = model.forecast_intervals(self.config.forecast_horizon, self.config.z_crit);
+>>>>>>> 4b60ced (docs: update README)
                         result.hw_forecast = Some(fc.clone());
                         result.hw_intervals = Some(pi);
                         true
@@ -1517,7 +1607,14 @@ impl AnomalyPredictionEngine {
                 if let Some(&last) = fc.last() {
                     predicted_value = last;
                     confidence = 0.7;
+<<<<<<< HEAD
                     reasons.push(format!("ARIMA forecast: {:.3} → {:.3}", current, last));
+=======
+                    reasons.push(format!(
+                        "ARIMA forecast: {:.3} → {:.3}",
+                        current, last
+                    ));
+>>>>>>> 4b60ced (docs: update README)
                 }
             }
         }
@@ -1527,10 +1624,23 @@ impl AnomalyPredictionEngine {
                     // If both models agree, boost confidence
                     if (predicted_value - last).abs() < 0.1 {
                         confidence = (confidence + 0.8) / 2.0;
+<<<<<<< HEAD
                         reasons.push(format!("Holt-Winters confirms: {:.3}", last));
                     } else {
                         predicted_value = (predicted_value + last) / 2.0;
                         reasons.push(format!("Holt-Winters diverges: {:.3}", last));
+=======
+                        reasons.push(format!(
+                            "Holt-Winters confirms: {:.3}",
+                            last
+                        ));
+                    } else {
+                        predicted_value = (predicted_value + last) / 2.0;
+                        reasons.push(format!(
+                            "Holt-Winters diverges: {:.3}",
+                            last
+                        ));
+>>>>>>> 4b60ced (docs: update README)
                     }
                 }
             }
@@ -1546,7 +1656,14 @@ impl AnomalyPredictionEngine {
                 .count();
             if recent_anom > 0 {
                 confidence = (confidence + 0.15 * recent_anom as f64).min(0.98);
+<<<<<<< HEAD
                 reasons.push(format!("{} recent anomaly signal(s)", recent_anom));
+=======
+                reasons.push(format!(
+                    "{} recent anomaly signal(s)",
+                    recent_anom
+                ));
+>>>>>>> 4b60ced (docs: update README)
             }
         }
 
@@ -1596,9 +1713,13 @@ mod tests {
         // Simple LCG for reproducibility
         let mut rng = seed as u64;
         let next_rand = |rng: &mut u64| -> f64 {
+<<<<<<< HEAD
             *rng = rng
                 .wrapping_mul(6364136223846793005)
                 .wrapping_add(1442695040888963407);
+=======
+            *rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+>>>>>>> 4b60ced (docs: update README)
             ((*rng >> 33) as f64) / 2147483648.0 - 0.5
         };
         for t in 1..n {
@@ -1611,8 +1732,12 @@ mod tests {
     fn seasonal_series(n: usize, m: usize, trend_slope: f64) -> Vec<f64> {
         (0..n)
             .map(|t| {
+<<<<<<< HEAD
                 50.0 + trend_slope * t as f64
                     + 10.0 * (2.0 * std::f64::consts::PI * t as f64 / m as f64).sin()
+=======
+                50.0 + trend_slope * t as f64 + 10.0 * (2.0 * std::f64::consts::PI * t as f64 / m as f64).sin()
+>>>>>>> 4b60ced (docs: update README)
             })
             .collect()
     }
@@ -1648,10 +1773,15 @@ mod tests {
     fn test_least_squares_overdetermined() {
         // y = 3 (constant) with some noise
         let x: Vec<Vec<f64>> = (0..20).map(|_| vec![1.0]).collect();
+<<<<<<< HEAD
         let y: Vec<f64> = vec![
             3.1, 2.9, 3.0, 3.2, 2.8, 3.0, 3.1, 2.9, 3.0, 3.0, 3.1, 2.9, 3.0, 3.2, 2.8, 3.0, 3.1,
             2.9, 3.0, 3.0,
         ];
+=======
+        let y: Vec<f64> = vec![3.1, 2.9, 3.0, 3.2, 2.8, 3.0, 3.1, 2.9, 3.0, 3.0,
+                               3.1, 2.9, 3.0, 3.2, 2.8, 3.0, 3.1, 2.9, 3.0, 3.0];
+>>>>>>> 4b60ced (docs: update README)
         let beta = least_squares(&x, &y).unwrap();
         assert!((beta[0] - 3.0).abs() < 0.1);
     }
@@ -1685,9 +1815,13 @@ mod tests {
 
     #[test]
     fn test_arima_fit_with_differencing() {
+<<<<<<< HEAD
         let y: Vec<f64> = (0..100)
             .map(|i| i as f64 * 0.5 + (i as f64 * 0.1).sin() * 2.0)
             .collect();
+=======
+        let y: Vec<f64> = (0..100).map(|i| i as f64 * 0.5 + (i as f64 * 0.1).sin() * 2.0).collect();
+>>>>>>> 4b60ced (docs: update README)
         let cfg = ArimaConfig::new(1, 1, 0);
         let model = ArimaModel::fit(&y, cfg).unwrap();
         assert!(model.sigma >= 0.0);
@@ -1801,9 +1935,13 @@ mod tests {
                 assert!(
                     (reconstructed - y[i]).abs() < 1e-8,
                     "reconstruction failed at index {}: got {}, expected {}",
+<<<<<<< HEAD
                     i,
                     reconstructed,
                     y[i]
+=======
+                    i, reconstructed, y[i]
+>>>>>>> 4b60ced (docs: update README)
                 );
             }
         }
@@ -1815,11 +1953,15 @@ mod tests {
         let dec = SeasonalDecomposition::decompose(&y, 12).unwrap();
         let indices = dec.seasonal_indices();
         let sum: f64 = indices.iter().sum();
+<<<<<<< HEAD
         assert!(
             sum.abs() < 1e-8,
             "seasonal indices should sum to 0, got {}",
             sum
         );
+=======
+        assert!(sum.abs() < 1e-8, "seasonal indices should sum to 0, got {}", sum);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1876,10 +2018,14 @@ mod tests {
             hw_config: None,
         });
         let anomalies = detector.detect(&y);
+<<<<<<< HEAD
         assert!(
             anomalies.is_empty(),
             "uniform series should have no anomalies"
         );
+=======
+        assert!(anomalies.is_empty(), "uniform series should have no anomalies");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1937,11 +2083,15 @@ mod tests {
         assert!(!cps.is_empty(), "CUSUM should detect the mean shift");
         // The change should be detected after the shift point
         let first_cp = &cps[0];
+<<<<<<< HEAD
         assert!(
             first_cp.index >= 30,
             "change point should be at or after index 30, got {}",
             first_cp.index
         );
+=======
+        assert!(first_cp.index >= 30, "change point should be at or after index 30, got {}", first_cp.index);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2079,11 +2229,15 @@ mod tests {
         let y = seasonal_series(60, 12, 0.0); // pure seasonal, no trend
         let dec = SeasonalDecomposition::decompose(&y, 12).unwrap();
         let strength = dec.seasonality_strength();
+<<<<<<< HEAD
         assert!(
             strength > 0.5,
             "seasonality strength should be high for pure seasonal data, got {}",
             strength
         );
+=======
+        assert!(strength > 0.5, "seasonality strength should be high for pure seasonal data, got {}", strength);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2160,6 +2314,7 @@ mod tests {
             component: "test".to_string(),
             arima_forecast: Some(vec![1.0, 2.0]),
             arima_intervals: Some(vec![
+<<<<<<< HEAD
                 PredictionInterval {
                     lower: 0.5,
                     point: 1.0,
@@ -2170,6 +2325,10 @@ mod tests {
                     point: 2.0,
                     upper: 3.0,
                 },
+=======
+                PredictionInterval { lower: 0.5, point: 1.0, upper: 1.5 },
+                PredictionInterval { lower: 1.0, point: 2.0, upper: 3.0 },
+>>>>>>> 4b60ced (docs: update README)
             ]),
             hw_forecast: None,
             hw_intervals: None,

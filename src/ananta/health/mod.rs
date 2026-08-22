@@ -21,6 +21,10 @@ pub use anomaly_prediction::*;
 pub mod health_correlation;
 pub use health_correlation::*;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4b60ced (docs: update README)
 /// Health status levels.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(rename_all = "snake_case")]
@@ -177,16 +181,24 @@ impl HealthGraph {
 
     /// Get the health score for a component.
     pub fn component_health(&self, component: &str) -> f64 {
+<<<<<<< HEAD
         self.observations
             .get(component)
+=======
+        self.observations.get(component)
+>>>>>>> 4b60ced (docs: update README)
             .map(|o| o.score)
             .unwrap_or(1.0)
     }
 
     /// Get the health status for a component.
     pub fn component_status(&self, component: &str) -> HealthStatus {
+<<<<<<< HEAD
         self.observations
             .get(component)
+=======
+        self.observations.get(component)
+>>>>>>> 4b60ced (docs: update README)
             .map(|o| o.status.clone())
             .unwrap_or(HealthStatus::Unknown)
     }
@@ -199,8 +211,12 @@ impl HealthGraph {
         let own_health = self.component_health(component);
 
         // Find all dependencies of this component.
+<<<<<<< HEAD
         let deps: Vec<&DependencyEdge> = self
             .dependencies
+=======
+        let deps: Vec<&DependencyEdge> = self.dependencies
+>>>>>>> 4b60ced (docs: update README)
             .iter()
             .filter(|d| d.from == component)
             .collect();
@@ -234,7 +250,13 @@ impl HealthGraph {
         }
 
         let components: Vec<String> = self.observations.keys().cloned().collect();
+<<<<<<< HEAD
         let total: f64 = components.iter().map(|c| self.propagated_health(c)).sum();
+=======
+        let total: f64 = components.iter()
+            .map(|c| self.propagated_health(c))
+            .sum();
+>>>>>>> 4b60ced (docs: update README)
         total / components.len() as f64
     }
 
@@ -314,8 +336,12 @@ impl HealthGraph {
         };
 
         let recent: f64 = history.iter().rev().take(5).sum::<f64>() / 5.0;
+<<<<<<< HEAD
         let older: f64 = history.iter().rev().skip(5).take(5).sum::<f64>()
             / 5.0_f64.min(history.len().saturating_sub(5).max(1) as f64);
+=======
+        let older: f64 = history.iter().rev().skip(5).take(5).sum::<f64>() / 5.0_f64.min(history.len().saturating_sub(5).max(1) as f64);
+>>>>>>> 4b60ced (docs: update README)
 
         let diff = recent - older;
         if diff.abs() < 0.02 {
@@ -452,20 +478,33 @@ mod tests {
 
     #[test]
     fn worst_status() {
+<<<<<<< HEAD
         let statuses = vec![
             HealthStatus::Healthy,
             HealthStatus::Degraded,
             HealthStatus::Failed,
         ];
+=======
+        let statuses = vec![HealthStatus::Healthy, HealthStatus::Degraded, HealthStatus::Failed];
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(HealthStatus::worst(&statuses), HealthStatus::Failed);
     }
 
     #[test]
     fn observation_serialization() {
+<<<<<<< HEAD
         let obs = HealthObservation::new("test", HealthStatus::Healthy).with_message("all good");
+=======
+        let obs = HealthObservation::new("test", HealthStatus::Healthy)
+            .with_message("all good");
+>>>>>>> 4b60ced (docs: update README)
         let json = serde_json::to_string(&obs).unwrap();
         let restored: HealthObservation = serde_json::from_str(&json).unwrap();
         assert_eq!(restored.component, "test");
         assert_eq!(restored.message, Some("all good".into()));
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

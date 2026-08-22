@@ -37,6 +37,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 pub enum PatchOp {
     /// Insert a new value at `path`. If the parent is an array, `path`
     /// may end with `/N` to splice into a specific index.
+<<<<<<< HEAD
     Add {
         path: String,
         value: serde_json::Value,
@@ -48,15 +49,26 @@ pub enum PatchOp {
         path: String,
         value: serde_json::Value,
     },
+=======
+    Add { path: String, value: serde_json::Value },
+    /// Remove the value at `path`.
+    Remove { path: String },
+    /// Replace the value at `path` with a new one.
+    Replace { path: String, value: serde_json::Value },
+>>>>>>> 4b60ced (docs: update README)
 }
 
 impl PatchOp {
     /// Returns the JSON Pointer path this operation targets.
     pub fn path(&self) -> &str {
         match self {
+<<<<<<< HEAD
             PatchOp::Add { path, .. }
             | PatchOp::Remove { path }
             | PatchOp::Replace { path, .. } => path,
+=======
+            PatchOp::Add { path, .. } | PatchOp::Remove { path } | PatchOp::Replace { path, .. } => path,
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -142,7 +154,14 @@ impl PatchSet {
 
     /// Apply this patch set to a state value, returning the resulting state
     /// or an error if a path cannot be resolved.
+<<<<<<< HEAD
     pub fn apply(&self, state: &serde_json::Value) -> Result<serde_json::Value, String> {
+=======
+    pub fn apply(
+        &self,
+        state: &serde_json::Value,
+    ) -> Result<serde_json::Value, String> {
+>>>>>>> 4b60ced (docs: update README)
         let mut result = state.clone();
         for op in &self.operations {
             apply_single_op(&mut result, op);
@@ -485,7 +504,15 @@ pub struct VersionedState {
 
 impl VersionedState {
     /// Create a new versioned state with a single-node clock.
+<<<<<<< HEAD
     pub fn new(value: serde_json::Value, node_id: &str, tag: &str) -> Self {
+=======
+    pub fn new(
+        value: serde_json::Value,
+        node_id: &str,
+        tag: &str,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         let vc = VectorClock::new().increment(node_id);
         Self {
             value,
@@ -496,7 +523,16 @@ impl VersionedState {
     }
 
     /// Produce a new versioned state by applying a mutation.
+<<<<<<< HEAD
     pub fn mutate(&self, new_value: serde_json::Value, node_id: &str, tag: &str) -> Self {
+=======
+    pub fn mutate(
+        &self,
+        new_value: serde_json::Value,
+        node_id: &str,
+        tag: &str,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             value: new_value,
             version: self.version.increment(node_id),
@@ -507,7 +543,15 @@ impl VersionedState {
 
     /// Merge two versioned states using the given conflict resolution strategy.
     /// The vector clocks are merged (component-wise max) to reflect the join.
+<<<<<<< HEAD
     pub fn merge(&self, other: &VersionedState, strategy: &ConflictStrategy) -> VersionedState {
+=======
+    pub fn merge(
+        &self,
+        other: &VersionedState,
+        strategy: &ConflictStrategy,
+    ) -> VersionedState {
+>>>>>>> 4b60ced (docs: update README)
         let resolved_value = match strategy {
             ConflictStrategy::LastWriterWins => {
                 if self.timestamp >= other.timestamp {
@@ -649,11 +693,25 @@ impl DiffBatch {
 
     /// Decompose this batch into individual [`PatchSet`]s.
     pub fn into_patch_sets(self) -> Result<Vec<PatchSet>, String> {
+<<<<<<< HEAD
         self.diffs.into_iter().map(|d| d.to_patch_set()).collect()
     }
 
     /// Apply all diffs in this batch sequentially to a base state.
     pub fn apply_all(&self, state: &serde_json::Value) -> Result<serde_json::Value, String> {
+=======
+        self.diffs
+            .into_iter()
+            .map(|d| d.to_patch_set())
+            .collect()
+    }
+
+    /// Apply all diffs in this batch sequentially to a base state.
+    pub fn apply_all(
+        &self,
+        state: &serde_json::Value,
+    ) -> Result<serde_json::Value, String> {
+>>>>>>> 4b60ced (docs: update README)
         let mut current = state.clone();
         for diff in &self.diffs {
             let patch = diff.to_patch_set()?;
@@ -678,7 +736,14 @@ pub fn rle_encode(data: &[u8]) -> Vec<u8> {
     while i < data.len() {
         let byte = data[i];
         let mut count: u8 = 1;
+<<<<<<< HEAD
         while (i + count as usize) < data.len() && data[i + count as usize] == byte && count < 255 {
+=======
+        while (i + count as usize) < data.len()
+            && data[i + count as usize] == byte
+            && count < 255
+        {
+>>>>>>> 4b60ced (docs: update README)
             count += 1;
         }
         out.push(count);
@@ -879,6 +944,7 @@ impl SnapshotRegistry {
     }
 
     /// Compute the diff between two snapshots identified by their IDs.
+<<<<<<< HEAD
     pub fn compare_snapshots(&self, id_a: &str, id_b: &str) -> Result<PatchSet, String> {
         let a = self
             .snapshots
@@ -889,6 +955,25 @@ impl SnapshotRegistry {
             .get(id_b)
             .ok_or_else(|| format!("snapshot not found: {id_b}"))?;
         Ok(diff_state(&a.state, &b.state, a.sequence, b.sequence))
+=======
+    pub fn compare_snapshots(
+        &self,
+        id_a: &str,
+        id_b: &str,
+    ) -> Result<PatchSet, String> {
+        let a = self.snapshots.get(id_a).ok_or_else(|| {
+            format!("snapshot not found: {id_a}")
+        })?;
+        let b = self.snapshots.get(id_b).ok_or_else(|| {
+            format!("snapshot not found: {id_b}")
+        })?;
+        Ok(diff_state(
+            &a.state,
+            &b.state,
+            a.sequence,
+            b.sequence,
+        ))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Total storage used by all snapshots in bytes.
@@ -966,7 +1051,17 @@ pub struct OTOperation {
 
 impl OTOperation {
     /// Create a new insert operation.
+<<<<<<< HEAD
     pub fn insert(op_id: &str, node_id: &str, position: u64, text: &str, vc: &VectorClock) -> Self {
+=======
+    pub fn insert(
+        op_id: &str,
+        node_id: &str,
+        position: u64,
+        text: &str,
+        vc: &VectorClock,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             op_id: op_id.to_string(),
             node_id: node_id.to_string(),
@@ -978,7 +1073,17 @@ impl OTOperation {
     }
 
     /// Create a new delete operation.
+<<<<<<< HEAD
     pub fn delete(op_id: &str, node_id: &str, position: u64, count: u64, vc: &VectorClock) -> Self {
+=======
+    pub fn delete(
+        op_id: &str,
+        node_id: &str,
+        position: u64,
+        count: u64,
+        vc: &VectorClock,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             op_id: op_id.to_string(),
             node_id: node_id.to_string(),
@@ -998,6 +1103,7 @@ impl OTOperation {
     pub fn transform(&self, other: &OTOperation) -> OTOperation {
         // Determine tie-breaking: self wins if its node_id <= other's node_id.
         let self_wins_tie = self.node_id <= other.node_id;
+<<<<<<< HEAD
         let (new_pos, new_del) = transform_pair(
             self.position,
             self.delete_count,
@@ -1007,6 +1113,12 @@ impl OTOperation {
             other.insert_text.len() as u64,
             self_wins_tie,
         );
+=======
+        let (new_pos, new_del) =
+            transform_pair(self.position, self.delete_count, self.insert_text.len() as u64,
+                         other.position, other.delete_count, other.insert_text.len() as u64,
+                         self_wins_tie);
+>>>>>>> 4b60ced (docs: update README)
 
         let insert_text = self.insert_text.clone();
         let op_id = self.op_id.clone();
@@ -1032,8 +1144,14 @@ impl OTOperation {
         if pos > doc.len() {
             return doc.to_string();
         }
+<<<<<<< HEAD
         let mut result =
             String::with_capacity(doc.len().saturating_sub(del) + self.insert_text.len());
+=======
+        let mut result = String::with_capacity(
+            doc.len().saturating_sub(del) + self.insert_text.len(),
+        );
+>>>>>>> 4b60ced (docs: update README)
         result.push_str(&doc[..pos]);
         result.push_str(&self.insert_text);
         let end = (pos + del).min(doc.len());
@@ -1157,9 +1275,13 @@ impl OTDocument {
         // clock entries are not dominated by the remote's vector clock.
         let mut transformed = remote_op;
         for local_op in &self.history {
+<<<<<<< HEAD
             if local_op
                 .vector_clock
                 .happened_before(&transformed.vector_clock)
+=======
+            if local_op.vector_clock.happened_before(&transformed.vector_clock)
+>>>>>>> 4b60ced (docs: update README)
                 || local_op.vector_clock.is_equal(&transformed.vector_clock)
             {
                 continue;
@@ -1175,14 +1297,34 @@ impl OTDocument {
 
     /// Generate a local insert operation.
     pub fn local_insert(&mut self, op_id: &str, position: u64, text: &str) -> OTOperation {
+<<<<<<< HEAD
         let op = OTOperation::insert(op_id, &self.node_id, position, text, &self.version);
+=======
+        let op = OTOperation::insert(
+            op_id,
+            &self.node_id,
+            position,
+            text,
+            &self.version,
+        );
+>>>>>>> 4b60ced (docs: update README)
         self.apply_local(op.clone());
         op
     }
 
     /// Generate a local delete operation.
     pub fn local_delete(&mut self, op_id: &str, position: u64, count: u64) -> OTOperation {
+<<<<<<< HEAD
         let op = OTOperation::delete(op_id, &self.node_id, position, count, &self.version);
+=======
+        let op = OTOperation::delete(
+            op_id,
+            &self.node_id,
+            position,
+            count,
+            &self.version,
+        );
+>>>>>>> 4b60ced (docs: update README)
         self.apply_local(op.clone());
         op
     }
@@ -1536,8 +1678,20 @@ mod tests {
 
     #[test]
     fn test_snapshot_registry_purge_expired() {
+<<<<<<< HEAD
         let mut reg = SnapshotRegistry::new(Some(Duration::from_millis(50)), 100);
         reg.create_snapshot(serde_json::json!(1), VectorClock::new(), "will_expire");
+=======
+        let mut reg = SnapshotRegistry::new(
+            Some(Duration::from_millis(50)),
+            100,
+        );
+        reg.create_snapshot(
+            serde_json::json!(1),
+            VectorClock::new(),
+            "will_expire",
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(reg.len(), 1);
         thread::sleep(Duration::from_millis(80));
         let purged = reg.purge_expired();
@@ -1548,7 +1702,15 @@ mod tests {
     #[test]
     fn test_snapshot_registry_compare() {
         let mut reg = SnapshotRegistry::new(None, 10);
+<<<<<<< HEAD
         let id_a = reg.create_snapshot(serde_json::json!({"a": 1}), VectorClock::new(), "v1");
+=======
+        let id_a = reg.create_snapshot(
+            serde_json::json!({"a": 1}),
+            VectorClock::new(),
+            "v1",
+        );
+>>>>>>> 4b60ced (docs: update README)
         let id_b = reg.create_snapshot(
             serde_json::json!({"a": 2, "b": 3}),
             VectorClock::new(),
@@ -1648,7 +1810,15 @@ mod tests {
 
     #[test]
     fn test_versioned_state_new_and_mutate() {
+<<<<<<< HEAD
         let vs = VersionedState::new(serde_json::json!({"v": 0}), "n1", "initial");
+=======
+        let vs = VersionedState::new(
+            serde_json::json!({"v": 0}),
+            "n1",
+            "initial",
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(vs.version.get("n1"), 1);
         let vs2 = vs.mutate(serde_json::json!({"v": 1}), "n1", "updated");
         assert_eq!(vs2.version.get("n1"), 2);

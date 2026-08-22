@@ -19,8 +19,13 @@ use std::sync::{Arc, Mutex};
 
 use super::message::{CrossRingMessage, CrossRingType};
 use super::transport::{
+<<<<<<< HEAD
     BroadcastTransport, RingSubscriber, RingTransport, TransportErrorKind, TransportMetrics,
     TransportMetricsCollector,
+=======
+    BroadcastTransport, RingSubscriber, RingTransport, TransportErrorKind,
+    TransportMetricsCollector, TransportMetrics,
+>>>>>>> 4b60ced (docs: update README)
 };
 
 // ─── Configuration ────────────────────────────────────────────────
@@ -47,6 +52,7 @@ pub struct CommunicationRingConfig {
     pub topic_filtering: bool,
 }
 
+<<<<<<< HEAD
 fn default_true() -> bool {
     true
 }
@@ -65,6 +71,14 @@ fn default_max_subscribers() -> usize {
 fn default_topic_filtering() -> bool {
     true
 }
+=======
+fn default_true() -> bool { true }
+fn default_enabled() -> bool { true }
+fn default_buffer_size() -> usize { 500 }
+fn default_history_size() -> usize { 200 }
+fn default_max_subscribers() -> usize { 50 }
+fn default_topic_filtering() -> bool { true }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for CommunicationRingConfig {
     fn default() -> Self {
@@ -201,12 +215,19 @@ impl CommunicationRing {
 
         // 3. Update topic stats.
         if let Ok(mut topics) = self.topic_stats.lock() {
+<<<<<<< HEAD
             let entry = topics
                 .entry(msg.msg_type.clone())
                 .or_insert_with(|| TopicStats {
                     topic: msg.msg_type.clone(),
                     ..Default::default()
                 });
+=======
+            let entry = topics.entry(msg.msg_type.clone()).or_insert_with(|| TopicStats {
+                topic: msg.msg_type.clone(),
+                ..Default::default()
+            });
+>>>>>>> 4b60ced (docs: update README)
             entry.message_count += 1;
             entry.last_broadcast_at = Some(chrono::Utc::now().to_rfc3339());
         }
@@ -265,7 +286,12 @@ impl CommunicationRing {
             if subs.len() >= self.config.max_subscribers {
                 return Err(crate::error::Error::Other(format!(
                     "communication ring max subscribers ({}) reached, cannot add '{}'",
+<<<<<<< HEAD
                     self.config.max_subscribers, subscriber_name
+=======
+                    self.config.max_subscribers,
+                    subscriber_name
+>>>>>>> 4b60ced (docs: update README)
                 )));
             }
             if subs.contains_key(subscriber_name) {
@@ -298,6 +324,7 @@ impl CommunicationRing {
         });
 
         // 3. Register subscription.
+<<<<<<< HEAD
         self.subscriptions
             .lock()
             .map_err(|e| {
@@ -307,6 +334,14 @@ impl CommunicationRing {
                 ))
             })?
             .insert(subscriber_name.into(), sub.clone());
+=======
+        self.subscriptions.lock().map_err(|e| {
+            crate::error::Error::Other(format!(
+                "communication subscriptions lock poisoned: {}",
+                e
+            ))
+        })?.insert(subscriber_name.into(), sub.clone());
+>>>>>>> 4b60ced (docs: update README)
 
         // 4. Update topic stats subscriber count.
         if let Some(ref topic) = sub.topic_filter {
@@ -322,6 +357,7 @@ impl CommunicationRing {
 
     /// Unsubscribe a component from broadcasts.
     pub fn unsubscribe(&self, subscriber_name: &str) -> crate::Result<()> {
+<<<<<<< HEAD
         let removed = self
             .subscriptions
             .lock()
@@ -332,6 +368,14 @@ impl CommunicationRing {
                 ))
             })?
             .remove(subscriber_name);
+=======
+        let removed = self.subscriptions.lock().map_err(|e| {
+            crate::error::Error::Other(format!(
+                "communication subscriptions lock poisoned: {}",
+                e
+            ))
+        })?.remove(subscriber_name);
+>>>>>>> 4b60ced (docs: update README)
 
         // Update topic stats.
         if let Some(ref sub) = removed {
@@ -349,7 +393,14 @@ impl CommunicationRing {
 
     /// Number of active subscribers.
     pub fn subscriber_count(&self) -> usize {
+<<<<<<< HEAD
         self.subscriptions.lock().map(|s| s.len()).unwrap_or(0)
+=======
+        self.subscriptions
+            .lock()
+            .map(|s| s.len())
+            .unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// List all active subscriber names.
@@ -486,8 +537,12 @@ mod tests {
         let ring = CommunicationRing::new(&CommunicationRingConfig {
             history_size: 100,
             ..Default::default()
+<<<<<<< HEAD
         })
         .unwrap();
+=======
+        }).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         ring.broadcast(broadcast_msg("early_event")).unwrap();
 
@@ -519,8 +574,12 @@ mod tests {
         let ring = CommunicationRing::new(&CommunicationRingConfig {
             max_subscribers: 1,
             ..Default::default()
+<<<<<<< HEAD
         })
         .unwrap();
+=======
+        }).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         ring.subscribe("shield", None).unwrap();
         let result = ring.subscribe("threat", None);

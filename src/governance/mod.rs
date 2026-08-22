@@ -51,12 +51,17 @@ pub struct GovernanceConfig {
     pub deny_threshold: f64,
 }
 
+<<<<<<< HEAD
 fn default_enabled() -> bool {
     true
 }
 fn default_deny_threshold() -> f64 {
     9.0
 }
+=======
+fn default_enabled() -> bool { true }
+fn default_deny_threshold() -> f64 { 9.0 }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for GovernanceConfig {
     fn default() -> Self {
@@ -80,6 +85,7 @@ pub struct PolicyComplianceConfig {
     #[serde(default = "default_max_violations")]
     pub max_violations: usize,
 }
+<<<<<<< HEAD
 fn default_max_violations() -> usize {
     3
 }
@@ -89,6 +95,11 @@ impl Default for PolicyComplianceConfig {
             max_violations: default_max_violations(),
         }
     }
+=======
+fn default_max_violations() -> usize { 3 }
+impl Default for PolicyComplianceConfig {
+    fn default() -> Self { Self { max_violations: default_max_violations() } }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -96,6 +107,7 @@ pub struct AuditLoggerConfig {
     #[serde(default = "default_retention_days")]
     pub retention_days: u32,
 }
+<<<<<<< HEAD
 fn default_retention_days() -> u32 {
     90
 }
@@ -105,6 +117,11 @@ impl Default for AuditLoggerConfig {
             retention_days: default_retention_days(),
         }
     }
+=======
+fn default_retention_days() -> u32 { 90 }
+impl Default for AuditLoggerConfig {
+    fn default() -> Self { Self { retention_days: default_retention_days() } }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -114,6 +131,7 @@ pub struct DataRetentionConfig {
     #[serde(default)]
     pub auto_delete: bool,
 }
+<<<<<<< HEAD
 fn default_max_retention() -> u32 {
     365
 }
@@ -124,6 +142,11 @@ impl Default for DataRetentionConfig {
             auto_delete: false,
         }
     }
+=======
+fn default_max_retention() -> u32 { 365 }
+impl Default for DataRetentionConfig {
+    fn default() -> Self { Self { max_retention_days: default_max_retention(), auto_delete: false } }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -132,11 +155,15 @@ pub struct ConsentTrackerConfig {
     pub require_explicit_consent: bool,
 }
 impl Default for ConsentTrackerConfig {
+<<<<<<< HEAD
     fn default() -> Self {
         Self {
             require_explicit_consent: false,
         }
     }
+=======
+    fn default() -> Self { Self { require_explicit_consent: false } }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -146,9 +173,13 @@ pub struct ComplianceReporterConfig {
     #[serde(default)]
     pub frameworks: Vec<String>,
 }
+<<<<<<< HEAD
 fn default_compliance_threshold() -> f64 {
     0.5
 }
+=======
+fn default_compliance_threshold() -> f64 { 0.5 }
+>>>>>>> 4b60ced (docs: update README)
 impl Default for ComplianceReporterConfig {
     fn default() -> Self {
         Self {
@@ -167,9 +198,13 @@ pub struct SanctionCheckerConfig {
     #[serde(default)]
     pub blocked_regions: Vec<String>,
 }
+<<<<<<< HEAD
 fn default_sanction_enabled() -> bool {
     true
 }
+=======
+fn default_sanction_enabled() -> bool { true }
+>>>>>>> 4b60ced (docs: update README)
 impl Default for SanctionCheckerConfig {
     fn default() -> Self {
         Self {
@@ -254,7 +289,11 @@ pub struct ConsentResult {
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ComplianceReportResult {
+<<<<<<< HEAD
     pub compliance_score: f64, // 0.0-1.0
+=======
+    pub compliance_score: f64,    // 0.0-1.0
+>>>>>>> 4b60ced (docs: update README)
     pub frameworks_checked: Vec<String>,
     pub framework_scores: HashMap<String, f64>,
 }
@@ -283,12 +322,17 @@ pub struct GovernanceVerdict {
 }
 
 impl Verdict for GovernanceVerdict {
+<<<<<<< HEAD
     fn decision(&self) -> &Decision {
         &self.decision
     }
     fn latency_ms(&self) -> f64 {
         self.latency_ms
     }
+=======
+    fn decision(&self) -> &Decision { &self.decision }
+    fn latency_ms(&self) -> f64 { self.latency_ms }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ── Engines ──
@@ -298,6 +342,7 @@ struct PolicyComplianceChecker {
 }
 
 impl PolicyComplianceChecker {
+<<<<<<< HEAD
     fn new(config: &PolicyComplianceConfig) -> Self {
         Self {
             config: config.clone(),
@@ -308,6 +353,11 @@ impl PolicyComplianceChecker {
         &self,
         request: &GovernanceRequest,
     ) -> (PolicyComplianceResult, GovernanceEngineResult) {
+=======
+    fn new(config: &PolicyComplianceConfig) -> Self { Self { config: config.clone() } }
+
+    fn evaluate(&self, request: &GovernanceRequest) -> (PolicyComplianceResult, GovernanceEngineResult) {
+>>>>>>> 4b60ced (docs: update README)
         let start = std::time::Instant::now();
 
         let mut violations = Vec::new();
@@ -318,6 +368,7 @@ impl PolicyComplianceChecker {
         // High-risk actions require elevated roles
         let high_risk_actions = ["delete", "drop", "remove", "purge", "truncate", "overwrite"];
         if high_risk_actions.iter().any(|a| action_lower.contains(a)) {
+<<<<<<< HEAD
             let has_admin_role = request
                 .role
                 .as_deref()
@@ -328,6 +379,11 @@ impl PolicyComplianceChecker {
                     "high_risk_action '{}' requires admin role",
                     request.action
                 ));
+=======
+            let has_admin_role = request.role.as_deref().map(|r| r == "admin" || r == "operator").unwrap_or(false);
+            if !has_admin_role {
+                violations.push(format!("high_risk_action '{}' requires admin role", request.action));
+>>>>>>> 4b60ced (docs: update README)
             }
         }
 
@@ -335,6 +391,7 @@ impl PolicyComplianceChecker {
         if let Some(classification) = &request.data_classification {
             let restricted_actions_for_sensitive = match classification.to_lowercase().as_str() {
                 "confidential" | "restricted" => {
+<<<<<<< HEAD
                     if action_lower.contains("export")
                         || action_lower.contains("transfer")
                         || action_lower.contains("copy")
@@ -343,6 +400,10 @@ impl PolicyComplianceChecker {
                             "action '{}' not allowed for {} data",
                             request.action, classification
                         ));
+=======
+                    if action_lower.contains("export") || action_lower.contains("transfer") || action_lower.contains("copy") {
+                        violations.push(format!("action '{}' not allowed for {} data", request.action, classification));
+>>>>>>> 4b60ced (docs: update README)
                         true
                     } else {
                         false
@@ -387,11 +448,15 @@ struct AuditLogger {
 }
 
 impl AuditLogger {
+<<<<<<< HEAD
     fn new(config: &AuditLoggerConfig) -> Self {
         Self {
             config: config.clone(),
         }
     }
+=======
+    fn new(config: &AuditLoggerConfig) -> Self { Self { config: config.clone() } }
+>>>>>>> 4b60ced (docs: update README)
 
     fn evaluate(&self, request: &GovernanceRequest) -> (AuditLogResult, GovernanceEngineResult) {
         let start = std::time::Instant::now();
@@ -422,6 +487,7 @@ struct DataRetentionEnforcer {
 }
 
 impl DataRetentionEnforcer {
+<<<<<<< HEAD
     fn new(config: &DataRetentionConfig) -> Self {
         Self {
             config: config.clone(),
@@ -439,6 +505,15 @@ impl DataRetentionEnforcer {
             .headers
             .get("x-data-age-days")
             .and_then(|v| v.parse::<u32>().ok());
+=======
+    fn new(config: &DataRetentionConfig) -> Self { Self { config: config.clone() } }
+
+    fn evaluate(&self, request: &GovernanceRequest) -> (DataRetentionResult, GovernanceEngineResult) {
+        let start = std::time::Instant::now();
+
+        // Check data age from headers if present
+        let data_age_days = request.headers.get("x-data-age-days").and_then(|v| v.parse::<u32>().ok());
+>>>>>>> 4b60ced (docs: update README)
 
         let within_policy = match data_age_days {
             Some(age) => age <= self.config.max_retention_days,
@@ -465,10 +540,14 @@ impl DataRetentionEnforcer {
         let engine_result = GovernanceEngineResult {
             engine_name: "data_retention".into(),
             decision: decision.into(),
+<<<<<<< HEAD
             reason: format!(
                 "within_policy={}, age={:?}, max={}",
                 within_policy, data_age_days, self.config.max_retention_days
             ),
+=======
+            reason: format!("within_policy={}, age={:?}, max={}", within_policy, data_age_days, self.config.max_retention_days),
+>>>>>>> 4b60ced (docs: update README)
             latency_ms: start.elapsed().as_secs_f64() * 1000.0,
             metadata: serde_json::json!({ "within_policy": within_policy }),
         };
@@ -482,17 +561,25 @@ struct ConsentTracker {
 }
 
 impl ConsentTracker {
+<<<<<<< HEAD
     fn new(config: &ConsentTrackerConfig) -> Self {
         Self {
             config: config.clone(),
         }
     }
+=======
+    fn new(config: &ConsentTrackerConfig) -> Self { Self { config: config.clone() } }
+>>>>>>> 4b60ced (docs: update README)
 
     fn evaluate(&self, request: &GovernanceRequest) -> (ConsentResult, GovernanceEngineResult) {
         let start = std::time::Instant::now();
 
+<<<<<<< HEAD
         let has_consent_token =
             request.consent_token.is_some() && !request.consent_token.as_ref().unwrap().is_empty();
+=======
+        let has_consent_token = request.consent_token.is_some() && !request.consent_token.as_ref().unwrap().is_empty();
+>>>>>>> 4b60ced (docs: update README)
         let has_consent_header = request.headers.contains_key("x-consent-granted");
 
         let consent_valid = if self.config.require_explicit_consent {
@@ -533,10 +620,14 @@ impl ConsentTracker {
         let engine_result = GovernanceEngineResult {
             engine_name: "consent_tracker".into(),
             decision: decision.into(),
+<<<<<<< HEAD
             reason: format!(
                 "consent_valid={}, type={}, require_explicit={}",
                 consent_valid, consent_type, self.config.require_explicit_consent
             ),
+=======
+            reason: format!("consent_valid={}, type={}, require_explicit={}", consent_valid, consent_type, self.config.require_explicit_consent),
+>>>>>>> 4b60ced (docs: update README)
             latency_ms: start.elapsed().as_secs_f64() * 1000.0,
             metadata: serde_json::json!({ "consent_valid": consent_valid, "consent_type": consent_type }),
         };
@@ -550,6 +641,7 @@ struct ComplianceReporter {
 }
 
 impl ComplianceReporter {
+<<<<<<< HEAD
     fn new(config: &ComplianceReporterConfig) -> Self {
         Self {
             config: config.clone(),
@@ -560,6 +652,11 @@ impl ComplianceReporter {
         &self,
         request: &GovernanceRequest,
     ) -> (ComplianceReportResult, GovernanceEngineResult) {
+=======
+    fn new(config: &ComplianceReporterConfig) -> Self { Self { config: config.clone() } }
+
+    fn evaluate(&self, request: &GovernanceRequest) -> (ComplianceReportResult, GovernanceEngineResult) {
+>>>>>>> 4b60ced (docs: update README)
         let start = std::time::Instant::now();
 
         let frameworks_to_check = if request.frameworks.is_empty() {
@@ -598,10 +695,14 @@ impl ComplianceReporter {
         let engine_result = GovernanceEngineResult {
             engine_name: "compliance_reporter".into(),
             decision: decision.into(),
+<<<<<<< HEAD
             reason: format!(
                 "compliance_score={:.3}, frameworks={:?}",
                 compliance_score, frameworks_to_check
             ),
+=======
+            reason: format!("compliance_score={:.3}, frameworks={:?}", compliance_score, frameworks_to_check),
+>>>>>>> 4b60ced (docs: update README)
             latency_ms: start.elapsed().as_secs_f64() * 1000.0,
             metadata: serde_json::json!({ "compliance_score": compliance_score }),
         };
@@ -617,6 +718,7 @@ impl ComplianceReporter {
         match framework {
             "GDPR" => {
                 let mut score: f64 = 0.5;
+<<<<<<< HEAD
                 if has_consent {
                     score += 0.3;
                 }
@@ -626,17 +728,27 @@ impl ComplianceReporter {
                 if request.region.as_deref() != Some("EU") || has_consent {
                     score += 0.1;
                 }
+=======
+                if has_consent { score += 0.3; }
+                if !action_lower.contains("export") { score += 0.1; }
+                if request.region.as_deref() != Some("EU") || has_consent { score += 0.1; }
+>>>>>>> 4b60ced (docs: update README)
                 score.clamp(0.0, 1.0)
             }
             "HIPAA" => {
                 let mut score: f64 = 0.5;
                 if request.data_classification.as_deref() == Some("phi") {
+<<<<<<< HEAD
                     if has_consent {
                         score += 0.3;
                     }
                     if is_admin {
                         score += 0.2;
                     }
+=======
+                    if has_consent { score += 0.3; }
+                    if is_admin { score += 0.2; }
+>>>>>>> 4b60ced (docs: update README)
                 } else {
                     score = 0.9;
                 }
@@ -644,12 +756,17 @@ impl ComplianceReporter {
             }
             "SOC2" => {
                 let mut score: f64 = 0.7;
+<<<<<<< HEAD
                 if request.headers.contains_key("x-audit-trail") {
                     score += 0.2;
                 }
                 if is_admin {
                     score += 0.1;
                 }
+=======
+                if request.headers.contains_key("x-audit-trail") { score += 0.2; }
+                if is_admin { score += 0.1; }
+>>>>>>> 4b60ced (docs: update README)
                 score.clamp(0.0, 1.0)
             }
             _ => 0.8, // Unknown framework — assume moderate compliance
@@ -662,6 +779,7 @@ struct SanctionChecker {
 }
 
 impl SanctionChecker {
+<<<<<<< HEAD
     fn new(config: &SanctionCheckerConfig) -> Self {
         Self {
             config: config.clone(),
@@ -680,6 +798,15 @@ impl SanctionChecker {
                 matched_entity: None,
                 matched_region: None,
             };
+=======
+    fn new(config: &SanctionCheckerConfig) -> Self { Self { config: config.clone() } }
+
+    fn evaluate(&self, request: &GovernanceRequest) -> (SanctionCheckResult, GovernanceEngineResult) {
+        let start = std::time::Instant::now();
+
+        if !self.config.enabled {
+            let result = SanctionCheckResult { blocked: false, matched_entity: None, matched_region: None };
+>>>>>>> 4b60ced (docs: update README)
             let engine_result = GovernanceEngineResult {
                 engine_name: "sanction_checker".into(),
                 decision: "allowed".into(),
@@ -691,6 +818,7 @@ impl SanctionChecker {
         }
 
         let matched_entity = request.entity_id.as_ref().and_then(|id| {
+<<<<<<< HEAD
             self.config
                 .blocked_entities
                 .iter()
@@ -704,6 +832,13 @@ impl SanctionChecker {
                 .iter()
                 .find(|br| br.eq_ignore_ascii_case(r))
                 .cloned()
+=======
+            self.config.blocked_entities.iter().find(|e| *e == id).cloned()
+        });
+
+        let matched_region = request.region.as_ref().and_then(|r| {
+            self.config.blocked_regions.iter().find(|br| br.eq_ignore_ascii_case(r)).cloned()
+>>>>>>> 4b60ced (docs: update README)
         });
 
         let blocked = matched_entity.is_some() || matched_region.is_some();
@@ -719,10 +854,14 @@ impl SanctionChecker {
         let engine_result = GovernanceEngineResult {
             engine_name: "sanction_checker".into(),
             decision: decision.into(),
+<<<<<<< HEAD
             reason: format!(
                 "blocked={}, entity={:?}, region={:?}",
                 blocked, matched_entity, matched_region
             ),
+=======
+            reason: format!("blocked={}, entity={:?}, region={:?}", blocked, matched_entity, matched_region),
+>>>>>>> 4b60ced (docs: update README)
             latency_ms: start.elapsed().as_secs_f64() * 1000.0,
             metadata: serde_json::json!({ "blocked": blocked }),
         };
@@ -881,9 +1020,13 @@ impl GovernanceRing {
     }
 
     /// Get the configuration reference.
+<<<<<<< HEAD
     pub fn config(&self) -> &GovernanceConfig {
         &self.config
     }
+=======
+    pub fn config(&self) -> &GovernanceConfig { &self.config }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[cfg(test)]
@@ -907,9 +1050,13 @@ mod tests {
         }
     }
 
+<<<<<<< HEAD
     fn default_config() -> GovernanceConfig {
         GovernanceConfig::default()
     }
+=======
+    fn default_config() -> GovernanceConfig { GovernanceConfig::default() }
+>>>>>>> 4b60ced (docs: update README)
 
     #[test]
     fn governance_ring_constructs() {
@@ -998,12 +1145,16 @@ mod tests {
         let ring = GovernanceRing::new(&default_config()).unwrap();
         let verdict = ring.evaluate(&default_request());
         assert!(verdict.compliance_report.is_some());
+<<<<<<< HEAD
         assert!(!verdict
             .compliance_report
             .as_ref()
             .unwrap()
             .frameworks_checked
             .is_empty());
+=======
+        assert!(!verdict.compliance_report.as_ref().unwrap().frameworks_checked.is_empty());
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

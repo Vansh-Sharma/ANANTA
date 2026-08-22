@@ -80,6 +80,7 @@ impl Default for ParameterValidatorConfig {
                         required_fields: vec!["query".into()],
                         properties: {
                             let mut m = std::collections::HashMap::new();
+<<<<<<< HEAD
                             m.insert(
                                 "query".into(),
                                 PropertySpec {
@@ -102,6 +103,24 @@ impl Default for ParameterValidatorConfig {
                                     enum_values: vec![],
                                 },
                             );
+=======
+                            m.insert("query".into(), PropertySpec {
+                                prop_type: PropertyType::String,
+                                max_length: Some(200),
+                                min_length: Some(1),
+                                minimum: None,
+                                maximum: None,
+                                enum_values: vec![],
+                            });
+                            m.insert("max_results".into(), PropertySpec {
+                                prop_type: PropertyType::Integer,
+                                max_length: None,
+                                min_length: None,
+                                minimum: Some(1),
+                                maximum: Some(20),
+                                enum_values: vec![],
+                            });
+>>>>>>> 4b60ced (docs: update README)
                             m
                         },
                     },
@@ -112,6 +131,7 @@ impl Default for ParameterValidatorConfig {
                         required_fields: vec!["expression".into()],
                         properties: {
                             let mut m = std::collections::HashMap::new();
+<<<<<<< HEAD
                             m.insert(
                                 "expression".into(),
                                 PropertySpec {
@@ -123,6 +143,16 @@ impl Default for ParameterValidatorConfig {
                                     enum_values: vec![],
                                 },
                             );
+=======
+                            m.insert("expression".into(), PropertySpec {
+                                prop_type: PropertyType::String,
+                                max_length: Some(100),
+                                min_length: Some(1),
+                                minimum: None,
+                                maximum: None,
+                                enum_values: vec![],
+                            });
+>>>>>>> 4b60ced (docs: update README)
                             m
                         },
                     },
@@ -133,6 +163,7 @@ impl Default for ParameterValidatorConfig {
                         required_fields: vec!["path".into()],
                         properties: {
                             let mut m = std::collections::HashMap::new();
+<<<<<<< HEAD
                             m.insert(
                                 "path".into(),
                                 PropertySpec {
@@ -144,6 +175,16 @@ impl Default for ParameterValidatorConfig {
                                     enum_values: vec![],
                                 },
                             );
+=======
+                            m.insert("path".into(), PropertySpec {
+                                prop_type: PropertyType::String,
+                                max_length: Some(500),
+                                min_length: Some(1),
+                                minimum: None,
+                                maximum: None,
+                                enum_values: vec![],
+                            });
+>>>>>>> 4b60ced (docs: update README)
                             m
                         },
                     },
@@ -198,11 +239,15 @@ impl ParameterValidator {
         }
 
         // Find schema for this tool.
+<<<<<<< HEAD
         let tool_schema = self
             .config
             .tool_schemas
             .iter()
             .find(|s| s.tool_name == tool_name);
+=======
+        let tool_schema = self.config.tool_schemas.iter().find(|s| s.tool_name == tool_name);
+>>>>>>> 4b60ced (docs: update README)
 
         let Some(tool_schema) = tool_schema else {
             // No schema configured for this tool — allow (open policy).

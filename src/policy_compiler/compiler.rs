@@ -74,6 +74,7 @@ enum Token {
     Ident(String),
 
     // Operators
+<<<<<<< HEAD
     Plus,    // +
     Minus,   // -
     Star,    // *
@@ -89,6 +90,23 @@ enum Token {
     Or,      // OR
     Not,     // NOT
     Bang,    // !
+=======
+    Plus,      // +
+    Minus,     // -
+    Star,      // *
+    Slash,     // /
+    Percent,   // %
+    Gt,        // >
+    Lt,        // <
+    Ge,        // >=
+    Le,        // <=
+    Eq,        // ==
+    Ne,        // !=
+    And,       // AND
+    Or,        // OR
+    Not,       // NOT
+    Bang,      // !
+>>>>>>> 4b60ced (docs: update README)
 
     // Delimiters
     LParen, // (
@@ -136,8 +154,12 @@ fn tokenize(input: &str) -> Result<Vec<Token>> {
         }
 
         // Number literal.
+<<<<<<< HEAD
         if c.is_ascii_digit() || (c == '.' && i + 1 < chars.len() && chars[i + 1].is_ascii_digit())
         {
+=======
+        if c.is_ascii_digit() || (c == '.' && i + 1 < chars.len() && chars[i + 1].is_ascii_digit()) {
+>>>>>>> 4b60ced (docs: update README)
             let start = i;
             while i < chars.len() && (chars[i].is_ascii_digit() || chars[i] == '.') {
                 i += 1;
@@ -145,12 +167,16 @@ fn tokenize(input: &str) -> Result<Vec<Token>> {
             let num_str: String = chars[start..i].iter().collect();
             match num_str.parse::<f64>() {
                 Ok(n) => tokens.push(Token::Number(n)),
+<<<<<<< HEAD
                 Err(_) => {
                     return Err(Error::Evaluation(format!(
                         "invalid number literal: {}",
                         num_str
                     )))
                 }
+=======
+                Err(_) => return Err(Error::Evaluation(format!("invalid number literal: {}", num_str))),
+>>>>>>> 4b60ced (docs: update README)
             }
             continue;
         }
@@ -177,6 +203,7 @@ fn tokenize(input: &str) -> Result<Vec<Token>> {
         if i + 1 < chars.len() {
             let two: String = chars[i..i + 2].iter().collect();
             match two.as_str() {
+<<<<<<< HEAD
                 ">=" => {
                     tokens.push(Token::Ge);
                     i += 2;
@@ -197,12 +224,19 @@ fn tokenize(input: &str) -> Result<Vec<Token>> {
                     i += 2;
                     continue;
                 }
+=======
+                ">=" => { tokens.push(Token::Ge); i += 2; continue; }
+                "<=" => { tokens.push(Token::Le); i += 2; continue; }
+                "==" => { tokens.push(Token::Eq); i += 2; continue; }
+                "!=" => { tokens.push(Token::Ne); i += 2; continue; }
+>>>>>>> 4b60ced (docs: update README)
                 _ => {}
             }
         }
 
         // Single-character operators and delimiters.
         match c {
+<<<<<<< HEAD
             '+' => {
                 tokens.push(Token::Plus);
                 i += 1;
@@ -257,6 +291,21 @@ fn tokenize(input: &str) -> Result<Vec<Token>> {
                     c, i
                 )))
             }
+=======
+            '+' => { tokens.push(Token::Plus); i += 1; }
+            '-' => { tokens.push(Token::Minus); i += 1; }
+            '*' => { tokens.push(Token::Star); i += 1; }
+            '/' => { tokens.push(Token::Slash); i += 1; }
+            '%' => { tokens.push(Token::Percent); i += 1; }
+            '>' => { tokens.push(Token::Gt); i += 1; }
+            '<' => { tokens.push(Token::Lt); i += 1; }
+            '!' => { tokens.push(Token::Bang); i += 1; }
+            '(' => { tokens.push(Token::LParen); i += 1; }
+            ')' => { tokens.push(Token::RParen); i += 1; }
+            '.' => { tokens.push(Token::Dot); i += 1; }
+            ',' => { tokens.push(Token::Comma); i += 1; }
+            _ => return Err(Error::Evaluation(format!("unexpected character '{}' at position {}", c, i))),
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -284,9 +333,21 @@ pub enum ASTNode {
         right: Box<ASTNode>,
     },
     /// Unary operation: op operand.
+<<<<<<< HEAD
     UnaryOp { op: UnOp, operand: Box<ASTNode> },
     /// Function call: name(args...).
     FunctionCall { name: String, args: Vec<ASTNode> },
+=======
+    UnaryOp {
+        op: UnOp,
+        operand: Box<ASTNode>,
+    },
+    /// Function call: name(args...).
+    FunctionCall {
+        name: String,
+        args: Vec<ASTNode>,
+    },
+>>>>>>> 4b60ced (docs: update README)
     /// Access to a risk-related value.
     RiskAccess,
 }
@@ -294,6 +355,7 @@ pub enum ASTNode {
 /// Binary operators.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinOp {
+<<<<<<< HEAD
     Add,
     Sub,
     Mul,
@@ -307,13 +369,22 @@ pub enum BinOp {
     Ne,
     And,
     Or,
+=======
+    Add, Sub, Mul, Div, Mod,
+    Gt, Lt, Ge, Le, Eq, Ne,
+    And, Or,
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Unary operators.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum UnOp {
+<<<<<<< HEAD
     Not,
     Neg,
+=======
+    Not, Neg,
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ── Parser ─────────────────────────────────────────────────────────────
@@ -345,8 +416,12 @@ impl Parser {
         let tok = self.advance();
         if &tok != expected {
             return Err(Error::Evaluation(format!(
+<<<<<<< HEAD
                 "expected {:?}, got {:?}",
                 expected, tok
+=======
+                "expected {:?}, got {:?}", expected, tok
+>>>>>>> 4b60ced (docs: update README)
             )));
         }
         Ok(())
@@ -357,8 +432,12 @@ impl Parser {
         let node = self.parse_or()?;
         if !matches!(self.peek(), Token::Eof | Token::RParen) {
             return Err(Error::Evaluation(format!(
+<<<<<<< HEAD
                 "unexpected token after expression: {:?}",
                 self.peek()
+=======
+                "unexpected token after expression: {:?}", self.peek()
+>>>>>>> 4b60ced (docs: update README)
             )));
         }
         Ok(node)
@@ -401,12 +480,16 @@ impl Parser {
             let op = match self.advance() {
                 Token::Eq => BinOp::Eq,
                 Token::Ne => BinOp::Ne,
+<<<<<<< HEAD
                 other => {
                     return Err(Error::Evaluation(format!(
                         "expected == or !=, got {:?}",
                         other
                     )))
                 }
+=======
+                other => return Err(Error::Evaluation(format!("expected == or !=, got {:?}", other))),
+>>>>>>> 4b60ced (docs: update README)
             };
             let right = self.parse_comparison()?;
             left = ASTNode::BinaryOp {
@@ -427,12 +510,16 @@ impl Parser {
                 Token::Lt => BinOp::Lt,
                 Token::Ge => BinOp::Ge,
                 Token::Le => BinOp::Le,
+<<<<<<< HEAD
                 other => {
                     return Err(Error::Evaluation(format!(
                         "expected comparison, got {:?}",
                         other
                     )))
                 }
+=======
+                other => return Err(Error::Evaluation(format!("expected comparison, got {:?}", other))),
+>>>>>>> 4b60ced (docs: update README)
             };
             let right = self.parse_additive()?;
             left = ASTNode::BinaryOp {
@@ -451,12 +538,16 @@ impl Parser {
             let op = match self.advance() {
                 Token::Plus => BinOp::Add,
                 Token::Minus => BinOp::Sub,
+<<<<<<< HEAD
                 other => {
                     return Err(Error::Evaluation(format!(
                         "expected + or -, got {:?}",
                         other
                     )))
                 }
+=======
+                other => return Err(Error::Evaluation(format!("expected + or -, got {:?}", other))),
+>>>>>>> 4b60ced (docs: update README)
             };
             let right = self.parse_multiplicative()?;
             left = ASTNode::BinaryOp {
@@ -476,12 +567,16 @@ impl Parser {
                 Token::Star => BinOp::Mul,
                 Token::Slash => BinOp::Div,
                 Token::Percent => BinOp::Mod,
+<<<<<<< HEAD
                 other => {
                     return Err(Error::Evaluation(format!(
                         "expected *, /, or %, got {:?}",
                         other
                     )))
                 }
+=======
+                other => return Err(Error::Evaluation(format!("expected *, /, or %, got {:?}", other))),
+>>>>>>> 4b60ced (docs: update README)
             };
             let right = self.parse_unary()?;
             left = ASTNode::BinaryOp {
@@ -599,10 +694,14 @@ impl Parser {
                     } else {
                         (full_name, args)
                     };
+<<<<<<< HEAD
                     Ok(ASTNode::FunctionCall {
                         name: func_name,
                         args,
                     })
+=======
+                    Ok(ASTNode::FunctionCall { name: func_name, args })
+>>>>>>> 4b60ced (docs: update README)
                 } else if full_name == "risk_score" {
                     Ok(ASTNode::RiskAccess)
                 } else {
@@ -616,8 +715,12 @@ impl Parser {
                 Ok(node)
             }
             other => Err(Error::Evaluation(format!(
+<<<<<<< HEAD
                 "unexpected token in expression: {:?}",
                 other
+=======
+                "unexpected token in expression: {:?}", other
+>>>>>>> 4b60ced (docs: update README)
             ))),
         }
     }
@@ -660,7 +763,12 @@ impl CodeGen {
             ASTNode::Literal(n) => {
                 let ci = self.program.add_constant(Constant::Number(*n));
                 let idx = self.program.emit(
+<<<<<<< HEAD
                     Instruction::with_operand(OpCode::Push, ci).with_source(0, &self.current_rule),
+=======
+                    Instruction::with_operand(OpCode::Push, ci)
+                        .with_source(0, &self.current_rule),
+>>>>>>> 4b60ced (docs: update README)
                 );
                 Ok(idx)
             }
@@ -676,7 +784,12 @@ impl CodeGen {
                 let n = if *b { 1.0 } else { 0.0 };
                 let ci = self.program.add_constant(Constant::Number(n));
                 let idx = self.program.emit(
+<<<<<<< HEAD
                     Instruction::with_operand(OpCode::Push, ci).with_source(0, &self.current_rule),
+=======
+                    Instruction::with_operand(OpCode::Push, ci)
+                        .with_source(0, &self.current_rule),
+>>>>>>> 4b60ced (docs: update README)
                 );
                 Ok(idx)
             }
@@ -714,9 +827,16 @@ impl CodeGen {
                     BinOp::And => OpCode::And,
                     BinOp::Or => OpCode::Or,
                 };
+<<<<<<< HEAD
                 let idx = self
                     .program
                     .emit(Instruction::new(opcode).with_source(0, &self.current_rule));
+=======
+                let idx = self.program.emit(
+                    Instruction::new(opcode)
+                        .with_source(0, &self.current_rule),
+                );
+>>>>>>> 4b60ced (docs: update README)
                 Ok(idx)
             }
             ASTNode::UnaryOp { op, operand } => {
@@ -738,14 +858,28 @@ impl CodeGen {
                         Instruction::with_operand(OpCode::Push, ci_neg)
                             .with_source(0, &self.current_rule),
                     );
+<<<<<<< HEAD
                     self.program
                         .emit(Instruction::new(OpCode::Mul).with_source(0, &self.current_rule));
+=======
+                    self.program.emit(
+                        Instruction::new(OpCode::Mul)
+                            .with_source(0, &self.current_rule),
+                    );
+>>>>>>> 4b60ced (docs: update README)
                     // The original operand is already on stack, so we have:
                     // operand, -1 → Mul → -operand
                     let _ = (ci, opcode); // suppress unused warnings
                 } else {
+<<<<<<< HEAD
                     self.program
                         .emit(Instruction::new(opcode).with_source(0, &self.current_rule));
+=======
+                    self.program.emit(
+                        Instruction::new(opcode)
+                            .with_source(0, &self.current_rule),
+                    );
+>>>>>>> 4b60ced (docs: update README)
                 }
                 // Return the index of the last emitted instruction.
                 Ok(self.program.instructions.len() as u32 - 1)
@@ -758,19 +892,34 @@ impl CodeGen {
                 match name.as_str() {
                     "contains" => {
                         let idx = self.program.emit(
+<<<<<<< HEAD
                             Instruction::new(OpCode::Contains).with_source(0, &self.current_rule),
+=======
+                            Instruction::new(OpCode::Contains)
+                                .with_source(0, &self.current_rule),
+>>>>>>> 4b60ced (docs: update README)
                         );
                         Ok(idx)
                     }
                     "startswith" | "starts_with" => {
                         let idx = self.program.emit(
+<<<<<<< HEAD
                             Instruction::new(OpCode::StartsWith).with_source(0, &self.current_rule),
+=======
+                            Instruction::new(OpCode::StartsWith)
+                                .with_source(0, &self.current_rule),
+>>>>>>> 4b60ced (docs: update README)
                         );
                         Ok(idx)
                     }
                     "endswith" | "ends_with" => {
                         let idx = self.program.emit(
+<<<<<<< HEAD
                             Instruction::new(OpCode::EndsWith).with_source(0, &self.current_rule),
+=======
+                            Instruction::new(OpCode::EndsWith)
+                                .with_source(0, &self.current_rule),
+>>>>>>> 4b60ced (docs: update README)
                         );
                         Ok(idx)
                     }
@@ -809,6 +958,7 @@ impl CodeGen {
         self.emit_node(&ast)?;
 
         // Emit conditional jump past the action.
+<<<<<<< HEAD
         let jump_idx = self
             .program
             .emit(Instruction::new(OpCode::JumpIfFalse).with_source(0, &self.current_rule));
@@ -823,6 +973,24 @@ impl CodeGen {
             );
             self.program
                 .emit(Instruction::new(OpCode::RiskAdd).with_source(0, &self.current_rule));
+=======
+        let jump_idx = self.program.emit(
+            Instruction::new(OpCode::JumpIfFalse)
+                .with_source(0, &self.current_rule),
+        );
+
+        // Emit risk weight if > 0.
+        if rule.risk_weight > 0.0 {
+            let ci = self.program.add_constant(Constant::Number(rule.risk_weight));
+            self.program.emit(
+                Instruction::with_operand(OpCode::Push, ci)
+                    .with_source(0, &self.current_rule),
+            );
+            self.program.emit(
+                Instruction::new(OpCode::RiskAdd)
+                    .with_source(0, &self.current_rule),
+            );
+>>>>>>> 4b60ced (docs: update README)
         }
 
         // Emit action.
@@ -833,8 +1001,15 @@ impl CodeGen {
             "challenge" => OpCode::Challenge,
             _ => OpCode::Deny, // default to deny
         };
+<<<<<<< HEAD
         self.program
             .emit(Instruction::new(action_opcode).with_source(0, &self.current_rule));
+=======
+        self.program.emit(
+            Instruction::new(action_opcode)
+                .with_source(0, &self.current_rule),
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         // Patch jump target to point after the action.
         let after_idx = self.program.instructions.len() as u32;
@@ -906,7 +1081,12 @@ impl Optimizer {
                         if let Some(val) = result {
                             let ci = program.add_constant(Constant::Number(val));
                             // Replace the 3 instructions with 1.
+<<<<<<< HEAD
                             program.instructions[i] = Instruction::with_operand(OpCode::Push, ci);
+=======
+                            program.instructions[i] =
+                                Instruction::with_operand(OpCode::Push, ci);
+>>>>>>> 4b60ced (docs: update README)
                             program.instructions.remove(i + 2);
                             program.instructions.remove(i + 1);
                             // Don't increment i — check the new instruction next.
@@ -980,11 +1160,15 @@ impl PolicyCompilerEngine {
         program.rule_count = policy.rules.len() as u32;
 
         // Build the ordered variable_slots list from the codegen's slot map.
+<<<<<<< HEAD
         let mut slots: Vec<(u32, String)> = codegen
             .variable_slots
             .into_iter()
             .map(|(name, slot)| (slot, name))
             .collect();
+=======
+        let mut slots: Vec<(u32, String)> = codegen.variable_slots.into_iter().map(|(name, slot)| (slot, name)).collect();
+>>>>>>> 4b60ced (docs: update README)
         slots.sort_by_key(|(slot, _)| *slot);
         program.variable_slots = slots.into_iter().map(|(_, name)| name).collect();
 
@@ -1232,19 +1416,27 @@ rules:
 
         // Execute with risk_score = 0.9 (should deny).
         let mut env = HashMap::new();
+<<<<<<< HEAD
         env.insert(
             "risk_score".to_string(),
             super::super::vm::Value::Number(0.9),
         );
+=======
+        env.insert("risk_score".to_string(), super::super::vm::Value::Number(0.9));
+>>>>>>> 4b60ced (docs: update README)
         let vm = super::super::vm::PolicyVM::new();
         let result = vm.execute(&program, &env).unwrap();
         assert!(result.decision.is_deny());
 
         // Execute with risk_score = 0.5 (should allow).
+<<<<<<< HEAD
         env.insert(
             "risk_score".to_string(),
             super::super::vm::Value::Number(0.5),
         );
+=======
+        env.insert("risk_score".to_string(), super::super::vm::Value::Number(0.5));
+>>>>>>> 4b60ced (docs: update README)
         let result = vm.execute(&program, &env).unwrap();
         assert!(result.decision.is_allow());
     }
@@ -1327,19 +1519,27 @@ rules:
 
         // With malicious payload.
         let mut env = HashMap::new();
+<<<<<<< HEAD
         env.insert(
             "payload".to_string(),
             super::super::vm::Value::String("DROP TABLE users".into()),
         );
+=======
+        env.insert("payload".to_string(), super::super::vm::Value::String("DROP TABLE users".into()));
+>>>>>>> 4b60ced (docs: update README)
         let vm = super::super::vm::PolicyVM::new();
         let result = vm.execute(&program, &env).unwrap();
         assert!(result.decision.is_deny());
 
         // With safe payload.
+<<<<<<< HEAD
         env.insert(
             "payload".to_string(),
             super::super::vm::Value::String("hello world".into()),
         );
+=======
+        env.insert("payload".to_string(), super::super::vm::Value::String("hello world".into()));
+>>>>>>> 4b60ced (docs: update README)
         let result = vm.execute(&program, &env).unwrap();
         assert!(result.decision.is_allow());
     }

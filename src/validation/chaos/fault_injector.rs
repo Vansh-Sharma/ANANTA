@@ -148,18 +148,28 @@ impl FaultInjector {
 
     /// Check if a specific target has any active faults.
     pub fn has_active_fault(&self, target: &FaultTarget) -> bool {
+<<<<<<< HEAD
         self.active_faults
             .iter()
             .any(|f| f.active && f.fault.primary_target() == Some(target))
+=======
+        self.active_faults.iter().any(|f| {
+            f.active && f.fault.primary_target() == Some(target)
+        })
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Check if a network path is currently partitioned.
     pub fn is_partitioned(&self, from: &FaultTarget, to: &FaultTarget) -> bool {
         let key = format!("{}→{}", from.label(), to.label());
+<<<<<<< HEAD
         self.simulated_partitions
             .get(&key)
             .copied()
             .unwrap_or(false)
+=======
+        self.simulated_partitions.get(&key).copied().unwrap_or(false)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get the simulated (possibly corrupted) state of a target.
@@ -174,8 +184,17 @@ impl FaultInjector {
             FaultType::StateCorruption { target, fields } => {
                 self.apply_state_corruption(target, fields)
             }
+<<<<<<< HEAD
             FaultType::StateLoss { target } => self.apply_state_loss(target),
             FaultType::NetworkPartition { from, to } => self.apply_network_partition(from, to),
+=======
+            FaultType::StateLoss { target } => {
+                self.apply_state_loss(target)
+            }
+            FaultType::NetworkPartition { from, to } => {
+                self.apply_network_partition(from, to)
+            }
+>>>>>>> 4b60ced (docs: update README)
             FaultType::NetworkLatency { from, to, .. } => {
                 // Record the partition key as "latency" rather than full partition.
                 let key = format!("{}→{}", from.label(), to.label());
@@ -188,11 +207,24 @@ impl FaultInjector {
                 self.simulated_partitions.insert(key, true);
                 Ok(snapshot)
             }
+<<<<<<< HEAD
             FaultType::NetworkLoss { from, to, .. } => self.apply_network_partition(from, to),
             FaultType::RingCrash { target } => {
                 // Simulate by marking the target's state as crashed.
                 let target_key = target.label().to_string();
                 let entry = self.simulated_state.entry(target_key.clone()).or_default();
+=======
+            FaultType::NetworkLoss { from, to, .. } => {
+                self.apply_network_partition(from, to)
+            }
+            FaultType::RingCrash { target } => {
+                // Simulate by marking the target's state as crashed.
+                let target_key = target.label().to_string();
+                let entry = self
+                    .simulated_state
+                    .entry(target_key.clone())
+                    .or_default();
+>>>>>>> 4b60ced (docs: update README)
                 let original = entry
                     .get("status")
                     .cloned()
@@ -218,12 +250,23 @@ impl FaultInjector {
                     corrupted_fields: Vec::new(),
                 })
             }
+<<<<<<< HEAD
             FaultType::MemoryPressure { .. } | FaultType::CpuSpike { .. } => Ok(FaultSnapshot {
                 target: "system".to_string(),
                 original_values: HashMap::new(),
                 network_affected: false,
                 corrupted_fields: Vec::new(),
             }),
+=======
+            FaultType::MemoryPressure { .. } | FaultType::CpuSpike { .. } => {
+                Ok(FaultSnapshot {
+                    target: "system".to_string(),
+                    original_values: HashMap::new(),
+                    network_affected: false,
+                    corrupted_fields: Vec::new(),
+                })
+            }
+>>>>>>> 4b60ced (docs: update README)
             FaultType::OvaphLoopDisruption { phase } => Ok(FaultSnapshot {
                 target: format!("ovaph:{}", phase),
                 original_values: HashMap::new(),
@@ -260,6 +303,7 @@ impl FaultInjector {
         fields: &[String],
     ) -> Result<FaultSnapshot, String> {
         let target_key = target.label().to_string();
+<<<<<<< HEAD
         let entry = self.simulated_state.entry(target_key.clone()).or_default();
 
         let mut original_values = HashMap::new();
@@ -271,6 +315,22 @@ impl FaultInjector {
                 field.clone(),
                 serde_json::json!(format!("__CORRUPTED_{}", field)),
             );
+=======
+        let entry = self
+            .simulated_state
+            .entry(target_key.clone())
+            .or_default();
+
+        let mut original_values = HashMap::new();
+        for field in fields {
+            let original = entry
+                .get(field)
+                .cloned()
+                .unwrap_or(serde_json::json!(null));
+            original_values.insert(field.clone(), original);
+            // Corrupt: set to a recognizable corrupt value.
+            entry.insert(field.clone(), serde_json::json!(format!("__CORRUPTED_{}", field)));
+>>>>>>> 4b60ced (docs: update README)
         }
 
         Ok(FaultSnapshot {

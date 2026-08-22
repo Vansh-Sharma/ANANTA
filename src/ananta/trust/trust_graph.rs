@@ -110,6 +110,7 @@ impl TrustGraph {
     }
 
     /// Add or update a trust edge.
+<<<<<<< HEAD
     pub fn update_edge(
         &mut self,
         from: &str,
@@ -123,6 +124,11 @@ impl TrustGraph {
             .edges
             .entry(key)
             .or_insert_with(|| TrustEdge::new(from, to));
+=======
+    pub fn update_edge(&mut self, from: &str, to: &str, positive: bool, magnitude: f64, event: &str) {
+        let key = (from.into(), to.into());
+        let edge = self.edges.entry(key).or_insert_with(|| TrustEdge::new(from, to));
+>>>>>>> 4b60ced (docs: update README)
         edge.update(positive, magnitude, event);
     }
 
@@ -152,6 +158,7 @@ impl TrustGraph {
     }
 
     /// Number of nodes.
+<<<<<<< HEAD
     pub fn node_count(&self) -> usize {
         self.nodes.len()
     }
@@ -167,17 +174,32 @@ impl TrustGraph {
             .values()
             .filter(|e| e.weight < threshold)
             .collect()
+=======
+    pub fn node_count(&self) -> usize { self.nodes.len() }
+
+    /// Number of edges.
+    pub fn edge_count(&self) -> usize { self.edges.len() }
+
+    /// Find weak links (trust < threshold).
+    pub fn weak_links(&self, threshold: f64) -> Vec<&TrustEdge> {
+        self.edges.values().filter(|e| e.weight < threshold).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Find the minimum trust path between two nodes (Dijkstra-like).
     /// Returns the path cost (lower = more trusted). None if no path.
     pub fn trust_path_cost(&self, from: &str, to: &str) -> Option<f64> {
+<<<<<<< HEAD
         if from == to {
             return Some(0.0);
         }
         if !self.nodes.contains_key(from) || !self.nodes.contains_key(to) {
             return None;
         }
+=======
+        if from == to { return Some(0.0); }
+        if !self.nodes.contains_key(from) || !self.nodes.contains_key(to) { return None; }
+>>>>>>> 4b60ced (docs: update README)
 
         // Dijkstra with trust as inverse cost.
         let mut dist: HashMap<String, f64> = HashMap::new();
@@ -186,8 +208,12 @@ impl TrustGraph {
 
         loop {
             // Find unvisited node with minimum distance.
+<<<<<<< HEAD
             let current = dist
                 .iter()
+=======
+            let current = dist.iter()
+>>>>>>> 4b60ced (docs: update README)
                 .filter(|(k, _)| !visited.contains_key(*k))
                 .min_by(|a, b| a.1.partial_cmp(b.1).unwrap())
                 .map(|(k, _)| k.clone());
@@ -205,9 +231,13 @@ impl TrustGraph {
             let current_dist = dist[&current];
 
             for edge in self.outgoing_edges(&current) {
+<<<<<<< HEAD
                 if visited.contains_key(&edge.to) {
                     continue;
                 }
+=======
+                if visited.contains_key(&edge.to) { continue; }
+>>>>>>> 4b60ced (docs: update README)
                 let cost = 1.0 - edge.weight; // Invert trust to get cost.
                 let new_dist = current_dist + cost;
                 let entry = dist.entry(edge.to.clone()).or_insert(f64::MAX);
@@ -227,6 +257,7 @@ mod tests {
 
     fn test_graph() -> TrustGraph {
         let mut g = TrustGraph::new();
+<<<<<<< HEAD
         g.add_node(TrustNode {
             id: "user-1".into(),
             node_type: NodeType::User,
@@ -242,6 +273,11 @@ mod tests {
             node_type: NodeType::Ring("shield".into()),
             labels: BTreeMap::new(),
         });
+=======
+        g.add_node(TrustNode { id: "user-1".into(), node_type: NodeType::User, labels: BTreeMap::new() });
+        g.add_node(TrustNode { id: "agent-1".into(), node_type: NodeType::Agent, labels: BTreeMap::new() });
+        g.add_node(TrustNode { id: "shield".into(), node_type: NodeType::Ring("shield".into()), labels: BTreeMap::new() });
+>>>>>>> 4b60ced (docs: update README)
         g
     }
 
@@ -273,6 +309,7 @@ mod tests {
         let mut g = test_graph();
         g.update_edge("a", "b", false, 0.9, "major_violation");
         // Re-add nodes.
+<<<<<<< HEAD
         g.add_node(TrustNode {
             id: "a".into(),
             node_type: NodeType::Agent,
@@ -283,6 +320,10 @@ mod tests {
             node_type: NodeType::Agent,
             labels: BTreeMap::new(),
         });
+=======
+        g.add_node(TrustNode { id: "a".into(), node_type: NodeType::Agent, labels: BTreeMap::new() });
+        g.add_node(TrustNode { id: "b".into(), node_type: NodeType::Agent, labels: BTreeMap::new() });
+>>>>>>> 4b60ced (docs: update README)
         let weak = g.weak_links(0.5);
         assert!(!weak.is_empty());
     }

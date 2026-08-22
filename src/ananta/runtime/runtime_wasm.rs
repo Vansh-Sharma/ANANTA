@@ -379,7 +379,11 @@ impl Default for PressureConfig {
     fn default() -> Self {
         Self {
             medium_threshold_bytes: 256 * 1024 * 1024,   // 256 MiB
+<<<<<<< HEAD
             high_threshold_bytes: 512 * 1024 * 1024,     // 512 MiB
+=======
+            high_threshold_bytes: 512 * 1024 * 1024,    // 512 MiB
+>>>>>>> 4b60ced (docs: update README)
             critical_threshold_bytes: 768 * 1024 * 1024, // 768 MiB
             rate_window_size: 1024,
             rate_window_secs: 60.0,
@@ -489,7 +493,16 @@ impl MemoryPressureDetector {
         if self.total_allocations == 0 {
             return 0.0;
         }
+<<<<<<< HEAD
         let max_bucket = self.size_bucket_counts.values().copied().max().unwrap_or(0);
+=======
+        let max_bucket = self
+            .size_bucket_counts
+            .values()
+            .copied()
+            .max()
+            .unwrap_or(0);
+>>>>>>> 4b60ced (docs: update README)
         1.0 - (max_bucket as f64 / self.total_allocations as f64)
     }
 
@@ -548,10 +561,14 @@ impl MemoryPressureDetector {
         let levels = [
             (PressureLevel::Medium, self.config.medium_threshold_bytes),
             (PressureLevel::High, self.config.high_threshold_bytes),
+<<<<<<< HEAD
             (
                 PressureLevel::Critical,
                 self.config.critical_threshold_bytes,
             ),
+=======
+            (PressureLevel::Critical, self.config.critical_threshold_bytes),
+>>>>>>> 4b60ced (docs: update README)
         ];
         for (level, threshold) in &levels {
             if usage >= *threshold {
@@ -1014,15 +1031,25 @@ impl ComponentLifecycleManager {
         component: &str,
         target: LifecycleState,
     ) -> Result<(), TransitionError> {
+<<<<<<< HEAD
         let record = self
             .records
             .get_mut(component)
             .ok_or_else(|| TransitionError {
+=======
+        let record = self.records.get_mut(component).ok_or_else(|| {
+            TransitionError {
+>>>>>>> 4b60ced (docs: update README)
                 component: component.to_string(),
                 from: LifecycleState::Uninitialized,
                 to: target.clone(),
                 reason: "component not registered".to_string(),
+<<<<<<< HEAD
             })?;
+=======
+            }
+        })?;
+>>>>>>> 4b60ced (docs: update README)
 
         let from = record.state.clone();
         let is_valid = VALID_TRANSITIONS
@@ -1039,10 +1066,14 @@ impl ComponentLifecycleManager {
                 component: component.to_string(),
                 from: from.clone(),
                 to: target,
+<<<<<<< HEAD
                 reason: format!(
                     "transition {:?} -> {:?} is not in the allowed set",
                     from, record.state
                 ),
+=======
+                reason: format!("transition {:?} -> {:?} is not in the allowed set", from, record.state),
+>>>>>>> 4b60ced (docs: update README)
             };
             record.last_error = Some(err.to_string());
             return Err(err);
@@ -1220,7 +1251,14 @@ impl ComponentHealthSummary {
             .map(|r| r.component.clone())
             .unwrap_or_default();
         let healthy = results.iter().all(|r| r.healthy);
+<<<<<<< HEAD
         let worst_latency_ms = results.iter().map(|r| r.latency_ms).fold(0.0_f64, f64::max);
+=======
+        let worst_latency_ms = results
+            .iter()
+            .map(|r| r.latency_ms)
+            .fold(0.0_f64, f64::max);
+>>>>>>> 4b60ced (docs: update README)
         Self {
             component,
             healthy,
@@ -1443,6 +1481,7 @@ mod tests {
         ResourceHealth::Unhealthy("simulated failure".to_string())
     }
 
+<<<<<<< HEAD
     fn sample_health_check(component: &str, check_type: HealthCheckType) -> HealthCheckResult {
         match (component, &check_type) {
             ("fail-deep", HealthCheckType::Deep) => {
@@ -1451,6 +1490,25 @@ mod tests {
             ("fail-all", _) => {
                 HealthCheckResult::unhealthy(component, check_type, "all checks fail", 5.0)
             }
+=======
+    fn sample_health_check(
+        component: &str,
+        check_type: HealthCheckType,
+    ) -> HealthCheckResult {
+        match (component, &check_type) {
+            ("fail-deep", HealthCheckType::Deep) => HealthCheckResult::unhealthy(
+                component,
+                check_type,
+                "deep check failed",
+                10.0,
+            ),
+            ("fail-all", _) => HealthCheckResult::unhealthy(
+                component,
+                check_type,
+                "all checks fail",
+                5.0,
+            ),
+>>>>>>> 4b60ced (docs: update README)
             _ => HealthCheckResult::healthy(component, check_type, 1.0),
         }
     }
@@ -1858,12 +1916,22 @@ mod tests {
     fn lifecycle_valid_transitions() {
         let mut mgr = ComponentLifecycleManager::new();
         mgr.register("sentinel");
+<<<<<<< HEAD
         assert!(mgr
             .transition("sentinel", LifecycleState::Initializing)
             .is_ok());
         assert!(mgr.transition("sentinel", LifecycleState::Ready).is_ok());
         assert!(mgr.transition("sentinel", LifecycleState::Active).is_ok());
         assert_eq!(mgr.state_of("sentinel"), Some(&LifecycleState::Active));
+=======
+        assert!(mgr.transition("sentinel", LifecycleState::Initializing).is_ok());
+        assert!(mgr.transition("sentinel", LifecycleState::Ready).is_ok());
+        assert!(mgr.transition("sentinel", LifecycleState::Active).is_ok());
+        assert_eq!(
+            mgr.state_of("sentinel"),
+            Some(&LifecycleState::Active)
+        );
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1884,6 +1952,7 @@ mod tests {
     fn lifecycle_suspend_resume_cycle() {
         let mut mgr = ComponentLifecycleManager::new();
         mgr.register("phoenix");
+<<<<<<< HEAD
         mgr.transition("phoenix", LifecycleState::Initializing)
             .unwrap();
         mgr.transition("phoenix", LifecycleState::Ready).unwrap();
@@ -1894,12 +1963,25 @@ mod tests {
             .unwrap();
         mgr.transition("phoenix", LifecycleState::Resuming).unwrap();
         assert_eq!(mgr.state_of("phoenix"), Some(&LifecycleState::Active));
+=======
+        mgr.transition("phoenix", LifecycleState::Initializing).unwrap();
+        mgr.transition("phoenix", LifecycleState::Ready).unwrap();
+        mgr.transition("phoenix", LifecycleState::Active).unwrap();
+        mgr.transition("phoenix", LifecycleState::Suspending).unwrap();
+        mgr.transition("phoenix", LifecycleState::Suspended).unwrap();
+        mgr.transition("phoenix", LifecycleState::Resuming).unwrap();
+        assert_eq!(
+            mgr.state_of("phoenix"),
+            Some(&LifecycleState::Active)
+        );
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn lifecycle_shutdown_terminates() {
         let mut mgr = ComponentLifecycleManager::new();
         mgr.register("anchor");
+<<<<<<< HEAD
         mgr.transition("anchor", LifecycleState::Initializing)
             .unwrap();
         mgr.transition("anchor", LifecycleState::Ready).unwrap();
@@ -1907,6 +1989,12 @@ mod tests {
             .unwrap();
         mgr.transition("anchor", LifecycleState::Terminated)
             .unwrap();
+=======
+        mgr.transition("anchor", LifecycleState::Initializing).unwrap();
+        mgr.transition("anchor", LifecycleState::Ready).unwrap();
+        mgr.transition("anchor", LifecycleState::ShuttingDown).unwrap();
+        mgr.transition("anchor", LifecycleState::Terminated).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(mgr.all_terminated());
     }
 
@@ -1914,8 +2002,12 @@ mod tests {
     fn lifecycle_transition_count_increments() {
         let mut mgr = ComponentLifecycleManager::new();
         mgr.register("trust");
+<<<<<<< HEAD
         mgr.transition("trust", LifecycleState::Initializing)
             .unwrap();
+=======
+        mgr.transition("trust", LifecycleState::Initializing).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         mgr.transition("trust", LifecycleState::Ready).unwrap();
         let record = mgr.record("trust").unwrap();
         assert_eq!(record.transition_count, 2);
@@ -1938,12 +2030,19 @@ mod tests {
         mgr.register("b");
         mgr.register("c");
         // a and b go to Active; c stays Uninitialized
+<<<<<<< HEAD
         mgr.transition("a", LifecycleState::Initializing)
             .unwrap_or(());
         mgr.transition("a", LifecycleState::Ready).unwrap_or(());
         mgr.transition("a", LifecycleState::Active).unwrap_or(());
         mgr.transition("b", LifecycleState::Initializing)
             .unwrap_or(());
+=======
+        mgr.transition("a", LifecycleState::Initializing).unwrap_or(());
+        mgr.transition("a", LifecycleState::Ready).unwrap_or(());
+        mgr.transition("a", LifecycleState::Active).unwrap_or(());
+        mgr.transition("b", LifecycleState::Initializing).unwrap_or(());
+>>>>>>> 4b60ced (docs: update README)
         mgr.transition("b", LifecycleState::Ready).unwrap_or(());
         mgr.transition("b", LifecycleState::Active).unwrap_or(());
         let dist = mgr.state_distribution();
@@ -2161,8 +2260,12 @@ mod tests {
     fn lifecycle_accumulated_time() {
         let mut mgr = ComponentLifecycleManager::new();
         mgr.register("sentinel");
+<<<<<<< HEAD
         mgr.transition("sentinel", LifecycleState::Initializing)
             .unwrap();
+=======
+        mgr.transition("sentinel", LifecycleState::Initializing).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         // Give a tiny bit of time, then transition.
         mgr.transition("sentinel", LifecycleState::Ready).unwrap();
         let rec = mgr.record("sentinel").unwrap();

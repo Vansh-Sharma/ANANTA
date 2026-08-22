@@ -28,9 +28,15 @@
 use std::collections::HashMap;
 use std::sync::RwLock;
 
+<<<<<<< HEAD
 use hmac::{Hmac, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+=======
+use serde::{Deserialize, Serialize};
+use hmac::{Hmac, Mac};
+use sha2::{Sha256, Digest};
+>>>>>>> 4b60ced (docs: update README)
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -105,9 +111,13 @@ pub struct ApiKeyConfig {
     pub require_for_v1: bool,
 }
 
+<<<<<<< HEAD
 fn default_timestamp_tolerance() -> u64 {
     300
 } // 5 minutes
+=======
+fn default_timestamp_tolerance() -> u64 { 300 } // 5 minutes
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for ApiKeyConfig {
     fn default() -> Self {
@@ -143,10 +153,14 @@ impl ApiKeyManager {
     }
 
     /// Create an API key manager with persistent storage.
+<<<<<<< HEAD
     pub fn with_store(
         config: ApiKeyConfig,
         store: std::sync::Arc<dyn crate::storage::Store>,
     ) -> Self {
+=======
+    pub fn with_store(config: ApiKeyConfig, store: std::sync::Arc<dyn crate::storage::Store>) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         let mut keys_map = HashMap::new();
 
         // Restore keys from store.
@@ -159,10 +173,14 @@ impl ApiKeyManager {
             }
         }
 
+<<<<<<< HEAD
         tracing::info!(
             restored_keys = keys_map.len(),
             "ApiKeyManager: restored keys from store"
         );
+=======
+        tracing::info!(restored_keys = keys_map.len(), "ApiKeyManager: restored keys from store");
+>>>>>>> 4b60ced (docs: update README)
 
         Self {
             config,
@@ -183,11 +201,15 @@ impl ApiKeyManager {
         description: &str,
         rate_limit_rpm: u32,
     ) -> crate::Result<(String, String)> {
+<<<<<<< HEAD
         let key_id = format!(
             "ak_{}_{}",
             random_prefix(),
             &uuid::Uuid::new_v4().to_string()[..8]
         );
+=======
+        let key_id = format!("ak_{}_{}", random_prefix(), &uuid::Uuid::new_v4().to_string()[..8]);
+>>>>>>> 4b60ced (docs: update README)
         let secret = uuid::Uuid::new_v4().to_string() + &uuid::Uuid::new_v4().to_string();
         let secret_hash = hash_secret(&secret);
 
@@ -338,7 +360,13 @@ impl ApiKeyManager {
         let window = std::time::Duration::from_secs(60);
 
         let mut counters = self.rate_counters.write().unwrap();
+<<<<<<< HEAD
         let (window_start, count) = counters.entry(key_id.to_string()).or_insert((now, 0));
+=======
+        let (window_start, count) = counters
+            .entry(key_id.to_string())
+            .or_insert((now, 0));
+>>>>>>> 4b60ced (docs: update README)
 
         // Reset window if expired.
         if now.duration_since(*window_start) > window {
@@ -357,6 +385,7 @@ impl ApiKeyManager {
     /// Get all key IDs (for admin listing).
     pub fn list_keys(&self) -> Vec<ApiKeyInfo> {
         let keys = self.keys.read().unwrap();
+<<<<<<< HEAD
         keys.values()
             .map(|m| ApiKeyInfo {
                 key_id: m.key_id.clone(),
@@ -368,6 +397,17 @@ impl ApiKeyManager {
                 rate_limit_rpm: m.rate_limit_rpm,
             })
             .collect()
+=======
+        keys.values().map(|m| ApiKeyInfo {
+            key_id: m.key_id.clone(),
+            name: m.name.clone(),
+            active: m.active,
+            permissions: m.permissions.clone(),
+            created_at: m.created_at.clone(),
+            expires_at: m.expires_at.clone(),
+            rate_limit_rpm: m.rate_limit_rpm,
+        }).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Persist a key to the store.
@@ -442,8 +482,13 @@ fn hash_secret(secret: &str) -> String {
 
 /// Compute HMAC-SHA256.
 fn compute_hmac(secret: &str, message: &str) -> String {
+<<<<<<< HEAD
     let mut mac =
         HmacSha256::new_from_slice(secret.as_bytes()).expect("HMAC can take key of any size");
+=======
+    let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
+        .expect("HMAC can take key of any size");
+>>>>>>> 4b60ced (docs: update README)
     mac.update(message.as_bytes());
     hex::encode(mac.finalize().into_bytes())
 }
@@ -468,6 +513,7 @@ fn parse_auth_header(header: &str) -> Option<(String, String)> {
 fn random_prefix() -> String {
     use rand::Rng;
     let mut rng = rand::rng();
+<<<<<<< HEAD
     (0..4)
         .map(|_| {
             let b = rng.random_range(0..36);
@@ -478,6 +524,12 @@ fn random_prefix() -> String {
             }
         })
         .collect()
+=======
+    (0..4).map(|_| {
+        let b = rng.random_range(0..36);
+        if b < 26 { (b'a' + b) as char } else { (b'0' + b - 26) as char }
+    }).collect()
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[cfg(test)]
@@ -496,6 +548,7 @@ mod tests {
     #[test]
     fn create_key_returns_id_and_secret() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let (key_id, secret) = mgr
             .create_key(
                 "test-key",
@@ -506,6 +559,16 @@ mod tests {
                 100,
             )
             .unwrap();
+=======
+        let (key_id, secret) = mgr.create_key(
+            "test-key",
+            vec![Permission::Evaluate],
+            None,
+            "admin",
+            "Test key",
+            100,
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(key_id.starts_with("ak_"));
         assert!(!secret.is_empty());
         assert_ne!(key_id, secret);
@@ -514,13 +577,18 @@ mod tests {
     #[test]
     fn revoke_key() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let (key_id, _) = mgr
             .create_key("test", vec![Permission::Evaluate], None, "admin", "", 0)
             .unwrap();
+=======
+        let (key_id, _) = mgr.create_key("test", vec![Permission::Evaluate], None, "admin", "", 0).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(mgr.revoke_key(&key_id));
 
         // Revoked key should not authenticate.
         let ts = chrono::Utc::now().timestamp().to_string();
+<<<<<<< HEAD
         let sig = compute_hmac(
             "test-master-secret",
             &format!("{}{}GET/v1/evalhash", key_id, ts),
@@ -531,6 +599,12 @@ mod tests {
             "GET",
             "/v1/eval",
             "hash",
+=======
+        let sig = compute_hmac("test-master-secret", &format!("{}{}GET/v1/evalhash", key_id, ts));
+        let result = mgr.authenticate(
+            &format!("Bearer {}:{}", key_id, sig),
+            &ts, "GET", "/v1/eval", "hash",
+>>>>>>> 4b60ced (docs: update README)
             Some(&Permission::Evaluate),
         );
         assert_eq!(result, AuthResult::Revoked);
@@ -539,9 +613,13 @@ mod tests {
     #[test]
     fn delete_key() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let (key_id, _) = mgr
             .create_key("test", vec![Permission::Evaluate], None, "admin", "", 0)
             .unwrap();
+=======
+        let (key_id, _) = mgr.create_key("test", vec![Permission::Evaluate], None, "admin", "", 0).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(mgr.delete_key(&key_id));
         assert!(!mgr.delete_key(&key_id)); // already deleted
     }
@@ -549,9 +627,20 @@ mod tests {
     #[test]
     fn authenticate_valid() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let (key_id, _secret) = mgr
             .create_key("test", vec![Permission::Evaluate], None, "admin", "", 0)
             .unwrap();
+=======
+        let (key_id, _secret) = mgr.create_key(
+            "test",
+            vec![Permission::Evaluate],
+            None,
+            "admin",
+            "",
+            0,
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         let ts = chrono::Utc::now().timestamp().to_string();
         let message = format!("{}{}GET/v1/evaluatebodyhash", key_id, ts);
@@ -559,10 +648,14 @@ mod tests {
 
         let result = mgr.authenticate(
             &format!("Bearer {}:{}", key_id, sig),
+<<<<<<< HEAD
             &ts,
             "GET",
             "/v1/evaluate",
             "bodyhash",
+=======
+            &ts, "GET", "/v1/evaluate", "bodyhash",
+>>>>>>> 4b60ced (docs: update README)
             Some(&Permission::Evaluate),
         );
         assert_eq!(result, AuthResult::Authenticated(key_id.clone()));
@@ -579,13 +672,22 @@ mod tests {
     fn authenticate_invalid_key() {
         let mgr = make_manager();
         let ts = chrono::Utc::now().timestamp().to_string();
+<<<<<<< HEAD
         let result = mgr.authenticate("Bearer nonexistent:sig", &ts, "GET", "/v1/eval", "", None);
+=======
+        let result = mgr.authenticate(
+            "Bearer nonexistent:sig",
+            &ts, "GET", "/v1/eval", "",
+            None,
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(result, AuthResult::InvalidKey);
     }
 
     #[test]
     fn authenticate_insufficient_permissions() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let (key_id, _) = mgr
             .create_key(
                 "test",
@@ -596,6 +698,16 @@ mod tests {
                 0,
             )
             .unwrap();
+=======
+        let (key_id, _) = mgr.create_key(
+            "test",
+            vec![Permission::Evaluate], // only Evaluate, not Execute
+            None,
+            "admin",
+            "",
+            0,
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         let ts = chrono::Utc::now().timestamp().to_string();
         let message = format!("{}{}POST/v1/executebodyhash", key_id, ts);
@@ -603,10 +715,14 @@ mod tests {
 
         let result = mgr.authenticate(
             &format!("Bearer {}:{}", key_id, sig),
+<<<<<<< HEAD
             &ts,
             "POST",
             "/v1/execute",
             "bodyhash",
+=======
+            &ts, "POST", "/v1/execute", "bodyhash",
+>>>>>>> 4b60ced (docs: update README)
             Some(&Permission::Execute),
         );
         assert_eq!(result, AuthResult::InsufficientPermissions);
@@ -622,10 +738,15 @@ mod tests {
     #[test]
     fn list_keys() {
         let mgr = make_manager();
+<<<<<<< HEAD
         mgr.create_key("key1", vec![Permission::Evaluate], None, "admin", "", 0)
             .unwrap();
         mgr.create_key("key2", vec![Permission::Admin], None, "admin", "", 0)
             .unwrap();
+=======
+        mgr.create_key("key1", vec![Permission::Evaluate], None, "admin", "", 0).unwrap();
+        mgr.create_key("key2", vec![Permission::Admin], None, "admin", "", 0).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let keys = mgr.list_keys();
         assert_eq!(keys.len(), 2);
     }
@@ -633,6 +754,7 @@ mod tests {
     #[test]
     fn rate_limit_enforced() {
         let mgr = make_manager();
+<<<<<<< HEAD
         let (key_id, _) = mgr
             .create_key(
                 "test",
@@ -643,6 +765,16 @@ mod tests {
                 2, // 2 requests per minute
             )
             .unwrap();
+=======
+        let (key_id, _) = mgr.create_key(
+            "test",
+            vec![Permission::Evaluate],
+            None,
+            "admin",
+            "",
+            2, // 2 requests per minute
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         let ts = chrono::Utc::now().timestamp().to_string();
         let message = |t: &str| format!("{}{}GET/v1/evalhash", key_id, t);
@@ -651,10 +783,14 @@ mod tests {
         // First request: OK.
         let r1 = mgr.authenticate(
             &format!("Bearer {}:{}", key_id, sig(&ts)),
+<<<<<<< HEAD
             &ts,
             "GET",
             "/v1/eval",
             "hash",
+=======
+            &ts, "GET", "/v1/eval", "hash",
+>>>>>>> 4b60ced (docs: update README)
             Some(&Permission::Evaluate),
         );
         assert_eq!(r1, AuthResult::Authenticated(key_id.clone()));
@@ -662,10 +798,14 @@ mod tests {
         // Second request: OK.
         let r2 = mgr.authenticate(
             &format!("Bearer {}:{}", key_id, sig(&ts)),
+<<<<<<< HEAD
             &ts,
             "GET",
             "/v1/eval",
             "hash",
+=======
+            &ts, "GET", "/v1/eval", "hash",
+>>>>>>> 4b60ced (docs: update README)
             Some(&Permission::Evaluate),
         );
         assert_eq!(r2, AuthResult::Authenticated(key_id.clone()));
@@ -673,10 +813,14 @@ mod tests {
         // Third request: Rate limited.
         let r3 = mgr.authenticate(
             &format!("Bearer {}:{}", key_id, sig(&ts)),
+<<<<<<< HEAD
             &ts,
             "GET",
             "/v1/eval",
             "hash",
+=======
+            &ts, "GET", "/v1/eval", "hash",
+>>>>>>> 4b60ced (docs: update README)
             Some(&Permission::Evaluate),
         );
         assert_eq!(r3, AuthResult::RateLimited);
@@ -687,6 +831,7 @@ mod tests {
         let backend = crate::storage::MemoryStore::new();
         let arc_store: std::sync::Arc<dyn crate::storage::Store> = std::sync::Arc::new(backend);
 
+<<<<<<< HEAD
         let mgr1 = ApiKeyManager::with_store(
             ApiKeyConfig {
                 enabled: true,
@@ -716,6 +861,22 @@ mod tests {
             },
             arc_store.clone(),
         );
+=======
+        let mgr1 = ApiKeyManager::with_store(ApiKeyConfig {
+            enabled: true,
+            master_secret: "secret".to_string(),
+            ..Default::default()
+        }, arc_store.clone());
+
+        let (key_id, _) = mgr1.create_key("persisted", vec![Permission::Evaluate], None, "admin", "", 0).unwrap();
+
+        // Restore from store.
+        let mgr2 = ApiKeyManager::with_store(ApiKeyConfig {
+            enabled: true,
+            master_secret: "secret".to_string(),
+            ..Default::default()
+        }, arc_store.clone());
+>>>>>>> 4b60ced (docs: update README)
 
         let keys = mgr2.list_keys();
         assert_eq!(keys.len(), 1);

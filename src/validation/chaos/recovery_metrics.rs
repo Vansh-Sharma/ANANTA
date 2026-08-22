@@ -114,11 +114,19 @@ impl RecoverySummary {
         let data_loss = metrics.iter().filter(|m| m.data_loss).count() as u64;
         let auto_healed = metrics.iter().filter(|m| m.auto_healed).count() as u64;
 
+<<<<<<< HEAD
         let recovery_sum: u64 = metrics.iter().filter_map(|m| m.recovery_time_ms).sum();
         let recovery_count = metrics
             .iter()
             .filter(|m| m.recovery_time_ms.is_some())
             .count();
+=======
+        let recovery_sum: u64 = metrics
+            .iter()
+            .filter_map(|m| m.recovery_time_ms)
+            .sum();
+        let recovery_count = metrics.iter().filter(|m| m.recovery_time_ms.is_some()).count();
+>>>>>>> 4b60ced (docs: update README)
         let avg_recovery = if recovery_count > 0 {
             recovery_sum as f64 / recovery_count as f64
         } else {
@@ -148,10 +156,22 @@ impl RecoverySummary {
     ///
     /// Groups metrics by the `target` field and computes a `RecoverySummary`
     /// for each group.
+<<<<<<< HEAD
     pub fn per_target_summary(metrics: &[RecoveryMetrics]) -> HashMap<String, RecoverySummary> {
         let mut by_target: HashMap<String, Vec<&RecoveryMetrics>> = HashMap::new();
         for m in metrics {
             by_target.entry(m.target.clone()).or_default().push(m);
+=======
+    pub fn per_target_summary(
+        metrics: &[RecoveryMetrics],
+    ) -> HashMap<String, RecoverySummary> {
+        let mut by_target: HashMap<String, Vec<&RecoveryMetrics>> = HashMap::new();
+        for m in metrics {
+            by_target
+                .entry(m.target.clone())
+                .or_default()
+                .push(m);
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let mut result = HashMap::new();
@@ -182,9 +202,13 @@ mod tests {
     #[test]
     fn full_recovery_summary() {
         let metrics = vec![
+<<<<<<< HEAD
             make_metric("f1", "ring_crash", "shield")
                 .recovered(100)
                 .auto_healed(),
+=======
+            make_metric("f1", "ring_crash", "shield").recovered(100).auto_healed(),
+>>>>>>> 4b60ced (docs: update README)
             make_metric("f2", "ring_crash", "shield").recovered(200),
             make_metric("f3", "state_loss", "memory")
                 .recovered(500)

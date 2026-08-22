@@ -66,12 +66,16 @@ pub struct RollingCorrelation {
 
 impl RollingCorrelation {
     /// Create a new rolling correlation tracker for the given pair.
+<<<<<<< HEAD
     pub fn new(
         component_a: &str,
         component_b: &str,
         window_size: usize,
         max_history: usize,
     ) -> Self {
+=======
+    pub fn new(component_a: &str, component_b: &str, window_size: usize, max_history: usize) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             component_a: component_a.to_string(),
             component_b: component_b.to_string(),
@@ -264,10 +268,14 @@ impl CorrelationEngine {
             if a == comp || b == comp {
                 // Need the other component's latest score.
                 let other = if a == comp { b } else { a };
+<<<<<<< HEAD
                 let other_score = self
                     .signals
                     .get(other)
                     .and_then(|buf| buf.back().map(|s| s.score));
+=======
+                let other_score = self.signals.get(other).and_then(|buf| buf.back().map(|s| s.score));
+>>>>>>> 4b60ced (docs: update README)
                 if let Some(os) = other_score {
                     // Insert in the correct order.
                     let (va, vb) = if a == comp { (score, os) } else { (os, score) };
@@ -289,6 +297,7 @@ impl CorrelationEngine {
         if len < 2 {
             return None;
         }
+<<<<<<< HEAD
         let va: Vec<f64> = sig_a
             .iter()
             .rev()
@@ -303,6 +312,10 @@ impl CorrelationEngine {
             .rev()
             .map(|s| s.score)
             .collect();
+=======
+        let va: Vec<f64> = sig_a.iter().rev().take(len).rev().map(|s| s.score).collect();
+        let vb: Vec<f64> = sig_b.iter().rev().take(len).rev().map(|s| s.score).collect();
+>>>>>>> 4b60ced (docs: update README)
         Some(pearson_correlation(&va, &vb))
     }
 
@@ -315,6 +328,7 @@ impl CorrelationEngine {
         if len < 3 {
             return None;
         }
+<<<<<<< HEAD
         let vx: Vec<f64> = sig_x
             .iter()
             .rev()
@@ -336,6 +350,11 @@ impl CorrelationEngine {
             .rev()
             .map(|s| s.score)
             .collect();
+=======
+        let vx: Vec<f64> = sig_x.iter().rev().take(len).rev().map(|s| s.score).collect();
+        let vy: Vec<f64> = sig_y.iter().rev().take(len).rev().map(|s| s.score).collect();
+        let vz: Vec<f64> = sig_z.iter().rev().take(len).rev().map(|s| s.score).collect();
+>>>>>>> 4b60ced (docs: update README)
         partial_correlation(&vx, &vy, &vz)
     }
 
@@ -792,12 +811,17 @@ impl AnomalyPropagationTracker {
 
     /// Register a dependency edge.
     pub fn add_dependency(&mut self, from: &str, to: &str, weight: f64) {
+<<<<<<< HEAD
         self.dependencies
             .push((from.to_string(), to.to_string(), weight.clamp(0.0, 1.0)));
+=======
+        self.dependencies.push((from.to_string(), to.to_string(), weight.clamp(0.0, 1.0)));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Record a health observation. If the score falls below the anomaly
     /// threshold, it is logged as an anomaly.
+<<<<<<< HEAD
     pub fn observe(
         &mut self,
         component: &str,
@@ -810,6 +834,11 @@ impl AnomalyPropagationTracker {
             .health_impacts
             .entry(component.to_string())
             .or_default();
+=======
+    pub fn observe(&mut self, component: &str, score: f64, time: DateTime<Utc>, previous_score: f64) {
+        let times = self.anomaly_times.entry(component.to_string()).or_default();
+        let impacts = self.health_impacts.entry(component.to_string()).or_default();
+>>>>>>> 4b60ced (docs: update README)
         let score_drop = (previous_score - score).max(0.0);
         impacts.push((time, score_drop));
 
@@ -827,6 +856,7 @@ impl AnomalyPropagationTracker {
         }
         let origin_time = origin_times.iter().min().cloned()?;
 
+<<<<<<< HEAD
         let origin_impact = self
             .health_impacts
             .get(origin)
@@ -835,15 +865,23 @@ impl AnomalyPropagationTracker {
                     .find(|(t, _)| *t == origin_time)
                     .map(|(_, s)| *s)
             })
+=======
+        let origin_impact = self.health_impacts.get(origin)
+            .and_then(|imps| imps.iter().find(|(t, _)| *t == origin_time).map(|(_, s)| *s))
+>>>>>>> 4b60ced (docs: update README)
             .unwrap_or(0.5);
 
         // Collect dependents (components that depend on the current one).
         let mut dependents_map: HashMap<String, Vec<(String, f64)>> = HashMap::new();
         for (from, to, w) in &self.dependencies {
+<<<<<<< HEAD
             dependents_map
                 .entry(to.clone())
                 .or_default()
                 .push((from.clone(), *w));
+=======
+            dependents_map.entry(to.clone()).or_default().push((from.clone(), *w));
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let mut events: Vec<PropagationEvent> = Vec::new();
@@ -859,9 +897,13 @@ impl AnomalyPropagationTracker {
                         continue;
                     }
                     if let Some(dep_impacts) = self.health_impacts.get(dep) {
+<<<<<<< HEAD
                         if let Some(&(dep_time, dep_impact)) =
                             dep_impacts.iter().find(|(t, _)| *t >= cur_time)
                         {
+=======
+                        if let Some(&(dep_time, dep_impact)) = dep_impacts.iter().find(|(t, _)| *t >= cur_time) {
+>>>>>>> 4b60ced (docs: update README)
                             visited.insert(dep.clone());
                             let delay = (dep_time - cur_time).num_milliseconds() as f64 / 1000.0;
 
@@ -899,10 +941,14 @@ impl AnomalyPropagationTracker {
         let max_depth = events.iter().map(|_| 0).max().unwrap_or(0) + 1;
         let avg_delay: f64 = events.iter().map(|e| e.delay_secs).sum::<f64>() / events.len() as f64;
         let avg_impact: f64 = events.iter().map(|e| e.impact).sum::<f64>() / events.len() as f64;
+<<<<<<< HEAD
         let amp_count = events
             .iter()
             .filter(|e| e.propagation_type == PropagationType::Amplification)
             .count();
+=======
+        let amp_count = events.iter().filter(|e| e.propagation_type == PropagationType::Amplification).count();
+>>>>>>> 4b60ced (docs: update README)
         let amplification_fraction = amp_count as f64 / events.len() as f64;
 
         Some(PropagationSummary {
@@ -936,9 +982,13 @@ impl AnomalyPropagationTracker {
         if summary.events.is_empty() {
             return None;
         }
+<<<<<<< HEAD
         let origin_impact = self
             .health_impacts
             .get(origin)
+=======
+        let origin_impact = self.health_impacts.get(origin)
+>>>>>>> 4b60ced (docs: update README)
             .and_then(|imps| imps.first().map(|(_, s)| *s))
             .unwrap_or(1.0);
         if origin_impact < 1e-12 {
@@ -954,19 +1004,27 @@ impl AnomalyPropagationTracker {
         if summary.events.is_empty() {
             return None;
         }
+<<<<<<< HEAD
         let origin_impact = self
             .health_impacts
             .get(origin)
+=======
+        let origin_impact = self.health_impacts.get(origin)
+>>>>>>> 4b60ced (docs: update README)
             .and_then(|imps| imps.first().map(|(_, s)| *s))
             .unwrap_or(1.0);
         if origin_impact < 1e-12 {
             return None;
         }
+<<<<<<< HEAD
         let max_impact = summary
             .events
             .iter()
             .map(|e| e.impact)
             .fold(0.0_f64, f64::max);
+=======
+        let max_impact = summary.events.iter().map(|e| e.impact).fold(0.0_f64, f64::max);
+>>>>>>> 4b60ced (docs: update README)
         Some(max_impact / origin_impact)
     }
 }
@@ -1034,8 +1092,12 @@ impl RootCauseAnalyzer {
 
     /// Add a dependency edge.
     pub fn add_dependency(&mut self, from: &str, to: &str, weight: f64) {
+<<<<<<< HEAD
         self.dependencies
             .push((from.to_string(), to.to_string(), weight.clamp(0.0, 1.0)));
+=======
+        self.dependencies.push((from.to_string(), to.to_string(), weight.clamp(0.0, 1.0)));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Record a correlation value for a pair.
@@ -1046,10 +1108,14 @@ impl RootCauseAnalyzer {
 
     /// Record the timestamp when a component first became anomalous.
     pub fn record_anomaly_time(&mut self, component: &str, time: DateTime<Utc>) {
+<<<<<<< HEAD
         let entry = self
             .anomaly_timestamps
             .entry(component.to_string())
             .or_insert_with(|| time);
+=======
+        let entry = self.anomaly_timestamps.entry(component.to_string()).or_insert_with(|| time);
+>>>>>>> 4b60ced (docs: update README)
         if time < *entry {
             *entry = time;
         }
@@ -1057,10 +1123,14 @@ impl RootCauseAnalyzer {
 
     /// Record a health score for a component.
     pub fn record_health(&mut self, component: &str, score: f64) {
+<<<<<<< HEAD
         let entry = self
             .health_history
             .entry(component.to_string())
             .or_default();
+=======
+        let entry = self.health_history.entry(component.to_string()).or_default();
+>>>>>>> 4b60ced (docs: update README)
         entry.push(score);
         if entry.len() > 1000 {
             entry.remove(0);
@@ -1071,16 +1141,24 @@ impl RootCauseAnalyzer {
     /// dependents and fewer dependencies score higher (they are more upstream).
     fn dag_position_score(&self, component: &str) -> f64 {
         // Count dependents (how many depend on this component).
+<<<<<<< HEAD
         let dependents: HashSet<String> = self
             .dependencies
+=======
+        let dependents: HashSet<String> = self.dependencies
+>>>>>>> 4b60ced (docs: update README)
             .iter()
             .filter(|(_, to, _)| to == component)
             .map(|(from, _, _)| from.clone())
             .collect();
 
         // Count dependencies (how many this depends on).
+<<<<<<< HEAD
         let deps: HashSet<String> = self
             .dependencies
+=======
+        let deps: HashSet<String> = self.dependencies
+>>>>>>> 4b60ced (docs: update README)
             .iter()
             .filter(|(from, _, _)| from == component)
             .map(|(_, to, _)| to.clone())
@@ -1194,11 +1272,15 @@ impl RootCauseAnalyzer {
             .collect();
 
         // Sort by score descending (most likely root cause first).
+<<<<<<< HEAD
         candidates.sort_by(|a, b| {
             b.score
                 .partial_cmp(&a.score)
                 .unwrap_or(std::cmp::Ordering::Equal)
         });
+=======
+        candidates.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+>>>>>>> 4b60ced (docs: update README)
 
         RootCauseAnalysisResult {
             candidates,
@@ -1282,16 +1364,24 @@ impl PredictiveHealthScorer {
 
     /// Add a dependency edge.
     pub fn add_dependency(&mut self, from: &str, to: &str, weight: f64) {
+<<<<<<< HEAD
         self.dependencies
             .push((from.to_string(), to.to_string(), weight.clamp(0.0, 1.0)));
+=======
+        self.dependencies.push((from.to_string(), to.to_string(), weight.clamp(0.0, 1.0)));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Record a health score for a component.
     pub fn record_health(&mut self, component: &str, score: f64) {
+<<<<<<< HEAD
         let entry = self
             .health_history
             .entry(component.to_string())
             .or_default();
+=======
+        let entry = self.health_history.entry(component.to_string()).or_default();
+>>>>>>> 4b60ced (docs: update README)
         entry.push_back(score);
         if entry.len() > self.max_history {
             entry.pop_front();
@@ -1333,11 +1423,15 @@ impl PredictiveHealthScorer {
             return TrendDirection::Stable;
         }
 
+<<<<<<< HEAD
         let older_sum: f64 = history
             .iter()
             .skip(older_start)
             .take(older_end - older_start)
             .sum();
+=======
+        let older_sum: f64 = history.iter().skip(older_start).take(older_end - older_start).sum();
+>>>>>>> 4b60ced (docs: update README)
         let older_mean = older_sum / (older_end - older_start) as f64;
 
         let diff = recent_mean - older_mean;
@@ -1381,8 +1475,12 @@ impl PredictiveHealthScorer {
 
     /// Count the dependencies of a component.
     fn dependency_info(&self, component: &str) -> (usize, usize, usize) {
+<<<<<<< HEAD
         let deps: Vec<&(String, String, f64)> = self
             .dependencies
+=======
+        let deps: Vec<&(String, String, f64)> = self.dependencies
+>>>>>>> 4b60ced (docs: update README)
             .iter()
             .filter(|(from, _, _)| from == component)
             .collect();
@@ -1407,8 +1505,12 @@ impl PredictiveHealthScorer {
     /// dependency health scores. If a component has no dependencies,
     /// returns 1.0.
     fn dependency_factor(&self, component: &str) -> f64 {
+<<<<<<< HEAD
         let deps: Vec<&(String, String, f64)> = self
             .dependencies
+=======
+        let deps: Vec<&(String, String, f64)> = self.dependencies
+>>>>>>> 4b60ced (docs: update README)
             .iter()
             .filter(|(from, _, _)| from == component)
             .collect();
@@ -1486,6 +1588,7 @@ impl PredictiveHealthScorer {
         let dep_prediction = current * (0.5 + 0.5 * dep_factor);
 
         // Combined prediction: 40% trend, 40% dependency, 20% correlation adjustment.
+<<<<<<< HEAD
         let raw_predicted =
             0.4 * trend_prediction + 0.4 * dep_prediction + 0.2 * (current + corr_adj);
         let predicted = raw_predicted.clamp(0.0, 1.0);
@@ -1508,6 +1611,15 @@ impl PredictiveHealthScorer {
         } else {
             1.0 - (unhealthy_deps as f64 * 0.15).min(0.5)
         };
+=======
+        let raw_predicted = 0.4 * trend_prediction + 0.4 * dep_prediction + 0.2 * (current + corr_adj);
+        let predicted = raw_predicted.clamp(0.0, 1.0);
+
+        // Confidence: higher with more history and fewer uncertainties.
+        let history_len = self.health_history.get(component).map(|h| h.len()).unwrap_or(0);
+        let data_confidence = if history_len >= 50 { 0.8 } else if history_len >= 20 { 0.6 } else { 0.3 };
+        let dep_confidence = if total_deps == 0 { 1.0 } else { 1.0 - (unhealthy_deps as f64 * 0.15).min(0.5) };
+>>>>>>> 4b60ced (docs: update README)
         let confidence = (data_confidence * dep_confidence).clamp(0.1, 0.95);
 
         let explanation = if degrading_deps > 0 || unhealthy_deps > 0 {
@@ -1542,10 +1654,14 @@ impl PredictiveHealthScorer {
     /// Produce predictions for all components with recorded history.
     pub fn predict_all(&self, horizon_secs: Option<u64>) -> Vec<PredictedHealth> {
         let components: Vec<String> = self.health_history.keys().cloned().collect();
+<<<<<<< HEAD
         components
             .iter()
             .map(|c| self.predict(c, horizon_secs))
             .collect()
+=======
+        components.iter().map(|c| self.predict(c, horizon_secs)).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Return components whose predicted health is below the unhealthy
@@ -1621,8 +1737,12 @@ impl HealthCorrelationEngine {
         self.root_cause.record_health(component, score);
 
         if score < self.propagation.anomaly_threshold {
+<<<<<<< HEAD
             self.propagation
                 .observe(component, score, Utc::now(), previous_score);
+=======
+            self.propagation.observe(component, score, Utc::now(), previous_score);
+>>>>>>> 4b60ced (docs: update README)
             self.root_cause.record_anomaly_time(component, Utc::now());
         }
 
@@ -1631,14 +1751,19 @@ impl HealthCorrelationEngine {
 
     /// Run Granger causality tests for all tracked pairs and cache results.
     pub fn compute_all_causality(&mut self, max_lag: usize, significance: f64) {
+<<<<<<< HEAD
         let pairs: Vec<(String, String)> = self
             .correlation
             .tracked_pairs()
+=======
+        let pairs: Vec<(String, String)> = self.correlation.tracked_pairs()
+>>>>>>> 4b60ced (docs: update README)
             .into_iter()
             .map(|(a, b)| (a.clone(), b.clone()))
             .collect();
 
         for (a, b) in pairs {
+<<<<<<< HEAD
             let sig_a: Vec<f64> = self
                 .correlation
                 .signals
@@ -1648,6 +1773,13 @@ impl HealthCorrelationEngine {
             let sig_b: Vec<f64> = self
                 .correlation
                 .signals
+=======
+            let sig_a: Vec<f64> = self.correlation.signals
+                .get(a.as_str())
+                .map(|s| s.iter().map(|hs| hs.score).collect())
+                .unwrap_or_default();
+            let sig_b: Vec<f64> = self.correlation.signals
+>>>>>>> 4b60ced (docs: update README)
                 .get(b.as_str())
                 .map(|s| s.iter().map(|hs| hs.score).collect())
                 .unwrap_or_default();
@@ -1791,10 +1923,14 @@ mod tests {
         let x = vec![1.0, 2.0, 2.0, 3.0];
         let y = vec![1.0, 2.0, 2.0, 3.0];
         let r = spearman_correlation(&x, &y);
+<<<<<<< HEAD
         assert!(
             (r - 1.0).abs() < 1e-10,
             "Tied values should still yield 1.0"
         );
+=======
+        assert!((r - 1.0).abs() < 1e-10, "Tied values should still yield 1.0");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1808,12 +1944,17 @@ mod tests {
         let rxy = pearson_correlation(&x, &y);
         let r_partial = partial_correlation(&x, &y, &z).unwrap();
         // Partial should remove the common Z effect.
+<<<<<<< HEAD
         assert!(
             r_partial.abs() < rxy.abs() + 0.05,
             "partial ({}) should be lower than bivariate ({})",
             r_partial,
             rxy
         );
+=======
+        assert!(r_partial.abs() < rxy.abs() + 0.05,
+            "partial ({}) should be lower than bivariate ({})", r_partial, rxy);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1827,10 +1968,14 @@ mod tests {
         let result = rolling.push(4.0, 8.0);
         assert!(result.is_some(), "Window should now be full");
         let r = result.unwrap();
+<<<<<<< HEAD
         assert!(
             (r.pearson - 1.0).abs() < 1e-10,
             "Perfect correlation expected"
         );
+=======
+        assert!((r.pearson - 1.0).abs() < 1e-10, "Perfect correlation expected");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1850,11 +1995,15 @@ mod tests {
             });
         }
         let pearson = engine.compute_pearson("alpha", "beta").unwrap();
+<<<<<<< HEAD
         assert!(
             pearson > 0.9,
             "Expected high positive correlation, got {}",
             pearson
         );
+=======
+        assert!(pearson > 0.9, "Expected high positive correlation, got {}", pearson);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1909,8 +2058,12 @@ mod tests {
         let result = granger_causality_test(&x, &y, 5, 0.05).unwrap();
         assert!(
             result.x_causes_y,
+<<<<<<< HEAD
             "X should Granger-cause Y (F={:.2})",
             result.f_statistic_xy
+=======
+            "X should Granger-cause Y (F={:.2})", result.f_statistic_xy
+>>>>>>> 4b60ced (docs: update README)
         );
     }
 
@@ -1938,10 +2091,14 @@ mod tests {
             // We don't strictly assert no causality since random data can
             // occasionally produce spurious results, but F-statistics
             // should be low.
+<<<<<<< HEAD
             assert!(
                 r.f_statistic_xy < 10.0,
                 "F-stat should be moderate for independent series"
             );
+=======
+            assert!(r.f_statistic_xy < 10.0, "F-stat should be moderate for independent series");
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -1996,11 +2153,15 @@ mod tests {
         let fc = approximate_f_critical(2.0, 50.0, 0.05);
         // F(2,50) at 5% is approximately 3.18. Our approximation should be
         // in the right ballpark.
+<<<<<<< HEAD
         assert!(
             fc > 2.0 && fc < 6.0,
             "F critical should be in reasonable range, got {}",
             fc
         );
+=======
+        assert!(fc > 2.0 && fc < 6.0, "F critical should be in reasonable range, got {}", fc);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── 3. Anomaly propagation tests ──
@@ -2036,11 +2197,15 @@ mod tests {
         tracker.observe("svc_a", 0.3, t1, 0.8);
 
         let speed = tracker.propagation_speed("svc_b").unwrap();
+<<<<<<< HEAD
         assert!(
             (speed - 10.0).abs() < 0.1,
             "Expected 10s delay, got {}",
             speed
         );
+=======
+        assert!((speed - 10.0).abs() < 0.1, "Expected 10s delay, got {}", speed);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2099,6 +2264,7 @@ mod tests {
 
         let result = analyzer.analyze(&["web".to_string(), "api".to_string(), "db".to_string()]);
         let top = &result.candidates[0];
+<<<<<<< HEAD
         assert_eq!(
             top.component, "db",
             "DB should be the top root cause candidate"
@@ -2107,6 +2273,10 @@ mod tests {
             top.dag_position_score > 0.5,
             "DB should have high DAG position score"
         );
+=======
+        assert_eq!(top.component, "db", "DB should be the top root cause candidate");
+        assert!(top.dag_position_score > 0.5, "DB should have high DAG position score");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2119,6 +2289,7 @@ mod tests {
         analyzer.record_anomaly_time("b", t0 + chrono::Duration::seconds(30));
 
         let result = analyzer.analyze(&["a".to_string(), "b".to_string()]);
+<<<<<<< HEAD
         let a_score = result
             .candidates
             .iter()
@@ -2135,6 +2306,11 @@ mod tests {
             a_score > b_score,
             "Earlier component should have higher timing score"
         );
+=======
+        let a_score = result.candidates.iter().find(|c| c.component == "a").unwrap().timing_score;
+        let b_score = result.candidates.iter().find(|c| c.component == "b").unwrap().timing_score;
+        assert!(a_score > b_score, "Earlier component should have higher timing score");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2151,8 +2327,12 @@ mod tests {
         analyzer.add_dependency("api", "db", 1.0);
         analyzer.record_anomaly_time("db", Utc::now());
 
+<<<<<<< HEAD
         let top =
             analyzer.top_candidates(&["web".to_string(), "api".to_string(), "db".to_string()], 2);
+=======
+        let top = analyzer.top_candidates(&["web".to_string(), "api".to_string(), "db".to_string()], 2);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(top.len(), 2);
     }
 
@@ -2165,11 +2345,15 @@ mod tests {
             scorer.record_health("stable_svc", 0.95);
         }
         let pred = scorer.predict("stable_svc", None);
+<<<<<<< HEAD
         assert!(
             pred.predicted_score > 0.8,
             "Healthy stable should predict high, got {}",
             pred.predicted_score
         );
+=======
+        assert!(pred.predicted_score > 0.8, "Healthy stable should predict high, got {}", pred.predicted_score);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(pred.trend, TrendDirection::Stable);
         assert_eq!(pred.degrading_dependency_count, 0);
     }
@@ -2183,11 +2367,15 @@ mod tests {
         }
         let pred = scorer.predict("declining", None);
         assert_eq!(pred.trend, TrendDirection::Degrading);
+<<<<<<< HEAD
         assert!(
             pred.predicted_score < 0.7,
             "Degrading should predict lower, got {}",
             pred.predicted_score
         );
+=======
+        assert!(pred.predicted_score < 0.7, "Degrading should predict lower, got {}", pred.predicted_score);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2204,10 +2392,15 @@ mod tests {
 
         let pred = scorer.predict("web", None);
         assert_eq!(pred.unhealthy_dependency_count, 2);
+<<<<<<< HEAD
         assert!(
             pred.predicted_score < pred.current_score,
             "With unhealthy deps, predicted should be lower than current"
         );
+=======
+        assert!(pred.predicted_score < pred.current_score,
+            "With unhealthy deps, predicted should be lower than current");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2233,10 +2426,14 @@ mod tests {
         }
         let failures = scorer.predicted_failures(None);
         let failing_pred = failures.iter().find(|p| p.component == "failing");
+<<<<<<< HEAD
         assert!(
             failing_pred.is_some(),
             "rapidly declining service should be predicted failure"
         );
+=======
+        assert!(failing_pred.is_some(), "rapidly declining service should be predicted failure");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2254,10 +2451,15 @@ mod tests {
 
         let pred = scorer.predict("primary", None);
         // Correlation with a degrading component should reduce prediction.
+<<<<<<< HEAD
         assert!(
             pred.predicted_score <= pred.current_score + 0.01,
             "Correlated degradation should not increase predicted score"
         );
+=======
+        assert!(pred.predicted_score <= pred.current_score + 0.01,
+            "Correlated degradation should not increase predicted score");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2267,11 +2469,15 @@ mod tests {
             scorer.record_health("well_observed", 0.9);
         }
         let pred = scorer.predict("well_observed", None);
+<<<<<<< HEAD
         assert!(
             pred.confidence > 0.7,
             "Should have high confidence with 60 observations, got {}",
             pred.confidence
         );
+=======
+        assert!(pred.confidence > 0.7, "Should have high confidence with 60 observations, got {}", pred.confidence);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // ── Integration tests ──
@@ -2298,7 +2504,15 @@ mod tests {
         }
 
         // Run full analysis.
+<<<<<<< HEAD
         let report = engine.full_analysis(&["db".to_string(), "api".to_string()], 3, 0.05);
+=======
+        let report = engine.full_analysis(
+            &["db".to_string(), "api".to_string()],
+            3,
+            0.05,
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         assert!(!report.root_cause.candidates.is_empty());
         assert!(!report.predictions.is_empty());
@@ -2311,10 +2525,14 @@ mod tests {
         let engine = HealthCorrelationEngine::new();
         let json = serde_json::to_string(&engine).unwrap();
         let restored: HealthCorrelationEngine = serde_json::from_str(&json).unwrap();
+<<<<<<< HEAD
         assert_eq!(
             restored.correlation.window_size,
             engine.correlation.window_size
         );
+=======
+        assert_eq!(restored.correlation.window_size, engine.correlation.window_size);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

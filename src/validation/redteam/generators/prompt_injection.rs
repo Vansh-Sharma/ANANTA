@@ -7,9 +7,13 @@
 //   - Multi-turn injection
 //   - Indirect injection via tool results
 
+<<<<<<< HEAD
 use crate::validation::redteam::attack_types::{
     AttackCategory, AttackPayload, AttackPayloadBuilder,
 };
+=======
+use crate::validation::redteam::attack_types::{AttackCategory, AttackPayload, AttackPayloadBuilder};
+>>>>>>> 4b60ced (docs: update README)
 use crate::validation::redteam::generators::Generator;
 use crate::validation::verification::Severity;
 
@@ -104,6 +108,7 @@ impl Generator for PromptInjectionGenerator {
             .into_iter()
             .take(count)
             .map(|(name, payload, rings)| {
+<<<<<<< HEAD
                 AttackPayloadBuilder::new(AttackCategory::PromptInjection, name, payload)
                     .target_rings(rings)
                     .severity(Severity::High)
@@ -111,6 +116,19 @@ impl Generator for PromptInjectionGenerator {
                     .tag("prompt-injection")
                     .metadata("category_code", "LLM01")
                     .build()
+=======
+                AttackPayloadBuilder::new(
+                    AttackCategory::PromptInjection,
+                    name,
+                    payload,
+                )
+                .target_rings(rings)
+                .severity(Severity::High)
+                .tag("LLM01")
+                .tag("prompt-injection")
+                .metadata("category_code", "LLM01")
+                .build()
+>>>>>>> 4b60ced (docs: update README)
             })
             .collect()
     }
@@ -130,11 +148,15 @@ mod tests {
     fn generates_at_least_10() {
         let gen = PromptInjectionGenerator::new();
         let payloads = gen.generate(10);
+<<<<<<< HEAD
         assert!(
             payloads.len() >= 10,
             "Expected >= 10, got {}",
             payloads.len()
         );
+=======
+        assert!(payloads.len() >= 10, "Expected >= 10, got {}", payloads.len());
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

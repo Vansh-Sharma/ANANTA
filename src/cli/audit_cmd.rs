@@ -13,7 +13,11 @@ use clap::Subcommand;
 use serde_json::Value;
 
 use crate::cli::utils::{self, Color, ExitCode, StatusIndicator};
+<<<<<<< HEAD
 use crate::infra::audit::{AuditConfig, AuditTrail};
+=======
+use crate::infra::audit::{AuditTrail, AuditConfig};
+>>>>>>> 4b60ced (docs: update README)
 use crate::storage::{create_store, StorageConfig};
 
 #[derive(Subcommand, Debug)]
@@ -92,6 +96,7 @@ pub async fn run(cmd: AuditCommand) -> ExitCode {
         AuditCommand::Verify { endpoint, api_key } => {
             cmd_verify(&endpoint, api_key.as_deref()).await
         }
+<<<<<<< HEAD
         AuditCommand::Tail {
             count,
             format,
@@ -122,6 +127,20 @@ pub async fn run(cmd: AuditCommand) -> ExitCode {
             endpoint,
         } => cmd_export(&output, &format, limit, &endpoint).await,
         AuditCommand::Stats { endpoint } => cmd_stats(&endpoint).await,
+=======
+        AuditCommand::Tail { count, format, endpoint } => {
+            cmd_tail(count, &format, &endpoint).await
+        }
+        AuditCommand::Search { source_ip, path, decision, limit, format, endpoint } => {
+            cmd_search(source_ip.as_deref(), path.as_deref(), decision.as_deref(), limit, &format, &endpoint).await
+        }
+        AuditCommand::Export { output, format, limit, endpoint } => {
+            cmd_export(&output, &format, limit, &endpoint).await
+        }
+        AuditCommand::Stats { endpoint } => {
+            cmd_stats(&endpoint).await
+        }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -141,10 +160,14 @@ async fn cmd_verify(endpoint: &str, api_key: Option<&str>) -> ExitCode {
         Ok(resp) if resp.status().is_success() => {
             if let Ok(body) = resp.json::<Value>().await {
                 let valid = body.get("valid").and_then(|v| v.as_bool()).unwrap_or(false);
+<<<<<<< HEAD
                 let total = body
                     .get("total_entries")
                     .and_then(|v| v.as_u64())
                     .unwrap_or(0);
+=======
+                let total = body.get("total_entries").and_then(|v| v.as_u64()).unwrap_or(0);
+>>>>>>> 4b60ced (docs: update README)
                 let broken = body.get("broken_at").and_then(|v| v.as_u64());
 
                 utils::kv("Total Entries", &total.to_string());
@@ -165,6 +188,7 @@ async fn cmd_verify(endpoint: &str, api_key: Option<&str>) -> ExitCode {
             }
         }
         Ok(resp) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Server returned {}",
                 StatusIndicator::fail(""),
@@ -175,6 +199,11 @@ async fn cmd_verify(endpoint: &str, api_key: Option<&str>) -> ExitCode {
                     "  {} Audit endpoint not available. Is audit enabled in config?",
                     StatusIndicator::warn("")
                 );
+=======
+            eprintln!("{} Server returned {}", StatusIndicator::fail(""), resp.status());
+            if resp.status().as_u16() == 404 {
+                eprintln!("  {} Audit endpoint not available. Is audit enabled in config?", StatusIndicator::warn(""));
+>>>>>>> 4b60ced (docs: update README)
             }
             ExitCode::ConnectionError
         }
@@ -198,11 +227,15 @@ async fn cmd_tail(count: usize, format: &str, endpoint: &str) -> ExitCode {
     match client.get(&url).send().await {
         Ok(resp) if resp.status().is_success() => {
             if let Ok(body) = resp.json::<Value>().await {
+<<<<<<< HEAD
                 let entries = body
                     .get("entries")
                     .and_then(|e| e.as_array())
                     .cloned()
                     .unwrap_or_default();
+=======
+                let entries = body.get("entries").and_then(|e| e.as_array()).cloned().unwrap_or_default();
+>>>>>>> 4b60ced (docs: update README)
 
                 if entries.is_empty() {
                     println!("  {}", Color::dim("No audit entries found"));
@@ -217,6 +250,7 @@ async fn cmd_tail(count: usize, format: &str, endpoint: &str) -> ExitCode {
                     }
                 } else {
                     for entry in &entries {
+<<<<<<< HEAD
                         let seq = entry
                             .get("seq")
                             .and_then(|v| Some(v.to_string()))
@@ -232,6 +266,13 @@ async fn cmd_tail(count: usize, format: &str, endpoint: &str) -> ExitCode {
                         let path = entry.get("path").and_then(|v| v.as_str()).unwrap_or("-");
                         let decision = entry
                             .get("decision_json")
+=======
+                        let seq = entry.get("seq").and_then(|v| Some(v.to_string())).unwrap_or_default();
+                        let ts = entry.get("timestamp").and_then(|v| v.as_str()).unwrap_or("-");
+                        let ip = entry.get("source_ip").and_then(|v| v.as_str()).unwrap_or("-");
+                        let path = entry.get("path").and_then(|v| v.as_str()).unwrap_or("-");
+                        let decision = entry.get("decision_json")
+>>>>>>> 4b60ced (docs: update README)
                             .and_then(|d| d.get("final_decision"))
                             .and_then(|d| d.get("type"))
                             .and_then(|d| d.as_str())
@@ -243,13 +284,18 @@ async fn cmd_tail(count: usize, format: &str, endpoint: &str) -> ExitCode {
                             _ => Color::yellow(decision),
                         };
 
+<<<<<<< HEAD
                         println!(
                             "  {} {} {:<15} {:<6} {} {}",
+=======
+                        println!("  {} {} {:<15} {:<6} {} {}",
+>>>>>>> 4b60ced (docs: update README)
                             Color::dim(&format!("#{:<6}", seq)),
                             Color::dim(ts),
                             ip,
                             decision_color,
                             path,
+<<<<<<< HEAD
                             Color::dim(&format!(
                                 "hash={}...",
                                 entry
@@ -259,6 +305,10 @@ async fn cmd_tail(count: usize, format: &str, endpoint: &str) -> ExitCode {
                                     .chars()
                                     .take(8)
                                     .collect::<String>()
+=======
+                            Color::dim(&format!("hash={}...", 
+                                entry.get("hash").and_then(|h| h.as_str()).unwrap_or("?").chars().take(8).collect::<String>()
+>>>>>>> 4b60ced (docs: update README)
                             ))
                         );
                     }
@@ -272,11 +322,15 @@ async fn cmd_tail(count: usize, format: &str, endpoint: &str) -> ExitCode {
             }
         }
         Ok(resp) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Server returned {}",
                 StatusIndicator::fail(""),
                 resp.status()
             );
+=======
+            eprintln!("{} Server returned {}", StatusIndicator::fail(""), resp.status());
+>>>>>>> 4b60ced (docs: update README)
             ExitCode::ConnectionError
         }
         Err(e) => {
@@ -300,6 +354,7 @@ async fn cmd_search(
     utils::kv("Endpoint", endpoint);
 
     let mut params = vec![("limit", limit.to_string())];
+<<<<<<< HEAD
     if let Some(ip) = source_ip {
         params.push(("source_ip", ip.to_string()));
     }
@@ -314,6 +369,14 @@ async fn cmd_search(
     let req = client
         .get(format!("{}/v1/audit/search", endpoint))
         .query(&params);
+=======
+    if let Some(ip) = source_ip { params.push(("source_ip", ip.to_string())); }
+    if let Some(p) = path { params.push(("path", p.to_string())); }
+    if let Some(d) = decision { params.push(("decision", d.to_string())); }
+
+    let client = reqwest::Client::new();
+    let req = client.get(format!("{}/v1/audit/search", endpoint)).query(&params);
+>>>>>>> 4b60ced (docs: update README)
 
     match req.send().await {
         Ok(resp) if resp.status().is_success() => {
@@ -321,11 +384,15 @@ async fn cmd_search(
                 if format == "json" {
                     println!("{}", serde_json::to_string_pretty(&body).unwrap());
                 } else {
+<<<<<<< HEAD
                     let entries = body
                         .get("entries")
                         .and_then(|e| e.as_array())
                         .cloned()
                         .unwrap_or_default();
+=======
+                    let entries = body.get("entries").and_then(|e| e.as_array()).cloned().unwrap_or_default();
+>>>>>>> 4b60ced (docs: update README)
                     let total = body.get("total").and_then(|t| t.as_u64()).unwrap_or(0);
                     println!("  Found {} entries (showing {})", total, entries.len());
                     for entry in &entries {
@@ -339,11 +406,15 @@ async fn cmd_search(
             }
         }
         Ok(resp) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Server returned {}",
                 StatusIndicator::fail(""),
                 resp.status()
             );
+=======
+            eprintln!("{} Server returned {}", StatusIndicator::fail(""), resp.status());
+>>>>>>> 4b60ced (docs: update README)
             ExitCode::ConnectionError
         }
         Err(e) => {
@@ -382,11 +453,15 @@ async fn cmd_export(output: &PathBuf, format: &str, limit: usize, endpoint: &str
 
             match std::fs::write(output, &content) {
                 Ok(()) => {
+<<<<<<< HEAD
                     println!(
                         "{} Exported to {}",
                         StatusIndicator::ok(""),
                         output.display()
                     );
+=======
+                    println!("{} Exported to {}", StatusIndicator::ok(""), output.display());
+>>>>>>> 4b60ced (docs: update README)
                     ExitCode::Ok
                 }
                 Err(e) => {
@@ -396,11 +471,15 @@ async fn cmd_export(output: &PathBuf, format: &str, limit: usize, endpoint: &str
             }
         }
         Ok(resp) => {
+<<<<<<< HEAD
             eprintln!(
                 "{} Server returned {}",
                 StatusIndicator::fail(""),
                 resp.status()
             );
+=======
+            eprintln!("{} Server returned {}", StatusIndicator::fail(""), resp.status());
+>>>>>>> 4b60ced (docs: update README)
             ExitCode::ConnectionError
         }
         Err(e) => {
@@ -438,10 +517,14 @@ async fn cmd_stats(endpoint: &str) -> ExitCode {
             if let Ok(body) = resp.json::<Value>().await {
                 let total = body.get("total").and_then(|t| t.as_u64()).unwrap_or(0);
                 utils::kv("Total Entries", &total.to_string());
+<<<<<<< HEAD
                 println!(
                     "\n{} No dedicated stats endpoint available.",
                     StatusIndicator::warn("")
                 );
+=======
+                println!("\n{} No dedicated stats endpoint available.", StatusIndicator::warn(""));
+>>>>>>> 4b60ced (docs: update README)
                 println!("  Use `chakravyuh audit tail --format json` for detailed analysis.");
                 return ExitCode::Ok;
             }
@@ -449,10 +532,14 @@ async fn cmd_stats(endpoint: &str) -> ExitCode {
         _ => {}
     }
 
+<<<<<<< HEAD
     eprintln!(
         "{} Could not reach audit endpoint",
         StatusIndicator::fail("")
     );
+=======
+    eprintln!("{} Could not reach audit endpoint", StatusIndicator::fail(""));
+>>>>>>> 4b60ced (docs: update README)
     ExitCode::ConnectionError
 }
 
@@ -491,6 +578,7 @@ pub fn verify_local_chain(store_config: &StorageConfig, audit_config: &AuditConf
 
     // Verify store health.
     let health = store.health_check();
+<<<<<<< HEAD
     utils::kv(
         "Store Reachable",
         if health.reachable { "yes" } else { "no" },
@@ -502,6 +590,13 @@ pub fn verify_local_chain(store_config: &StorageConfig, audit_config: &AuditConf
             StatusIndicator::ok(""),
             total
         );
+=======
+    utils::kv("Store Reachable", if health.reachable { "yes" } else { "no" });
+
+    if health.reachable {
+        println!("\n{} Store is reachable, {} entries indexed",
+            StatusIndicator::ok(""), total);
+>>>>>>> 4b60ced (docs: update README)
         ExitCode::Ok
     } else {
         eprintln!("\n{} Store is not reachable", StatusIndicator::fail(""));
@@ -521,8 +616,12 @@ mod tests {
         let code = run(AuditCommand::Verify {
             endpoint: "http://127.0.0.1:1".to_string(),
             api_key: None,
+<<<<<<< HEAD
         })
         .await;
+=======
+        }).await;
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(code, ExitCode::ConnectionError);
     }
 
@@ -530,8 +629,12 @@ mod tests {
     async fn test_stats_connection_error() {
         let code = run(AuditCommand::Stats {
             endpoint: "http://127.0.0.1:1".to_string(),
+<<<<<<< HEAD
         })
         .await;
+=======
+        }).await;
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(code, ExitCode::ConnectionError);
     }
 

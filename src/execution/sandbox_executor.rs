@@ -164,11 +164,15 @@ impl SandboxExecutor {
         }
 
         // Check if tool always gets full sandbox.
+<<<<<<< HEAD
         if self
             .config
             .always_sandbox_tools
             .contains(&tool_name.to_string())
         {
+=======
+        if self.config.always_sandbox_tools.contains(&tool_name.to_string()) {
+>>>>>>> 4b60ced (docs: update README)
             let mut cfg = SandboxConfig::default();
             cfg.mode = SandboxMode::Container;
             cfg.network_allowed = false;

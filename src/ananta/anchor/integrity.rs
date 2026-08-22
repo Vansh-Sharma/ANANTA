@@ -7,10 +7,17 @@
 //   4. Runtime integrity (hash of in-memory state structures)
 //   5. Plugin/module integrity (hash of loaded .rs source hashes)
 
+<<<<<<< HEAD
 use crate::ananta::anchor::manifest::Manifest;
 use crate::ananta::config::HashAlgorithm;
 use crate::ananta::crypto::hashing::{hash_bytes, HashDigest};
 use crate::ananta::crypto::merkle::MerkleTree;
+=======
+use crate::ananta::config::HashAlgorithm;
+use crate::ananta::crypto::hashing::{hash_bytes, HashDigest};
+use crate::ananta::crypto::merkle::MerkleTree;
+use crate::ananta::anchor::manifest::Manifest;
+>>>>>>> 4b60ced (docs: update README)
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::Instant;
@@ -31,12 +38,16 @@ pub struct IntegrityResult {
 }
 
 impl IntegrityResult {
+<<<<<<< HEAD
     pub fn failed(
         component: &str,
         expected: &HashDigest,
         actual: HashDigest,
         duration_ms: f64,
     ) -> Self {
+=======
+    pub fn failed(component: &str, expected: &HashDigest, actual: HashDigest, duration_ms: f64) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             component: component.into(),
             expected: Some(expected.clone()),
@@ -126,6 +137,7 @@ impl IntegrityChecker {
 
         let data = match self.providers.get(domain) {
             Some(provider) => provider(),
+<<<<<<< HEAD
             None => {
                 return IntegrityResult::passed(
                     &domain.to_string(),
@@ -133,6 +145,13 @@ impl IntegrityChecker {
                     start.elapsed().as_secs_f64() * 1000.0,
                 )
             }
+=======
+            None => return IntegrityResult::passed(
+                &domain.to_string(),
+                hash_bytes(b"no_provider_registered", &self.algorithm),
+                start.elapsed().as_secs_f64() * 1000.0,
+            ),
+>>>>>>> 4b60ced (docs: update README)
         };
 
         let actual = hash_bytes(&data, &self.algorithm);
@@ -163,11 +182,15 @@ impl IntegrityChecker {
         }
 
         // Also check manifest entries that have no provider.
+<<<<<<< HEAD
         for key in manifest
             .entries()
             .map(|(k, _)| k.clone())
             .collect::<Vec<_>>()
         {
+=======
+        for key in manifest.entries().map(|(k, _)| k.clone()).collect::<Vec<_>>() {
+>>>>>>> 4b60ced (docs: update README)
             let domain_str = key.as_str();
             let has_provider = self.providers.keys().any(|d| d.to_string() == domain_str);
             if !has_provider {
@@ -228,6 +251,7 @@ impl IntegritySnapshot {
     /// Summarize the snapshot.
     pub fn summary(&self) -> String {
         if self.passed {
+<<<<<<< HEAD
             format!(
                 "OK — {} domains verified in {:.1}ms",
                 self.results.len(),
@@ -240,16 +264,25 @@ impl IntegritySnapshot {
                 self.results.len(),
                 self.total_check_ms
             )
+=======
+            format!("OK — {} domains verified in {:.1}ms", self.results.len(), self.total_check_ms)
+        } else {
+            format!("FAILED — {}/{} domains failed in {:.1}ms", self.failed_count, self.results.len(), self.total_check_ms)
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
     /// Get the list of failed components.
     pub fn failed_components(&self) -> Vec<&str> {
+<<<<<<< HEAD
         self.results
             .iter()
             .filter(|r| !r.passed)
             .map(|r| r.component.as_str())
             .collect()
+=======
+        self.results.iter().filter(|r| !r.passed).map(|r| r.component.as_str()).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -259,6 +292,7 @@ mod tests {
 
     fn test_manifest() -> Manifest {
         let mut m = Manifest::new(HashAlgorithm::Sha256);
+<<<<<<< HEAD
         m.insert(
             "config".into(),
             crate::ananta::crypto::hash("valid_config_data", &HashAlgorithm::Sha256),
@@ -267,6 +301,10 @@ mod tests {
             "policy".into(),
             crate::ananta::crypto::hash("valid_policy_data", &HashAlgorithm::Sha256),
         );
+=======
+        m.insert("config".into(), crate::ananta::crypto::hash("valid_config_data", &HashAlgorithm::Sha256));
+        m.insert("policy".into(), crate::ananta::crypto::hash("valid_policy_data", &HashAlgorithm::Sha256));
+>>>>>>> 4b60ced (docs: update README)
         m
     }
 
@@ -323,4 +361,8 @@ mod tests {
         let r2 = checker.platform_merkle_root(&manifest);
         assert_eq!(r1.bytes, r2.bytes);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

@@ -65,9 +65,13 @@ pub struct AuditQuery {
     pub offset: usize,
 }
 
+<<<<<<< HEAD
 fn default_limit() -> usize {
     1000
 }
+=======
+fn default_limit() -> usize { 1000 }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for AuditQuery {
     fn default() -> Self {
@@ -145,8 +149,12 @@ fn parse_datetime_flexible(s: &str) -> Result<DateTime<Utc>> {
 
     // Try date-only (YYYY-MM-DD).
     if let Ok(naive_date) = chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d") {
+<<<<<<< HEAD
         let start_of_day = naive_date
             .and_hms_opt(0, 0, 0)
+=======
+        let start_of_day = naive_date.and_hms_opt(0, 0, 0)
+>>>>>>> 4b60ced (docs: update README)
             .ok_or_else(|| Error::Other("invalid date".into()))?;
         return Ok(start_of_day.and_utc());
     }
@@ -160,7 +168,14 @@ fn parse_datetime_flexible(s: &str) -> Result<DateTime<Utc>> {
 // ── Entry filtering ──────────────────────────────────────────────────────
 
 /// Filter audit entries according to a query.
+<<<<<<< HEAD
 pub fn filter_entries(entries: &[AuditEntryExport], query: &AuditQuery) -> Vec<AuditEntryExport> {
+=======
+pub fn filter_entries(
+    entries: &[AuditEntryExport],
+    query: &AuditQuery,
+) -> Vec<AuditEntryExport> {
+>>>>>>> 4b60ced (docs: update README)
     let mut filtered: Vec<AuditEntryExport> = entries
         .iter()
         .filter(|entry| {
@@ -192,9 +207,13 @@ pub fn filter_entries(entries: &[AuditEntryExport], query: &AuditQuery) -> Vec<A
 
             // Filter by time range.
             if let (Some(ref start_str), Some(ref end_str)) = (&query.start_time, &query.end_time) {
+<<<<<<< HEAD
                 if let Ok((start_dt, end_dt)) =
                     parse_time_range(&format!("{}..{}", start_str, end_str))
                 {
+=======
+                if let Ok((start_dt, end_dt)) = parse_time_range(&format!("{}..{}", start_str, end_str)) {
+>>>>>>> 4b60ced (docs: update README)
                     if let Ok(entry_dt) = DateTime::parse_from_rfc3339(&entry.timestamp) {
                         let entry_dt = entry_dt.with_timezone(&Utc);
                         if entry_dt < start_dt || entry_dt >= end_dt {
@@ -259,7 +278,15 @@ fn extract_severity(metadata: &str) -> Option<&str> {
 // ── Export formatting ─────────────────────────────────────────────────────
 
 /// Export filtered audit entries in the specified format.
+<<<<<<< HEAD
 pub fn export(query: &AuditQuery, entries: &[AuditEntryExport], format: ExportFormat) -> String {
+=======
+pub fn export(
+    query: &AuditQuery,
+    entries: &[AuditEntryExport],
+    format: ExportFormat,
+) -> String {
+>>>>>>> 4b60ced (docs: update README)
     let filtered = filter_entries(entries, query);
 
     match format {
@@ -281,6 +308,7 @@ fn export_csv(entries: &[AuditEntryExport]) -> String {
 
     // Header row.
     output.push(csv_escape_row(&[
+<<<<<<< HEAD
         "timestamp",
         "source_ring",
         "decision",
@@ -289,6 +317,10 @@ fn export_csv(entries: &[AuditEntryExport]) -> String {
         "request_id",
         "description",
         "metadata",
+=======
+        "timestamp", "source_ring", "decision", "risk_score",
+        "user_id", "request_id", "description", "metadata",
+>>>>>>> 4b60ced (docs: update README)
     ]));
 
     // Data rows.
@@ -321,11 +353,15 @@ fn csv_escape_value(val: &str) -> String {
 
 /// Build a CSV row from field values.
 fn csv_escape_row(fields: &[&str]) -> String {
+<<<<<<< HEAD
     fields
         .iter()
         .map(|f| csv_escape_value(f))
         .collect::<Vec<_>>()
         .join(",")
+=======
+    fields.iter().map(|f| csv_escape_value(f)).collect::<Vec<_>>().join(",")
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Export as a human-readable aligned text table.
@@ -334,6 +370,7 @@ fn export_text(entries: &[AuditEntryExport]) -> String {
         return "No audit entries found.".to_string();
     }
 
+<<<<<<< HEAD
     let headers = [
         "timestamp",
         "ring",
@@ -343,6 +380,9 @@ fn export_text(entries: &[AuditEntryExport]) -> String {
         "request_id",
         "description",
     ];
+=======
+    let headers = ["timestamp", "ring", "decision", "risk", "user_id", "request_id", "description"];
+>>>>>>> 4b60ced (docs: update README)
     let col_widths: [usize; 7] = [24, 12, 10, 6, 16, 16, 40];
 
     let mut lines = Vec::new();
@@ -369,6 +409,7 @@ fn export_text(entries: &[AuditEntryExport]) -> String {
         let user = entry.user_id.as_deref().unwrap_or("-");
         let row = format!(
             "{:<24} | {:<12} | {:<10} | {:>6.2} | {:<16} | {:<16} | {}",
+<<<<<<< HEAD
             entry.timestamp,
             entry.source_ring,
             entry.decision,
@@ -376,6 +417,10 @@ fn export_text(entries: &[AuditEntryExport]) -> String {
             user,
             entry.request_id,
             desc,
+=======
+            entry.timestamp, entry.source_ring, entry.decision,
+            entry.risk_score, user, entry.request_id, desc,
+>>>>>>> 4b60ced (docs: update README)
         );
         lines.push(row);
     }
@@ -483,7 +528,13 @@ mod tests {
 
     #[test]
     fn test_parse_time_range_with_datetime() {
+<<<<<<< HEAD
         let (start, end) = parse_time_range("2024-01-01T00:00:00Z..2024-01-01T23:59:59Z").unwrap();
+=======
+        let (start, end) = parse_time_range(
+            "2024-01-01T00:00:00Z..2024-01-01T23:59:59Z"
+        ).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(start < end);
     }
 
@@ -573,11 +624,15 @@ mod tests {
             .map(|i| AuditEntryExport {
                 timestamp: format!("2024-01-{:02}T{:02}:00:00Z", 1 + (i % 28), i % 24),
                 source_ring: ["shield", "threat", "identity"][i % 3].into(),
+<<<<<<< HEAD
                 decision: if i % 5 == 0 {
                     "deny".into()
                 } else {
                     "allow".into()
                 },
+=======
+                decision: if i % 5 == 0 { "deny".into() } else { "allow".into() },
+>>>>>>> 4b60ced (docs: update README)
                 risk_score: (i as f64) / 5000.0 * 10.0,
                 user_id: Some(format!("user-{:04}", i)),
                 request_id: format!("req-{:06}", i),
@@ -603,6 +658,7 @@ mod tests {
 
     #[test]
     fn test_column_alignment() {
+<<<<<<< HEAD
         let entries = vec![AuditEntryExport {
             timestamp: "2024-01-15T10:00:00Z".into(),
             source_ring: "x".into(),
@@ -613,6 +669,20 @@ mod tests {
             description: "d".into(),
             metadata: None,
         }];
+=======
+        let entries = vec![
+            AuditEntryExport {
+                timestamp: "2024-01-15T10:00:00Z".into(),
+                source_ring: "x".into(),
+                decision: "a".into(),
+                risk_score: 1.0,
+                user_id: None,
+                request_id: "r".into(),
+                description: "d".into(),
+                metadata: None,
+            },
+        ];
+>>>>>>> 4b60ced (docs: update README)
         let query = AuditQuery::default();
         let output = export(&query, &entries, ExportFormat::Text);
         // Verify columns are aligned (pipes line up).

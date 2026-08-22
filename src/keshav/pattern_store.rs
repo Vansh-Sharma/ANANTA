@@ -43,16 +43,24 @@ pub enum PatternType {
 /// Priority of a pattern (higher = more important).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PatternPriority {
+<<<<<<< HEAD
     pub level: u8,   // 0-255
+=======
+    pub level: u8, // 0-255
+>>>>>>> 4b60ced (docs: update README)
     pub weight: f64, // 0.0-1.0 in composite scoring
 }
 
 impl Default for PatternPriority {
     fn default() -> Self {
+<<<<<<< HEAD
         Self {
             level: 100,
             weight: 0.5,
         }
+=======
+        Self { level: 100, weight: 0.5 }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -137,6 +145,7 @@ pub struct PatternStoreConfig {
     pub min_matches_for_confidence: u64,
 }
 
+<<<<<<< HEAD
 fn default_max_patterns() -> usize {
     100_000
 }
@@ -146,6 +155,11 @@ fn default_min_confidence() -> f64 {
 fn default_min_matches() -> u64 {
     10
 }
+=======
+fn default_max_patterns() -> usize { 100_000 }
+fn default_min_confidence() -> f64 { 0.7 }
+fn default_min_matches() -> u64 { 10 }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for PatternStoreConfig {
     fn default() -> Self {
@@ -184,10 +198,14 @@ impl PatternStore {
 
     /// Create a PatternStore with persistent storage backing (Phase 9).
     /// Automatically restores patterns from the store on construction.
+<<<<<<< HEAD
     pub fn with_store(
         config: PatternStoreConfig,
         store: std::sync::Arc<dyn crate::storage::Store>,
     ) -> Self {
+=======
+    pub fn with_store(config: PatternStoreConfig, store: std::sync::Arc<dyn crate::storage::Store>) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         let ps = Self {
             config,
             patterns: RwLock::new(HashMap::new()),
@@ -225,8 +243,12 @@ impl PatternStore {
         }
 
         tracing::info!(
+<<<<<<< HEAD
             restored = restored,
             failed = failed,
+=======
+            restored = restored, failed = failed,
+>>>>>>> 4b60ced (docs: update README)
             "PatternStore: restored patterns from persistent store"
         );
     }
@@ -287,6 +309,7 @@ impl PatternStore {
     }
 
     /// Search patterns by ring and/or tags.
+<<<<<<< HEAD
     pub fn search(
         &self,
         ring: Option<&str>,
@@ -296,6 +319,11 @@ impl PatternStore {
         let patterns = self.patterns.read().unwrap();
         patterns
             .values()
+=======
+    pub fn search(&self, ring: Option<&str>, tags: &[&str], pattern_type: Option<PatternType>) -> Vec<Pattern> {
+        let patterns = self.patterns.read().unwrap();
+        patterns.values()
+>>>>>>> 4b60ced (docs: update README)
             .filter(|p| {
                 if let Some(r) = ring {
                     if !p.rings.iter().any(|pr| pr == r) {
@@ -377,9 +405,13 @@ impl PatternStore {
         for p in patterns.values() {
             *by_type.entry(format!("{:?}", p.pattern_type)).or_insert(0) += 1;
             *by_source.entry(format!("{:?}", p.source)).or_insert(0) += 1;
+<<<<<<< HEAD
             if p.active {
                 active += 1;
             }
+=======
+            if p.active { active += 1; }
+>>>>>>> 4b60ced (docs: update README)
             total_matches += p.match_count;
             total_tp += p.true_positive_count;
         }

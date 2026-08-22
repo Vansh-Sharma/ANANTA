@@ -50,6 +50,7 @@ impl RecoveryHistory {
     /// Get success/failure counts.
     pub fn success_rate(&self) -> (usize, usize, f64) {
         let total = self.results.len();
+<<<<<<< HEAD
         let successes = self
             .results
             .iter()
@@ -60,15 +61,23 @@ impl RecoveryHistory {
         } else {
             1.0
         };
+=======
+        let successes = self.results.iter().filter(|r| r.outcome == super::RecoveryOutcome::Success).count();
+        let rate = if total > 0 { successes as f64 / total as f64 } else { 1.0 };
+>>>>>>> 4b60ced (docs: update README)
         (successes, total - successes, rate)
     }
 
     /// Get actions for a specific target.
     pub fn actions_for(&self, target: &str) -> Vec<&RecoveryResult> {
+<<<<<<< HEAD
         self.results
             .iter()
             .filter(|r| r.action.target == target)
             .collect()
+=======
+        self.results.iter().filter(|r| r.action.target == target).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Verify chain integrity.

@@ -5,6 +5,7 @@
 // It orchestrates the full incident lifecycle from detection through
 // resolution and post-incident analysis.
 
+<<<<<<< HEAD
 pub mod evidence_chain;
 pub mod playbook;
 pub mod report_generator;
@@ -25,6 +26,29 @@ pub use report_generator::{
 pub use webhook_integration::{
     GenericPayload, JiraPayload, PagerDutyPayload, SlackPayload, WebhookEndpoint, WebhookEvent,
     WebhookPayload, WebhookRegistry, WebhookSender,
+=======
+pub mod playbook;
+pub mod evidence_chain;
+pub mod report_generator;
+pub mod webhook_integration;
+
+pub use playbook::{
+    Playbook, PlaybookStep, PlaybookAction, PlaybookEngine, PlaybookContext,
+    PlaybookResult, PlaybookRegistry, StepFailurePolicy, TriggerCondition,
+};
+pub use evidence_chain::{
+    EvidenceItem, EvidenceType, EvidenceCollector, ChainVerificationResult,
+    ChainOfCustody, CustodyEntry,
+};
+pub use report_generator::{
+    IncidentReport, ReportGenerator, OutputFormat, ExecutiveSummary,
+    TimelineEntry, RootCauseAnalysis, ImpactAnalysis, RemediationActions,
+    EvidenceSummary,
+};
+pub use webhook_integration::{
+    WebhookEndpoint, WebhookEvent, WebhookPayload, SlackPayload, PagerDutyPayload,
+    JiraPayload, GenericPayload, WebhookSender, WebhookRegistry,
+>>>>>>> 4b60ced (docs: update README)
 };
 
 use chrono::{DateTime, Utc};
@@ -195,7 +219,15 @@ pub struct Incident {
 
 impl Incident {
     /// Create a new incident with the given classification and description.
+<<<<<<< HEAD
     pub fn new(classification: IncidentClassification, description: &str, source_ring: u8) -> Self {
+=======
+    pub fn new(
+        classification: IncidentClassification,
+        description: &str,
+        source_ring: u8,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         let severity = classification.default_severity();
         Self {
             id: Uuid::new_v4().to_string(),
@@ -370,7 +402,12 @@ impl IncidentResponseOrchestrator {
             let result = playbook::PlaybookEngine::execute(playbook, context);
             self.status.playbooks_run_total += 1;
             if result.success {
+<<<<<<< HEAD
                 self.active_playbooks.insert(playbook.name.clone(), result);
+=======
+                self.active_playbooks
+                    .insert(playbook.name.clone(), result);
+>>>>>>> 4b60ced (docs: update README)
             }
         }
 
@@ -384,29 +421,66 @@ impl IncidentResponseOrchestrator {
 
     /// Get a list of currently active (running) playbooks.
     pub fn get_active_playbooks(&self) -> Vec<&str> {
+<<<<<<< HEAD
         self.active_playbooks.keys().map(|s| s.as_str()).collect()
     }
 
     /// Generate a report for a specific incident.
     pub fn generate_report(&self, incident_id: &str, format: OutputFormat) -> Result<String> {
+=======
+        self.active_playbooks
+            .keys()
+            .map(|s| s.as_str())
+            .collect()
+    }
+
+    /// Generate a report for a specific incident.
+    pub fn generate_report(
+        &self,
+        incident_id: &str,
+        format: OutputFormat,
+    ) -> Result<String> {
+>>>>>>> 4b60ced (docs: update README)
         let incident = self
             .incidents
             .iter()
             .find(|i| i.id == incident_id)
+<<<<<<< HEAD
             .ok_or_else(|| Error::Other(format!("Incident not found: {incident_id}")))?;
 
         let evidence_chain = self.evidence_collector.get_chain(incident_id);
+=======
+            .ok_or_else(|| {
+                Error::Other(format!("Incident not found: {incident_id}"))
+            })?;
+
+        let evidence_chain = self
+            .evidence_collector
+            .get_chain(incident_id);
+>>>>>>> 4b60ced (docs: update README)
         let evidence_chain: Vec<_> = if evidence_chain.is_empty() {
             Vec::new()
         } else {
             evidence_chain
         };
 
+<<<<<<< HEAD
         let active_results: Vec<_> = self.active_playbooks.values().cloned().collect();
 
         let report =
             self.report_generator
                 .generate(incident, &evidence_chain, &active_results, format)?;
+=======
+        let active_results: Vec<_> = self
+            .active_playbooks
+            .values()
+            .cloned()
+            .collect();
+
+        let report = self
+            .report_generator
+            .generate(incident, &evidence_chain, &active_results, format)?;
+>>>>>>> 4b60ced (docs: update README)
         Ok(report)
     }
 
@@ -431,12 +505,23 @@ impl IncidentResponseOrchestrator {
             .incidents
             .iter_mut()
             .find(|i| i.id == incident_id)
+<<<<<<< HEAD
             .ok_or_else(|| Error::Other(format!("Incident not found: {incident_id}")))?;
+=======
+            .ok_or_else(|| {
+                Error::Other(format!("Incident not found: {incident_id}"))
+            })?;
+>>>>>>> 4b60ced (docs: update README)
         incident.metadata.insert(
             "resolved_at".to_string(),
             serde_json::json!(Utc::now().to_rfc3339()),
         );
+<<<<<<< HEAD
         self.status.incidents_active = self.status.incidents_active.saturating_sub(1);
+=======
+        self.status.incidents_active =
+            self.status.incidents_active.saturating_sub(1);
+>>>>>>> 4b60ced (docs: update README)
         self.status.incidents_resolved += 1;
         Ok(())
     }
@@ -511,6 +596,7 @@ mod tests {
 
     #[test]
     fn test_incident_builder_pattern() {
+<<<<<<< HEAD
         let incident = Incident::new(IncidentClassification::DataBreach, "PII leaked", 2)
             .with_severity(IncidentSeverity::Critical)
             .with_resources(vec!["user_db".to_string(), "api_gateway".to_string()])
@@ -522,6 +608,20 @@ mod tests {
             incident.metadata["source_ip"],
             serde_json::json!("10.0.0.1")
         );
+=======
+        let incident = Incident::new(
+            IncidentClassification::DataBreach,
+            "PII leaked",
+            2,
+        )
+        .with_severity(IncidentSeverity::Critical)
+        .with_resources(vec!["user_db".to_string(), "api_gateway".to_string()])
+        .with_metadata("source_ip", serde_json::json!("10.0.0.1"));
+
+        assert_eq!(incident.severity, IncidentSeverity::Critical);
+        assert_eq!(incident.affected_resources.len(), 2);
+        assert_eq!(incident.metadata["source_ip"], serde_json::json!("10.0.0.1"));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -561,10 +661,14 @@ mod tests {
         );
 
         let result = orch.handle_incident(incident).unwrap();
+<<<<<<< HEAD
         assert_eq!(
             result.classification,
             IncidentClassification::PromptInjection
         );
+=======
+        assert_eq!(result.classification, IncidentClassification::PromptInjection);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(orch.get_status().incidents_total, 1);
         assert_eq!(orch.get_status().incidents_active, 1);
         assert!(orch.get_status().evidence_items_collected > 0);
@@ -613,8 +717,17 @@ mod tests {
 
     #[test]
     fn test_incident_serialization() {
+<<<<<<< HEAD
         let incident = Incident::new(IncidentClassification::DataBreach, "Test breach", 5)
             .with_severity(IncidentSeverity::Critical);
+=======
+        let incident = Incident::new(
+            IncidentClassification::DataBreach,
+            "Test breach",
+            5,
+        )
+        .with_severity(IncidentSeverity::Critical);
+>>>>>>> 4b60ced (docs: update README)
 
         let json = serde_json::to_string(&incident).unwrap();
         let deserialized: Incident = serde_json::from_str(&json).unwrap();

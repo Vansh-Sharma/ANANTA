@@ -187,10 +187,14 @@ fn cmd_version() -> ExitCode {
     print_banner();
     let version = env!("CARGO_PKG_VERSION");
     let profile = std::env::var("BUILD_PROFILE").unwrap_or_else(|_| "debug".into());
+<<<<<<< HEAD
     let rust_version = format!(
         "rustc {}",
         std::env::var("RUSTC_VERSION").unwrap_or_else(|_| "unknown".into())
     );
+=======
+    let rust_version = format!("rustc {}", std::env::var("RUSTC_VERSION").unwrap_or_else(|_| "unknown".into()));
+>>>>>>> 4b60ced (docs: update README)
 
     utils::sub_section("Build Information");
     utils::kv("Version", version);
@@ -236,31 +240,76 @@ mod tests {
 
     #[test]
     fn test_cli_parse_config_validate() {
+<<<<<<< HEAD
         let cli = Cli::try_parse_from(["chakravyuh", "config", "validate", "config.yaml"]);
+=======
+        let cli = Cli::try_parse_from([
+            "chakravyuh",
+            "config",
+            "validate",
+            "config.yaml",
+        ]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(cli.is_ok());
     }
 
     #[test]
     fn test_cli_parse_policy_compile() {
+<<<<<<< HEAD
         let cli = Cli::try_parse_from(["chakravyuh", "policy", "compile", "policy.yaml"]);
+=======
+        let cli = Cli::try_parse_from([
+            "chakravyuh",
+            "policy",
+            "compile",
+            "policy.yaml",
+        ]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(cli.is_ok());
     }
 
     #[test]
     fn test_cli_parse_evaluate_prompt() {
+<<<<<<< HEAD
         let cli = Cli::try_parse_from(["chakravyuh", "evaluate", "prompt", "What is 2+2?"]);
+=======
+        let cli = Cli::try_parse_from([
+            "chakravyuh",
+            "evaluate",
+            "prompt",
+            "What is 2+2?",
+        ]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(cli.is_ok());
     }
 
     #[test]
     fn test_cli_parse_test_shield() {
+<<<<<<< HEAD
         let cli = Cli::try_parse_from(["chakravyuh", "test", "shield"]);
+=======
+        let cli = Cli::try_parse_from([
+            "chakravyuh",
+            "test",
+            "shield",
+        ]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(cli.is_ok());
     }
 
     #[test]
     fn test_cli_parse_keys_generate() {
+<<<<<<< HEAD
         let cli = Cli::try_parse_from(["chakravyuh", "keys", "generate", "--name", "test-key"]);
+=======
+        let cli = Cli::try_parse_from([
+            "chakravyuh",
+            "keys",
+            "generate",
+            "--name",
+            "test-key",
+        ]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(cli.is_ok());
     }
 

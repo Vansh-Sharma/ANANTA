@@ -162,9 +162,13 @@ fn psi_test(reference: &[f64], sample: &[f64]) -> (f64, f64) {
         if bin_width <= 0.0 {
             0
         } else {
+<<<<<<< HEAD
             ((v - min_val) / bin_width)
                 .floor()
                 .clamp(0.0, (num_bins - 1) as f64) as usize
+=======
+            ((v - min_val) / bin_width).floor().clamp(0.0, (num_bins - 1) as f64) as usize
+>>>>>>> 4b60ced (docs: update README)
         }
     };
 
@@ -428,11 +432,15 @@ impl DriftBaselines {
     /// Compute a fresh baseline from a batch of values.
     ///
     /// This replaces any existing baseline for the given drift type.
+<<<<<<< HEAD
     pub fn compute_baseline(
         &mut self,
         drift_type: DriftType,
         values: &[f64],
     ) -> Result<(), String> {
+=======
+    pub fn compute_baseline(&mut self, drift_type: DriftType, values: &[f64]) -> Result<(), String> {
+>>>>>>> 4b60ced (docs: update README)
         if values.is_empty() {
             return Err("Cannot compute baseline from empty values".to_string());
         }
@@ -525,9 +533,13 @@ fn compute_histogram(values: &[f64], num_bins: usize) -> Vec<f64> {
         let idx = if bin_width <= 0.0 {
             0
         } else {
+<<<<<<< HEAD
             ((v - min_val) / bin_width)
                 .floor()
                 .clamp(0.0, (num_bins - 1) as f64) as usize
+=======
+            ((v - min_val) / bin_width).floor().clamp(0.0, (num_bins - 1) as f64) as usize
+>>>>>>> 4b60ced (docs: update README)
         };
         bins[idx] += 1.0;
     }
@@ -607,12 +619,17 @@ impl FusedDriftSignal {
 
         let adv_sev = advanced_severity.clone().unwrap_or(DriftSeverity::None);
 
+<<<<<<< HEAD
         let (composite_severity, composite_confidence, is_anomaly) = compute_fusion(
             z_severity,
             adv_sev,
             z_alert.is_some(),
             advanced_severity.is_some(),
         );
+=======
+        let (composite_severity, composite_confidence, is_anomaly) =
+            compute_fusion(z_severity, adv_sev, z_alert.is_some(), advanced_severity.is_some());
+>>>>>>> 4b60ced (docs: update README)
 
         let context = match (&z_alert, &advanced_severity) {
             (Some(za), Some(as_)) => format!(
@@ -677,11 +694,15 @@ fn compute_fusion(
         (boosted, confidence.clamp(0.0, 1.0), true)
     } else if z_fired {
         let confidence = 0.5 + 0.3 * z_severity.to_score();
+<<<<<<< HEAD
         (
             z_severity,
             confidence.clamp(0.0, 1.0),
             z_severity != DriftSeverity::None,
         )
+=======
+        (z_severity, confidence.clamp(0.0, 1.0), z_severity != DriftSeverity::None)
+>>>>>>> 4b60ced (docs: update README)
     } else if advanced_fired {
         let confidence = 0.5 + 0.3 * advanced_severity.to_score();
         (
@@ -831,10 +852,14 @@ impl SentinelHub {
     ///   5. Fuse the signals
     ///   6. Buffer the result
     ///   7. Return fused signal if it's an anomaly
+<<<<<<< HEAD
     pub fn observe(
         &mut self,
         observation: DriftObservation,
     ) -> Result<Option<FusedDriftSignal>, String> {
+=======
+    pub fn observe(&mut self, observation: DriftObservation) -> Result<Option<FusedDriftSignal>, String> {
+>>>>>>> 4b60ced (docs: update README)
         let drift_type = observation.drift_type.clone();
 
         // Step 1: Feed to simple z-score detector.
@@ -875,15 +900,28 @@ impl SentinelHub {
             } else {
                 trace!(
                     "Skipping advanced analysis: only {} samples (need {})",
+<<<<<<< HEAD
                     baseline.sample_count,
                     self.fusion_config.baseline_min_samples
+=======
+                    baseline.sample_count, self.fusion_config.baseline_min_samples
+>>>>>>> 4b60ced (docs: update README)
                 );
             }
         }
 
         // Step 5: Fuse signals.
+<<<<<<< HEAD
         let fused =
             FusedDriftSignal::fuse(drift_type.clone(), z_alert, advanced_severity, methods_used);
+=======
+        let fused = FusedDriftSignal::fuse(
+            drift_type.clone(),
+            z_alert,
+            advanced_severity,
+            methods_used,
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         // Step 6: Buffer if anomaly.
         if fused.is_anomaly {
@@ -941,10 +979,14 @@ impl SentinelHub {
                 } else {
                     DriftSeverity::None
                 };
+<<<<<<< HEAD
                 debug!(
                     "KS test: statistic={:.4}, confidence={:.3}, severity={:?}",
                     statistic, confidence, severity
                 );
+=======
+                debug!("KS test: statistic={:.4}, confidence={:.3}, severity={:?}", statistic, confidence, severity);
+>>>>>>> 4b60ced (docs: update README)
                 (severity, "ks".to_string())
             }
             "psi" => {
@@ -958,10 +1000,14 @@ impl SentinelHub {
                 } else {
                     DriftSeverity::None
                 };
+<<<<<<< HEAD
                 debug!(
                     "PSI test: psi={:.4}, confidence={:.3}, severity={:?}",
                     psi_value, confidence, severity
                 );
+=======
+                debug!("PSI test: psi={:.4}, confidence={:.3}, severity={:?}", psi_value, confidence, severity);
+>>>>>>> 4b60ced (docs: update README)
                 (severity, "psi".to_string())
             }
             "adwin" => {
@@ -971,10 +1017,14 @@ impl SentinelHub {
                 } else {
                     DriftSeverity::None
                 };
+<<<<<<< HEAD
                 debug!(
                     "ADWIN test: drift_score={:.4}, confidence={:.3}, severity={:?}",
                     drift_score, confidence, severity
                 );
+=======
+                debug!("ADWIN test: drift_score={:.4}, confidence={:.3}, severity={:?}", drift_score, confidence, severity);
+>>>>>>> 4b60ced (docs: update README)
                 (severity, "adwin".to_string())
             }
             _ => {
@@ -1036,10 +1086,14 @@ impl SentinelHub {
 
     /// Get the current observation count for a drift type.
     pub fn observation_count(&self, drift_type: &DriftType) -> u64 {
+<<<<<<< HEAD
         self.observation_counts
             .get(drift_type)
             .copied()
             .unwrap_or(0)
+=======
+        self.observation_counts.get(drift_type).copied().unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get the current anomaly count for a drift type.
@@ -1136,6 +1190,7 @@ pub struct CorrelatedAlert {
 
 impl CorrelatedAlert {
     /// Create a new correlated alert group.
+<<<<<<< HEAD
     pub fn new(alerts: Vec<FusedDriftSignal>, correlation_type: CorrelationType) -> Self {
         let severity = alerts
             .iter()
@@ -1148,6 +1203,22 @@ impl CorrelatedAlert {
             .unwrap_or(DriftSeverity::None);
 
         let drift_types: Vec<String> = alerts.iter().map(|s| s.drift_type.to_string()).collect();
+=======
+    pub fn new(
+        alerts: Vec<FusedDriftSignal>,
+        correlation_type: CorrelationType,
+    ) -> Self {
+        let severity = alerts
+            .iter()
+            .map(|s| s.composite_severity.clone())
+            .max_by(|a, b| a.to_score().partial_cmp(&b.to_score()).unwrap_or(std::cmp::Ordering::Equal))
+            .unwrap_or(DriftSeverity::None);
+
+        let drift_types: Vec<String> = alerts
+            .iter()
+            .map(|s| s.drift_type.to_string())
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
 
         let description = format!(
             "{} correlation across {} types: {}",
@@ -1185,9 +1256,13 @@ const CASCADE_PAIRS: &[(DriftType, DriftType)] = &[
 
 /// Check if two drift types form a known cascade pair.
 fn is_cascade_pair(a: &DriftType, b: &DriftType) -> bool {
+<<<<<<< HEAD
     CASCADE_PAIRS
         .iter()
         .any(|(x, y)| (a == x && b == y) || (a == y && b == x))
+=======
+    CASCADE_PAIRS.iter().any(|(x, y)| (a == x && b == y) || (a == y && b == x))
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Correlate a set of fused signals into groups.
@@ -1202,7 +1277,16 @@ pub fn correlate_signals(signals: &[&FusedDriftSignal]) -> Vec<CorrelatedAlert> 
         // Single signal cannot be correlated.
         return signals
             .iter()
+<<<<<<< HEAD
             .map(|s| CorrelatedAlert::new(vec![(*s).clone()], CorrelationType::SameDomain))
+=======
+            .map(|s| {
+                CorrelatedAlert::new(
+                    vec![(*s).clone()],
+                    CorrelationType::SameDomain,
+                )
+            })
+>>>>>>> 4b60ced (docs: update README)
             .collect();
     }
 
@@ -1220,10 +1304,14 @@ pub fn correlate_signals(signals: &[&FusedDriftSignal]) -> Vec<CorrelatedAlert> 
     // Emit SameDomain groups (multiple alerts of same type).
     for (_dt, group) in &type_groups {
         if group.len() > 1 {
+<<<<<<< HEAD
             correlated.push(CorrelatedAlert::new(
                 group.clone(),
                 CorrelationType::SameDomain,
             ));
+=======
+            correlated.push(CorrelatedAlert::new(group.clone(), CorrelationType::SameDomain));
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -1250,10 +1338,14 @@ pub fn correlate_signals(signals: &[&FusedDriftSignal]) -> Vec<CorrelatedAlert> 
             .filter_map(|dt| type_groups.get(dt).and_then(|g| g.first().cloned()))
             .collect();
         if cascade_alerts.len() > 1 {
+<<<<<<< HEAD
             correlated.push(CorrelatedAlert::new(
                 cascade_alerts,
                 CorrelationType::Cascade,
             ));
+=======
+            correlated.push(CorrelatedAlert::new(cascade_alerts, CorrelationType::Cascade));
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -1286,19 +1378,27 @@ pub fn correlate_signals(signals: &[&FusedDriftSignal]) -> Vec<CorrelatedAlert> 
     if correlated.is_empty() && signals.len() >= 2 {
         // Fall through to CrossDomain.
         let cross_alerts: Vec<FusedDriftSignal> = signals.iter().map(|s| (*s).clone()).collect();
+<<<<<<< HEAD
         correlated.push(CorrelatedAlert::new(
             cross_alerts,
             CorrelationType::CrossDomain,
         ));
+=======
+        correlated.push(CorrelatedAlert::new(cross_alerts, CorrelationType::CrossDomain));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Emit remaining singleton signals as SameDomain.
     for (dt, group) in &type_groups {
         if group.len() == 1 && !correlated_types.contains(&dt.to_string()) {
+<<<<<<< HEAD
             correlated.push(CorrelatedAlert::new(
                 group.clone(),
                 CorrelationType::SameDomain,
             ));
+=======
+            correlated.push(CorrelatedAlert::new(group.clone(), CorrelationType::SameDomain));
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -1337,10 +1437,14 @@ impl SentinelVerificationBridge {
 
     /// Create a bridge with an explicit sigma threshold for severity mapping.
     pub fn with_sigma_threshold(hub: SentinelHub, sigma_threshold: f64) -> Self {
+<<<<<<< HEAD
         Self {
             hub,
             sigma_threshold,
         }
+=======
+        Self { hub, sigma_threshold }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Process an OvaphObservation and produce an OvaphVerificationResult.
@@ -1431,7 +1535,12 @@ impl SentinelVerificationBridge {
             requires_healing,
             rationale: format!(
                 "Sentinel verification: {} signals processed, max severity={}",
+<<<<<<< HEAD
                 signal_count, max_severity,
+=======
+                signal_count,
+                max_severity,
+>>>>>>> 4b60ced (docs: update README)
             ),
         }
     }
@@ -1528,8 +1637,12 @@ mod tests {
     }
 
     fn make_hub() -> SentinelHub {
+<<<<<<< HEAD
         SentinelHub::with_defaults(3.0, 100)
             .unwrap_or_else(|e| panic!("Failed to create hub: {}", e))
+=======
+        SentinelHub::with_defaults(3.0, 100).unwrap_or_else(|e| panic!("Failed to create hub: {}", e))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     fn make_hub_with_config(config: FusionConfig) -> SentinelHub {
@@ -1537,12 +1650,16 @@ mod tests {
             .unwrap_or_else(|e| panic!("Failed to create hub: {}", e))
     }
 
+<<<<<<< HEAD
     fn establish_baseline(
         hub: &mut SentinelHub,
         drift_type: DriftType,
         base_value: f64,
         count: usize,
     ) {
+=======
+    fn establish_baseline(hub: &mut SentinelHub, drift_type: DriftType, base_value: f64, count: usize) {
+>>>>>>> 4b60ced (docs: update README)
         for _ in 0..count {
             let noise = (rand::random::<f64>() - 0.5) * 0.02;
             let obs = make_observation(drift_type.clone(), base_value + noise);
@@ -1720,7 +1837,16 @@ mod tests {
 
     #[test]
     fn test_fuse_neither() {
+<<<<<<< HEAD
         let fused = FusedDriftSignal::fuse(DriftType::Trust, None, None, vec![]);
+=======
+        let fused = FusedDriftSignal::fuse(
+            DriftType::Trust,
+            None,
+            None,
+            vec![],
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         assert!(!fused.is_anomaly);
         assert_eq!(fused.composite_severity, DriftSeverity::None);
@@ -1862,20 +1988,28 @@ mod tests {
         let mut hub = make_hub();
 
         // Trigger drift in multiple types.
+<<<<<<< HEAD
         for dt in &[
             DriftType::Decision,
             DriftType::Policy,
             DriftType::Configuration,
         ] {
+=======
+        for dt in &[DriftType::Decision, DriftType::Policy, DriftType::Configuration] {
+>>>>>>> 4b60ced (docs: update README)
             establish_baseline(&mut hub, dt.clone(), 0.5, 50);
         }
 
         // Shift all three.
+<<<<<<< HEAD
         for dt in &[
             DriftType::Decision,
             DriftType::Policy,
             DriftType::Configuration,
         ] {
+=======
+        for dt in &[DriftType::Decision, DriftType::Policy, DriftType::Configuration] {
+>>>>>>> 4b60ced (docs: update README)
             let obs = make_observation(dt.clone(), -2.0);
             let _ = hub.observe(obs);
         }
@@ -2030,10 +2164,19 @@ mod tests {
         let result = bridge.verify(&observation);
         assert!(!result.signals.is_empty());
         // Should use ZScore or Composite method.
+<<<<<<< HEAD
         assert!(matches!(
             result.signals[0].analysis_method,
             AnalysisMethod::ZScore | AnalysisMethod::Composite
         ));
+=======
+        assert!(
+            matches!(
+                result.signals[0].analysis_method,
+                AnalysisMethod::ZScore | AnalysisMethod::Composite
+            )
+        );
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2094,10 +2237,14 @@ mod tests {
         let has_cascade = correlated
             .iter()
             .any(|ca| ca.correlation_type == CorrelationType::Cascade);
+<<<<<<< HEAD
         assert!(
             has_cascade,
             "Expected cascade correlation for Decision+Policy"
         );
+=======
+        assert!(has_cascade, "Expected cascade correlation for Decision+Policy");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2121,10 +2268,14 @@ mod tests {
         let has_temporal = correlated
             .iter()
             .any(|ca| ca.correlation_type == CorrelationType::TemporalCluster);
+<<<<<<< HEAD
         assert!(
             has_temporal,
             "Expected temporal cluster for 3 non-cascade types"
         );
+=======
+        assert!(has_temporal, "Expected temporal cluster for 3 non-cascade types");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2194,10 +2345,14 @@ mod tests {
         // Introduce drift.
         let obs = make_observation(DriftType::Decision, 0.30);
         let result = hub.observe(obs).unwrap();
+<<<<<<< HEAD
         assert!(
             result.is_some(),
             "Should detect drift after baseline warmup"
         );
+=======
+        assert!(result.is_some(), "Should detect drift after baseline warmup");
+>>>>>>> 4b60ced (docs: update README)
 
         // Create bridge and verify.
         let mut bridge = SentinelVerificationBridge::new(hub);
@@ -2315,10 +2470,14 @@ mod tests {
     fn test_ks_identical_distributions() {
         let dist: Vec<f64> = (0..100).map(|i| i as f64).collect();
         let (stat, _conf) = ks_test(&dist, &dist);
+<<<<<<< HEAD
         assert!(
             (stat - 0.0).abs() < 1e-10,
             "Identical distributions should have KS=0"
         );
+=======
+        assert!((stat - 0.0).abs() < 1e-10, "Identical distributions should have KS=0");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2368,6 +2527,7 @@ mod tests {
 
     #[test]
     fn test_adwin_no_change() {
+<<<<<<< HEAD
         use rand::rngs::SmallRng;
         use rand::Rng;
         use rand::SeedableRng;
@@ -2378,6 +2538,14 @@ mod tests {
         let sample: Vec<f64> = (0..20)
             .map(|_| 0.5 + rng.random::<f64>() * 0.1 - 0.05)
             .collect();
+=======
+        use rand::Rng;
+        use rand::SeedableRng;
+        use rand::rngs::SmallRng;
+        let mut rng = SmallRng::seed_from_u64(12345);
+        let reference: Vec<f64> = (0..100).map(|_| 0.5 + rng.random::<f64>() * 0.1 - 0.05).collect();
+        let sample: Vec<f64> = (0..20).map(|_| 0.5 + rng.random::<f64>() * 0.1 - 0.05).collect();
+>>>>>>> 4b60ced (docs: update README)
         let (score, _) = adwin_test(&reference, &sample);
         // Same mean, noise — drift score should be low.
         assert!(
@@ -2445,10 +2613,14 @@ mod tests {
         let values = vec![2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0];
         let s = stddev(&values);
         // Expected: sqrt(mean((x - mean)^2)) = sqrt(4.0) = 2.0
+<<<<<<< HEAD
         assert!(
             (s - 2.0).abs() < 0.01,
             "Expected stddev ≈ 2.0, got {:.4}",
             s
         );
+=======
+        assert!((s - 2.0).abs() < 0.01, "Expected stddev ≈ 2.0, got {:.4}", s);
+>>>>>>> 4b60ced (docs: update README)
     }
 }

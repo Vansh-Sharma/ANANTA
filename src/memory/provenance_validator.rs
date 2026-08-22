@@ -26,6 +26,7 @@ pub struct ProvenanceValidatorConfig {
     pub trusted_sources: Vec<String>,
 }
 
+<<<<<<< HEAD
 fn default_enabled() -> bool {
     true
 }
@@ -40,6 +41,14 @@ impl Default for ProvenanceValidatorConfig {
             max_age_secs: default_max_age_secs(),
             trusted_sources: vec!["docs".into(), "verified".into(), "official".into()],
         }
+=======
+fn default_enabled() -> bool { true }
+fn default_max_age_secs() -> u64 { 30 * 24 * 3600 }
+
+impl Default for ProvenanceValidatorConfig {
+    fn default() -> Self {
+        Self { enabled: default_enabled(), max_age_secs: default_max_age_secs(), trusted_sources: vec!["docs".into(), "verified".into(), "official".into()] }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -59,13 +68,18 @@ pub struct ProvenanceValidator {
 
 impl ProvenanceValidator {
     pub fn new(config: &ProvenanceValidatorConfig) -> Self {
+<<<<<<< HEAD
         Self {
             config: config.clone(),
         }
+=======
+        Self { config: config.clone() }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     pub fn validate(&self, entries: &[MemoryEntry]) -> ProvenanceVerdict {
         if !self.config.enabled {
+<<<<<<< HEAD
             return ProvenanceVerdict {
                 valid_count: entries.len(),
                 stale_count: 0,
@@ -74,6 +88,9 @@ impl ProvenanceValidator {
                 risk_score: 0.0,
                 summary: "provenance validator disabled".into(),
             };
+=======
+            return ProvenanceVerdict { valid_count: entries.len(), stale_count: 0, tampered_count: 0, untrusted_count: 0, risk_score: 0.0, summary: "provenance validator disabled".into() };
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let mut valid = 0usize;
@@ -108,6 +125,7 @@ impl ProvenanceValidator {
 
             // Check source trust.
             let source_lower = entry.source.to_lowercase();
+<<<<<<< HEAD
             if !self
                 .config
                 .trusted_sources
@@ -116,10 +134,14 @@ impl ProvenanceValidator {
                 && source_lower != "docs"
                 && source_lower != "verified"
             {
+=======
+            if !self.config.trusted_sources.iter().any(|t| source_lower.contains(&t.to_lowercase())) && source_lower != "docs" && source_lower != "verified" {
+>>>>>>> 4b60ced (docs: update README)
                 untrusted += 1;
                 entry_valid = false;
             }
 
+<<<<<<< HEAD
             if entry_valid {
                 valid += 1;
             }
@@ -135,6 +157,16 @@ impl ProvenanceValidator {
                 "{} tampered, {} stale, {} untrusted of {} entries",
                 tampered, stale, untrusted, total
             )
+=======
+            if entry_valid { valid += 1; }
+        }
+
+        let total = entries.len().max(1);
+        let risk_score = ((tampered as f64 * 10.0 + stale as f64 * 3.0 + untrusted as f64 * 2.0) / total as f64).clamp(0.0, 10.0);
+
+        let summary = if tampered > 0 {
+            format!("{} tampered, {} stale, {} untrusted of {} entries", tampered, stale, untrusted, total)
+>>>>>>> 4b60ced (docs: update README)
         } else if stale > 0 {
             format!("{} stale entries detected", stale)
         } else if untrusted > 0 {
@@ -143,6 +175,7 @@ impl ProvenanceValidator {
             "all entries have valid provenance".into()
         };
 
+<<<<<<< HEAD
         ProvenanceVerdict {
             valid_count: valid,
             stale_count: stale,
@@ -151,6 +184,9 @@ impl ProvenanceValidator {
             risk_score,
             summary,
         }
+=======
+        ProvenanceVerdict { valid_count: valid, stale_count: stale, tampered_count: tampered, untrusted_count: untrusted, risk_score, summary }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -162,6 +198,7 @@ mod tests {
         ProvenanceValidator::new(&ProvenanceValidatorConfig::default())
     }
 
+<<<<<<< HEAD
     fn make_entry(
         id: &str,
         content: &str,
@@ -176,6 +213,10 @@ mod tests {
             timestamp: ts.into(),
             hash,
         }
+=======
+    fn make_entry(id: &str, content: &str, source: &str, ts: &str, hash: Option<String>) -> MemoryEntry {
+        MemoryEntry { id: id.into(), content: content.into(), source: source.into(), timestamp: ts.into(), hash }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     fn compute_hash(content: &str) -> String {
@@ -186,6 +227,7 @@ mod tests {
     fn valid_entries_pass() {
         let v = default_validator();
         let hash = compute_hash("Hello world");
+<<<<<<< HEAD
         let entries = vec![make_entry(
             "e1",
             "Hello world",
@@ -193,6 +235,9 @@ mod tests {
             "2026-07-28T12:00:00Z",
             Some(hash),
         )];
+=======
+        let entries = vec![make_entry("e1", "Hello world", "docs", "2026-07-28T12:00:00Z", Some(hash))];
+>>>>>>> 4b60ced (docs: update README)
         let r = v.validate(&entries);
         assert_eq!(r.tampered_count, 0);
         assert_eq!(r.stale_count, 0);
@@ -201,6 +246,7 @@ mod tests {
     #[test]
     fn tampered_hash_detected() {
         let v = default_validator();
+<<<<<<< HEAD
         let entries = vec![make_entry(
             "e1",
             "Hello world",
@@ -208,6 +254,9 @@ mod tests {
             "2026-07-28T12:00:00Z",
             Some("wrong_hash".into()),
         )];
+=======
+        let entries = vec![make_entry("e1", "Hello world", "docs", "2026-07-28T12:00:00Z", Some("wrong_hash".into()))];
+>>>>>>> 4b60ced (docs: update README)
         let r = v.validate(&entries);
         assert_eq!(r.tampered_count, 1);
         assert!(r.risk_score > 5.0);
@@ -216,6 +265,7 @@ mod tests {
     #[test]
     fn stale_entry_detected() {
         let v = default_validator();
+<<<<<<< HEAD
         let entries = vec![make_entry(
             "e1",
             "Old data",
@@ -223,6 +273,9 @@ mod tests {
             "2020-01-01T00:00:00Z",
             None,
         )];
+=======
+        let entries = vec![make_entry("e1", "Old data", "docs", "2020-01-01T00:00:00Z", None)];
+>>>>>>> 4b60ced (docs: update README)
         let r = v.validate(&entries);
         assert_eq!(r.stale_count, 1);
     }
@@ -230,6 +283,7 @@ mod tests {
     #[test]
     fn untrusted_source_detected() {
         let v = default_validator();
+<<<<<<< HEAD
         let entries = vec![make_entry(
             "e1",
             "Data",
@@ -237,6 +291,9 @@ mod tests {
             "2026-07-28T12:00:00Z",
             None,
         )];
+=======
+        let entries = vec![make_entry("e1", "Data", "unknown-malicious-source", "2026-07-28T12:00:00Z", None)];
+>>>>>>> 4b60ced (docs: update README)
         let r = v.validate(&entries);
         assert_eq!(r.untrusted_count, 1);
     }
@@ -251,6 +308,7 @@ mod tests {
 
     #[test]
     fn disabled_skips_all() {
+<<<<<<< HEAD
         let v = ProvenanceValidator::new(&ProvenanceValidatorConfig {
             enabled: false,
             ..Default::default()
@@ -262,6 +320,10 @@ mod tests {
             "2020-01-01",
             Some("wrong".into()),
         )];
+=======
+        let v = ProvenanceValidator::new(&ProvenanceValidatorConfig { enabled: false, ..Default::default() });
+        let entries = vec![make_entry("e1", "data", "unknown", "2020-01-01", Some("wrong".into()))];
+>>>>>>> 4b60ced (docs: update README)
         let r = v.validate(&entries);
         assert_eq!(r.risk_score, 0.0);
     }

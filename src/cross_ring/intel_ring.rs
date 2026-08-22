@@ -18,8 +18,13 @@ use std::sync::{Arc, Mutex};
 
 use super::message::CrossRingMessage;
 use super::transport::{
+<<<<<<< HEAD
     InProcessTransport, RingSubscriber, RingTransport, TransportErrorKind, TransportMetrics,
     TransportMetricsCollector,
+=======
+    RingTransport, RingSubscriber, TransportErrorKind, TransportMetricsCollector,
+    InProcessTransport, TransportMetrics,
+>>>>>>> 4b60ced (docs: update README)
 };
 
 // ─── Configuration ────────────────────────────────────────────────
@@ -50,6 +55,7 @@ pub struct IntelRingConfig {
     pub transport: String,
 }
 
+<<<<<<< HEAD
 fn default_enabled() -> bool {
     true
 }
@@ -68,6 +74,14 @@ fn default_true() -> bool {
 fn default_transport() -> String {
     "in_process".into()
 }
+=======
+fn default_enabled() -> bool { true }
+fn default_buffer_size() -> usize { 500 }
+fn default_max_subscribers() -> usize { 20 }
+fn default_replay_buffer() -> usize { 100 }
+fn default_true() -> bool { true }
+fn default_transport() -> String { "in_process".into() }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for IntelRingConfig {
     fn default() -> Self {
@@ -279,12 +293,24 @@ impl IntelRing {
         // Check subscriber limit.
         {
             let subs = self.subscriptions.lock().map_err(|e| {
+<<<<<<< HEAD
                 crate::error::Error::Other(format!("intel subscriptions lock poisoned: {}", e))
+=======
+                crate::error::Error::Other(format!(
+                    "intel subscriptions lock poisoned: {}",
+                    e
+                ))
+>>>>>>> 4b60ced (docs: update README)
             })?;
             if subs.len() >= self.config.max_subscribers {
                 return Err(crate::error::Error::Other(format!(
                     "intel ring max subscribers ({}) reached, cannot add '{}'",
+<<<<<<< HEAD
                     self.config.max_subscribers, subscriber_name
+=======
+                    self.config.max_subscribers,
+                    subscriber_name
+>>>>>>> 4b60ced (docs: update README)
                 )));
             }
             if subs.contains_key(subscriber_name) {
@@ -315,12 +341,18 @@ impl IntelRing {
         // Note: For InProcessTransport, subscribe() doesn't auto-replay.
         // Replay is handled at the ring level via the replay_buffer.
 
+<<<<<<< HEAD
         self.subscriptions
             .lock()
             .map_err(|e| {
                 crate::error::Error::Other(format!("intel subscriptions lock poisoned: {}", e))
             })?
             .insert(subscriber_name.into(), sub.clone());
+=======
+        self.subscriptions.lock().map_err(|e| {
+            crate::error::Error::Other(format!("intel subscriptions lock poisoned: {}", e))
+        })?.insert(subscriber_name.into(), sub.clone());
+>>>>>>> 4b60ced (docs: update README)
 
         Ok(sub)
     }
@@ -328,12 +360,18 @@ impl IntelRing {
     /// Unsubscribe a ring from intel observations.
     /// The subscriber's channel is dropped when the Arc is released.
     pub fn unsubscribe(&self, subscriber_name: &str) -> crate::Result<()> {
+<<<<<<< HEAD
         self.subscriptions
             .lock()
             .map_err(|e| {
                 crate::error::Error::Other(format!("intel subscriptions lock poisoned: {}", e))
             })?
             .remove(subscriber_name);
+=======
+        self.subscriptions.lock().map_err(|e| {
+            crate::error::Error::Other(format!("intel subscriptions lock poisoned: {}", e))
+        })?.remove(subscriber_name);
+>>>>>>> 4b60ced (docs: update README)
         Ok(())
     }
 
@@ -359,7 +397,14 @@ impl IntelRing {
 
     /// Number of active subscribers.
     pub fn subscriber_count(&self) -> usize {
+<<<<<<< HEAD
         self.subscriptions.lock().map(|s| s.len()).unwrap_or(0)
+=======
+        self.subscriptions
+            .lock()
+            .map(|s| s.len())
+            .unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// List all active subscriber names.
@@ -387,7 +432,14 @@ impl IntelRing {
 
     /// Number of observations in the replay buffer.
     pub fn replay_buffer_len(&self) -> usize {
+<<<<<<< HEAD
         self.replay_buffer.lock().map(|b| b.len()).unwrap_or(0)
+=======
+        self.replay_buffer
+            .lock()
+            .map(|b| b.len())
+            .unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Clear all subscriptions and replay buffer (for testing).
@@ -492,8 +544,12 @@ mod tests {
         let ring = IntelRing::new(&IntelRingConfig {
             max_subscribers: 2,
             ..Default::default()
+<<<<<<< HEAD
         })
         .unwrap();
+=======
+        }).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         ring.subscribe("shield", None).unwrap();
         ring.subscribe("threat", None).unwrap();
@@ -508,8 +564,12 @@ mod tests {
         let ring = IntelRing::new(&IntelRingConfig {
             replay_buffer_size: 50,
             ..Default::default()
+<<<<<<< HEAD
         })
         .unwrap();
+=======
+        }).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         ring.publish(intel_msg("shield", "attack")).unwrap();
         ring.publish(intel_msg("threat", "jailbreak")).unwrap();
@@ -521,8 +581,12 @@ mod tests {
         let ring = IntelRing::new(&IntelRingConfig {
             replay_buffer_size: 2,
             ..Default::default()
+<<<<<<< HEAD
         })
         .unwrap();
+=======
+        }).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         ring.publish(intel_msg("shield", "a")).unwrap();
         ring.publish(intel_msg("shield", "b")).unwrap();

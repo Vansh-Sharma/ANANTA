@@ -1,5 +1,6 @@
 // PermissionEnforcer — checks action permissions per agent type.
 
+<<<<<<< HEAD
 use super::agent_policy::AgentType;
 use std::collections::HashMap;
 
@@ -20,6 +21,16 @@ pub enum Permission {
     AdminAccess,
     ShellAccess,
     DatabaseAccess,
+=======
+use std::collections::HashMap;
+use super::agent_policy::AgentType;
+
+#[derive(Debug, Clone, serde::Serialize, PartialEq, Eq, Hash)]
+pub enum Permission {
+    Read, Write, Execute, NetworkAccess, FileSystem, ApiCall,
+    MemoryRead, MemoryWrite, ToolUse, CodeExecution, EmailSend,
+    FileDelete, AdminAccess, ShellAccess, DatabaseAccess,
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -31,6 +42,7 @@ pub struct PermissionEnforcerConfig {
     pub permission_overrides: HashMap<String, Vec<String>>,
 }
 
+<<<<<<< HEAD
 fn default_enabled() -> bool {
     true
 }
@@ -42,6 +54,12 @@ impl Default for PermissionEnforcerConfig {
             permission_overrides: HashMap::new(),
         }
     }
+=======
+fn default_enabled() -> bool { true }
+
+impl Default for PermissionEnforcerConfig {
+    fn default() -> Self { Self { enabled: default_enabled(), permission_overrides: HashMap::new() } }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 pub struct PermissionResult {
@@ -53,6 +71,7 @@ pub struct PermissionResult {
 
 fn type_permissions(agent_type: &AgentType) -> Vec<Permission> {
     match agent_type {
+<<<<<<< HEAD
         AgentType::Coder => vec![
             Permission::Read,
             Permission::Write,
@@ -82,12 +101,19 @@ fn type_permissions(agent_type: &AgentType) -> Vec<Permission> {
             Permission::DatabaseAccess,
             Permission::ToolUse,
         ],
+=======
+        AgentType::Coder => vec![Permission::Read, Permission::Write, Permission::Execute, Permission::FileSystem, Permission::ApiCall, Permission::ToolUse, Permission::CodeExecution],
+        AgentType::Researcher => vec![Permission::Read, Permission::NetworkAccess, Permission::ApiCall, Permission::MemoryRead, Permission::ToolUse],
+        AgentType::Assistant => vec![Permission::Read, Permission::MemoryRead, Permission::ToolUse],
+        AgentType::Analyst => vec![Permission::Read, Permission::NetworkAccess, Permission::ApiCall, Permission::MemoryRead, Permission::DatabaseAccess, Permission::ToolUse],
+>>>>>>> 4b60ced (docs: update README)
         AgentType::Custom(_) => vec![],
     }
 }
 
 fn parse_permission(s: &str) -> Option<Permission> {
     match s.to_lowercase().as_str() {
+<<<<<<< HEAD
         "read" => Some(Permission::Read),
         "write" => Some(Permission::Write),
         "execute" => Some(Permission::Execute),
@@ -102,6 +128,15 @@ fn parse_permission(s: &str) -> Option<Permission> {
         "file_delete" => Some(Permission::FileDelete),
         "admin_access" | "admin" => Some(Permission::AdminAccess),
         "shell_access" | "shell" => Some(Permission::ShellAccess),
+=======
+        "read" => Some(Permission::Read), "write" => Some(Permission::Write),
+        "execute" => Some(Permission::Execute), "network_access" | "network" => Some(Permission::NetworkAccess),
+        "filesystem" | "file_system" => Some(Permission::FileSystem), "api_call" | "api" => Some(Permission::ApiCall),
+        "memory_read" => Some(Permission::MemoryRead), "memory_write" => Some(Permission::MemoryWrite),
+        "tool_use" | "tool" => Some(Permission::ToolUse), "code_execution" | "code" => Some(Permission::CodeExecution),
+        "email_send" | "email" => Some(Permission::EmailSend), "file_delete" => Some(Permission::FileDelete),
+        "admin_access" | "admin" => Some(Permission::AdminAccess), "shell_access" | "shell" => Some(Permission::ShellAccess),
+>>>>>>> 4b60ced (docs: update README)
         "database_access" | "database" => Some(Permission::DatabaseAccess),
         _ => None,
     }
@@ -111,6 +146,7 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
     let mut perms = Vec::new();
     let action_lower = action.to_lowercase();
 
+<<<<<<< HEAD
     if action_lower.contains("execute_code")
         || action_lower.contains("run_code")
         || action_lower.contains("compile")
@@ -134,6 +170,19 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
         || action_lower.contains("create_file")
         || action_lower.contains("save")
     {
+=======
+    if action_lower.contains("execute_code") || action_lower.contains("run_code") || action_lower.contains("compile") {
+        perms.push(Permission::CodeExecution);
+    }
+    if action_lower.contains("network_call") || action_lower.contains("http_request") || action_lower.contains("fetch") {
+        perms.push(Permission::NetworkAccess);
+    }
+    if action_lower.contains("read_file") || action_lower.contains("get_file") || action_lower.contains("list_dir") {
+        perms.push(Permission::Read);
+        perms.push(Permission::FileSystem);
+    }
+    if action_lower.contains("write_file") || action_lower.contains("create_file") || action_lower.contains("save") {
+>>>>>>> 4b60ced (docs: update README)
         perms.push(Permission::Write);
         perms.push(Permission::FileSystem);
     }
@@ -144,6 +193,7 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
     if action_lower.contains("send_email") || action_lower.contains("email") {
         perms.push(Permission::EmailSend);
     }
+<<<<<<< HEAD
     if action_lower.contains("db_query")
         || action_lower.contains("sql")
         || action_lower.contains("database")
@@ -154,6 +204,12 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
         || action_lower.contains("bash")
         || action_lower.contains("cmd")
     {
+=======
+    if action_lower.contains("db_query") || action_lower.contains("sql") || action_lower.contains("database") {
+        perms.push(Permission::DatabaseAccess);
+    }
+    if action_lower.contains("shell") || action_lower.contains("bash") || action_lower.contains("cmd") {
+>>>>>>> 4b60ced (docs: update README)
         perms.push(Permission::ShellAccess);
     }
     if action_lower.contains("admin") || action_lower.contains("config") {
@@ -162,6 +218,7 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
 
     for tool in tools {
         let tl = tool.to_lowercase();
+<<<<<<< HEAD
         if tl.contains("shell") || tl.contains("bash") {
             perms.push(Permission::ShellAccess);
         }
@@ -183,6 +240,15 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
         if tl.contains("delete") || tl.contains("remove") {
             perms.push(Permission::FileDelete);
         }
+=======
+        if tl.contains("shell") || tl.contains("bash") { perms.push(Permission::ShellAccess); }
+        if tl.contains("code_exec") || tl.contains("python") || tl.contains("node") { perms.push(Permission::CodeExecution); }
+        if tl.contains("email") || tl.contains("smtp") { perms.push(Permission::EmailSend); }
+        if tl.contains("sql") || tl.contains("db_") { perms.push(Permission::DatabaseAccess); }
+        if tl.contains("http") || tl.contains("curl") || tl.contains("fetch") { perms.push(Permission::NetworkAccess); }
+        if tl.contains("write") || tl.contains("create") { perms.push(Permission::Write); }
+        if tl.contains("delete") || tl.contains("remove") { perms.push(Permission::FileDelete); }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     perms.sort_by(|a, b| format!("{:?}", a).cmp(&format!("{:?}", b)));
@@ -190,6 +256,7 @@ fn action_required_permissions(action: &str, tools: &[String]) -> Vec<Permission
     perms
 }
 
+<<<<<<< HEAD
 pub struct PermissionEnforcer {
     config: PermissionEnforcerConfig,
 }
@@ -214,6 +281,16 @@ impl PermissionEnforcer {
                 denied_permissions: vec![],
                 reason: "permission enforcer disabled".into(),
             };
+=======
+pub struct PermissionEnforcer { config: PermissionEnforcerConfig }
+
+impl PermissionEnforcer {
+    pub fn new(config: &PermissionEnforcerConfig) -> Self { Self { config: config.clone() } }
+
+    pub fn evaluate(&self, agent_type: &AgentType, action: &str, tools: &[String]) -> PermissionResult {
+        if !self.config.enabled {
+            return PermissionResult { allowed: true, effective_permissions: vec![], denied_permissions: vec![], reason: "permission enforcer disabled".into() };
+>>>>>>> 4b60ced (docs: update README)
         }
 
         let type_key = match agent_type {
@@ -221,6 +298,7 @@ impl PermissionEnforcer {
             other => format!("{:?}", other).to_lowercase(),
         };
 
+<<<<<<< HEAD
         let granted: Vec<Permission> =
             if let Some(overrides) = self.config.permission_overrides.get(&type_key) {
                 overrides
@@ -235,6 +313,17 @@ impl PermissionEnforcer {
         let granted_set: std::collections::HashSet<_> = granted.iter().collect();
         let denied: Vec<String> = required
             .iter()
+=======
+        let granted: Vec<Permission> = if let Some(overrides) = self.config.permission_overrides.get(&type_key) {
+            overrides.iter().filter_map(|p| parse_permission(p)).collect()
+        } else {
+            type_permissions(agent_type)
+        };
+
+        let required = action_required_permissions(action, tools);
+        let granted_set: std::collections::HashSet<_> = granted.iter().collect();
+        let denied: Vec<String> = required.iter()
+>>>>>>> 4b60ced (docs: update README)
             .filter(|p| !granted_set.contains(p))
             .map(|p| format!("{:?}", p))
             .collect();
@@ -246,12 +335,16 @@ impl PermissionEnforcer {
             format!("missing permissions: {}", denied.join(", "))
         };
 
+<<<<<<< HEAD
         PermissionResult {
             allowed,
             effective_permissions: granted,
             denied_permissions: denied,
             reason,
         }
+=======
+        PermissionResult { allowed, effective_permissions: granted, denied_permissions: denied, reason }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -259,9 +352,13 @@ impl PermissionEnforcer {
 mod tests {
     use super::*;
 
+<<<<<<< HEAD
     fn default_enforcer() -> PermissionEnforcer {
         PermissionEnforcer::new(&PermissionEnforcerConfig::default())
     }
+=======
+    fn default_enforcer() -> PermissionEnforcer { PermissionEnforcer::new(&PermissionEnforcerConfig::default()) }
+>>>>>>> 4b60ced (docs: update README)
 
     #[test]
     fn coder_can_execute_code() {
@@ -295,6 +392,7 @@ mod tests {
 
     #[test]
     fn disabled_allows_all() {
+<<<<<<< HEAD
         let e = PermissionEnforcer::new(&PermissionEnforcerConfig {
             enabled: false,
             ..Default::default()
@@ -304,6 +402,10 @@ mod tests {
             "execute_code",
             &["shell_exec".to_string()],
         );
+=======
+        let e = PermissionEnforcer::new(&PermissionEnforcerConfig { enabled: false, ..Default::default() });
+        let r = e.evaluate(&AgentType::Assistant, "execute_code", &["shell_exec".to_string()]);
+>>>>>>> 4b60ced (docs: update README)
         assert!(r.allowed);
     }
 }

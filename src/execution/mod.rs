@@ -30,12 +30,17 @@ use crate::{
 };
 
 pub use action_logger::{ActionLogEntry, ActionLogger, ActionLoggerConfig};
+<<<<<<< HEAD
 pub use approval_workflow::{
     ApprovalFallback, ApprovalRequest, ApprovalWorkflow, ApprovalWorkflowConfig,
 };
 pub use parameter_validator::{
     ParameterValidator, ParameterValidatorConfig, ParameterValidatorResult,
 };
+=======
+pub use approval_workflow::{ApprovalFallback, ApprovalRequest, ApprovalWorkflow, ApprovalWorkflowConfig};
+pub use parameter_validator::{ParameterValidator, ParameterValidatorConfig, ParameterValidatorResult};
+>>>>>>> 4b60ced (docs: update README)
 pub use sandbox_executor::{SandboxConfig, SandboxExecutor, SandboxExecutorConfig, SandboxMode};
 pub use ssrf_protector::{SsrfProtector, SsrfProtectorConfig, SsrfProtectorResult};
 pub use tool_allowlist::{ToolAllowlist, ToolAllowlistConfig, ToolEntry};
@@ -187,9 +192,13 @@ impl ExecutionRing {
         let mut approval_request = None;
 
         // Engine 1: Tool Allowlist
+<<<<<<< HEAD
         let allow_result = self
             .tool_allowlist
             .evaluate(&call.tool_name, &call.request_id);
+=======
+        let allow_result = self.tool_allowlist.evaluate(&call.tool_name, &call.request_id);
+>>>>>>> 4b60ced (docs: update README)
         engine_results.push(ExecutionEngineResult {
             engine_name: "tool_allowlist".into(),
             decision: allow_result.decision.clone(),
@@ -212,9 +221,13 @@ impl ExecutionRing {
         }
 
         // Engine 2: Parameter Validator
+<<<<<<< HEAD
         let param_result = self
             .parameter_validator
             .evaluate(&call.tool_name, &call.parameters);
+=======
+        let param_result = self.parameter_validator.evaluate(&call.tool_name, &call.parameters);
+>>>>>>> 4b60ced (docs: update README)
         engine_results.push(ExecutionEngineResult {
             engine_name: "parameter_validator".into(),
             decision: param_result.decision.clone(),
@@ -278,9 +291,17 @@ impl ExecutionRing {
         });
 
         // Engine 5: Approval Workflow (config only, doesn't block — escalation)
+<<<<<<< HEAD
         let approval_result =
             self.approval_workflow
                 .evaluate(&call.tool_name, &call.request_id, &call.parameters);
+=======
+        let approval_result = self.approval_workflow.evaluate(
+            &call.tool_name,
+            &call.request_id,
+            &call.parameters,
+        );
+>>>>>>> 4b60ced (docs: update README)
         if let Some(req) = &approval_result.approval_required {
             approval_request = Some(req.clone());
             final_decision = Decision::Escalate {
@@ -431,6 +452,7 @@ mod tests {
     #[test]
     fn deny_ssrf_in_params() {
         let ring = default_ring();
+<<<<<<< HEAD
         let call = make_call(
             "web_search",
             serde_json::json!({
@@ -444,6 +466,15 @@ mod tests {
             .engine_results
             .iter()
             .any(|r| r.engine_name == "ssrf_protector" && r.decision.is_deny()));
+=======
+        let call = make_call("web_search", serde_json::json!({
+            "query": "test",
+            "url": "http://169.254.169.254/latest/meta-data/"
+        }));
+        let verdict = ring.evaluate(&call);
+        assert!(verdict.decision.is_deny());
+        assert!(verdict.engine_results.iter().any(|r| r.engine_name == "ssrf_protector" && r.decision.is_deny()));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

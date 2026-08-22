@@ -112,6 +112,7 @@ pub struct SessionIdentityConfig {
     pub trust_bases: std::collections::HashMap<String, f64>,
 }
 
+<<<<<<< HEAD
 fn default_enabled() -> bool {
     true
 }
@@ -121,6 +122,11 @@ fn default_min_key_length() -> usize {
 fn default_max_key_length() -> usize {
     256
 }
+=======
+fn default_enabled() -> bool { true }
+fn default_min_key_length() -> usize { 16 }
+fn default_max_key_length() -> usize { 256 }
+>>>>>>> 4b60ced (docs: update README)
 
 fn default_trust_levels() -> std::collections::HashMap<String, f64> {
     let mut m = std::collections::HashMap::new();
@@ -167,9 +173,13 @@ pub struct SessionIdentity {
 
 impl SessionIdentity {
     pub fn new(config: &SessionIdentityConfig) -> Self {
+<<<<<<< HEAD
         Self {
             config: config.clone(),
         }
+=======
+        Self { config: config.clone() }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Classify and validate the identity from a request.
@@ -286,11 +296,15 @@ impl SessionIdentity {
 
             // It's an API key.
             let prefix_valid = self.config.valid_api_key_prefixes.is_empty()
+<<<<<<< HEAD
                 || self
                     .config
                     .valid_api_key_prefixes
                     .iter()
                     .any(|p| key.starts_with(p));
+=======
+                || self.config.valid_api_key_prefixes.iter().any(|p| key.starts_with(p));
+>>>>>>> 4b60ced (docs: update README)
             let length_valid = key.len() >= self.config.min_api_key_length
                 && key.len() <= self.config.max_api_key_length;
 
@@ -307,10 +321,14 @@ impl SessionIdentity {
                 reason: if valid {
                     format!("api key identity: {}", profile.principal_id)
                 } else if !prefix_valid {
+<<<<<<< HEAD
                     format!(
                         "api key prefix not recognized: {:?}",
                         self.config.valid_api_key_prefixes
                     )
+=======
+                    format!("api key prefix not recognized: {:?}", self.config.valid_api_key_prefixes)
+>>>>>>> 4b60ced (docs: update README)
                 } else {
                     format!(
                         "api key length {} outside range [{}, {}]",
@@ -417,8 +435,12 @@ fn base64_decode_urlsafe(input: &str) -> Option<String> {
             Err(_) => {
                 // Try with standard engine as fallback.
                 let engine = base64::engine::general_purpose::STANDARD;
+<<<<<<< HEAD
                 engine
                     .decode(&format!("{}{}", s, padding))
+=======
+                engine.decode(&format!("{}{}", s, padding))
+>>>>>>> 4b60ced (docs: update README)
                     .ok()
                     .and_then(|bytes| String::from_utf8(bytes).ok())
             }
@@ -429,7 +451,11 @@ fn base64_decode_urlsafe(input: &str) -> Option<String> {
 
 /// Compute a SHA-256 hash prefix for display/logging.
 fn hash_prefix(input: &str) -> String {
+<<<<<<< HEAD
     use sha2::{Digest, Sha256};
+=======
+    use sha2::{Sha256, Digest};
+>>>>>>> 4b60ced (docs: update README)
     let mut hasher = Sha256::new();
     hasher.update(input.as_bytes());
     let hash = hasher.finalize();
@@ -447,10 +473,14 @@ mod tests {
     }
 
     fn headers_from(pairs: Vec<(&str, &str)>) -> std::collections::HashMap<String, String> {
+<<<<<<< HEAD
         pairs
             .into_iter()
             .map(|(k, v)| (k.to_string(), v.to_string()))
             .collect()
+=======
+        pairs.into_iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -465,10 +495,14 @@ mod tests {
     #[test]
     fn api_key_recognized() {
         let engine = default_engine();
+<<<<<<< HEAD
         let result = engine.evaluate(
             Some("sk-live-abcdefghij1234567890"),
             &std::collections::HashMap::new(),
         );
+=======
+        let result = engine.evaluate(Some("sk-live-abcdefghij1234567890"), &std::collections::HashMap::new());
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(result.profile.identity_type, IdentityType::ApiKey);
         assert!(result.profile.principal_id.starts_with("key:"));
         assert!(result.valid);
@@ -489,10 +523,14 @@ mod tests {
             valid_api_key_prefixes: vec!["sk-".into()],
             ..Default::default()
         });
+<<<<<<< HEAD
         let result = engine.evaluate(
             Some("xx-some-long-key-12345678"),
             &std::collections::HashMap::new(),
         );
+=======
+        let result = engine.evaluate(Some("xx-some-long-key-12345678"), &std::collections::HashMap::new());
+>>>>>>> 4b60ced (docs: update README)
         assert!(!result.valid);
         assert!(result.reason.contains("prefix"));
     }
@@ -501,10 +539,15 @@ mod tests {
     fn jwt_detected() {
         let engine = default_engine();
         // A minimal valid-format JWT.
+<<<<<<< HEAD
         let header = base64::engine::general_purpose::URL_SAFE_NO_PAD
             .encode(r#"{"alg":"HS256","typ":"JWT"}"#);
         let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD
             .encode(r#"{"sub":"user-42","iss":"auth.example.com"}"#);
+=======
+        let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"HS256","typ":"JWT"}"#);
+        let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"sub":"user-42","iss":"auth.example.com"}"#);
+>>>>>>> 4b60ced (docs: update README)
         let signature = "signature";
         let jwt = format!("{}.{}.{}", header, payload, signature);
 
@@ -512,11 +555,15 @@ mod tests {
         assert_eq!(result.profile.identity_type, IdentityType::Jwt);
         assert_eq!(result.profile.principal_id, "user-42");
         assert!(result.profile.claims.iter().any(|c| c == "sub:user-42"));
+<<<<<<< HEAD
         assert!(result
             .profile
             .claims
             .iter()
             .any(|c| c == "iss:auth.example.com"));
+=======
+        assert!(result.profile.claims.iter().any(|c| c == "iss:auth.example.com"));
+>>>>>>> 4b60ced (docs: update README)
         assert!(result.valid);
     }
 
@@ -524,8 +571,12 @@ mod tests {
     fn jwt_with_roles() {
         let engine = default_engine();
         let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"RS256"}"#);
+<<<<<<< HEAD
         let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD
             .encode(r#"{"sub":"admin","roles":["admin","auditor"]}"#);
+=======
+        let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"sub":"admin","roles":["admin","auditor"]}"#);
+>>>>>>> 4b60ced (docs: update README)
         let jwt = format!("{}.{}.{}", header, payload, "sig");
 
         let result = engine.evaluate(Some(&jwt), &std::collections::HashMap::new());
@@ -572,10 +623,14 @@ mod tests {
     #[test]
     fn mtls_detected() {
         let engine = default_engine();
+<<<<<<< HEAD
         let headers = headers_from(vec![(
             "x-client-cert-fingerprint",
             "a1b2c3d4e5f6a1b2c3d4e5f6",
         )]);
+=======
+        let headers = headers_from(vec![("x-client-cert-fingerprint", "a1b2c3d4e5f6a1b2c3d4e5f6")]);
+>>>>>>> 4b60ced (docs: update README)
         let result = engine.evaluate(None, &headers);
         assert_eq!(result.profile.identity_type, IdentityType::Mtls);
         assert!(result.valid);
@@ -583,6 +638,7 @@ mod tests {
 
     #[test]
     fn disabled_engine_allows_anonymous() {
+<<<<<<< HEAD
         let engine = SessionIdentity::new(&SessionIdentityConfig {
             enabled: false,
             ..Default::default()
@@ -591,6 +647,10 @@ mod tests {
             Some("sk-test-1234567890123456"),
             &std::collections::HashMap::new(),
         );
+=======
+        let engine = SessionIdentity::new(&SessionIdentityConfig { enabled: false, ..Default::default() });
+        let result = engine.evaluate(Some("sk-test-1234567890123456"), &std::collections::HashMap::new());
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(result.profile.identity_type, IdentityType::Anonymous);
         assert!(result.valid);
     }
@@ -605,10 +665,14 @@ mod tests {
             },
             ..Default::default()
         });
+<<<<<<< HEAD
         let result = engine.evaluate(
             Some("sk-custom-high-trust-key"),
             &std::collections::HashMap::new(),
         );
+=======
+        let result = engine.evaluate(Some("sk-custom-high-trust-key"), &std::collections::HashMap::new());
+>>>>>>> 4b60ced (docs: update README)
         assert!((result.profile.trust_base - 0.9).abs() < 0.01);
     }
 
@@ -617,8 +681,12 @@ mod tests {
         let engine = default_engine();
         let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"HS256"}"#);
         // exp = 0 (Jan 1 1970 — always expired).
+<<<<<<< HEAD
         let payload =
             base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"sub":"user","exp":0}"#);
+=======
+        let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"sub":"user","exp":0}"#);
+>>>>>>> 4b60ced (docs: update README)
         let jwt = format!("{}.{}.{}", header, payload, "sig");
 
         let result = engine.evaluate(Some(&jwt), &std::collections::HashMap::new());

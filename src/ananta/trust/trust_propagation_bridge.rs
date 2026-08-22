@@ -20,7 +20,13 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, info, warn};
 
 use crate::ananta::sentinel::drift::{AlertSeverity as DriftAlertSeverity, DriftAlert};
+<<<<<<< HEAD
 use crate::ananta::trust::trust_engine::{BayesianTrustEngine, PropagationResult, TrustEvidence};
+=======
+use crate::ananta::trust::trust_engine::{
+    BayesianTrustEngine, PropagationResult, TrustEvidence,
+};
+>>>>>>> 4b60ced (docs: update README)
 use crate::ananta::trust::trust_state::TrustState;
 
 // ---------------------------------------------------------------------------
@@ -168,7 +174,14 @@ impl EventToEvidenceConverter {
 
     /// Get the default weight for a source.
     pub fn get_weight(&self, source: &TrustEventSource) -> f64 {
+<<<<<<< HEAD
         self.weight_map.get(source).copied().unwrap_or(0.5)
+=======
+        self.weight_map
+            .get(source)
+            .copied()
+            .unwrap_or(0.5)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Get the sentinel node name.
@@ -239,7 +252,16 @@ impl EventToEvidenceConverter {
     /// - `domain`: the trust domain this integrity check covers
     /// - `passed`: whether the integrity check passed
     /// - `detail`: human-readable detail string
+<<<<<<< HEAD
     pub fn convert_integrity_result(&self, domain: &str, passed: bool, detail: &str) -> TrustEvent {
+=======
+    pub fn convert_integrity_result(
+        &self,
+        domain: &str,
+        passed: bool,
+        detail: &str,
+    ) -> TrustEvent {
+>>>>>>> 4b60ced (docs: update README)
         let base_weight = self
             .weight_map
             .get(&TrustEventSource::IntegrityCheck)
@@ -722,9 +744,13 @@ impl TrustPropagationOrchestrator {
 
     /// Submit multiple trust events at once.
     pub fn submit_events(&mut self, events: Vec<TrustEvent>) -> Result<usize, String> {
+<<<<<<< HEAD
         let available = self
             .max_pending_events
             .saturating_sub(self.pending_events.len());
+=======
+        let available = self.max_pending_events.saturating_sub(self.pending_events.len());
+>>>>>>> 4b60ced (docs: update README)
         let total = events.len();
         if total > available {
             let accepted = total.min(available);
@@ -732,7 +758,12 @@ impl TrustPropagationOrchestrator {
             self.pending_events.extend(batch);
             return Err(format!(
                 "only {}/{} events accepted (buffer near capacity)",
+<<<<<<< HEAD
                 accepted, total
+=======
+                accepted,
+                total
+>>>>>>> 4b60ced (docs: update README)
             ));
         }
         self.pending_events.extend(events);
@@ -938,7 +969,14 @@ impl UnifiedTrustSnapshot {
     /// Bayesian engine.
     ///
     /// The Bayesian engine is propagated first to get fresh node-level values.
+<<<<<<< HEAD
     pub fn compute(simple: &TrustState, engine: &mut BayesianTrustEngine) -> Self {
+=======
+    pub fn compute(
+        simple: &TrustState,
+        engine: &mut BayesianTrustEngine,
+    ) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         let timestamp = chrono::Utc::now().to_rfc3339();
 
         // Collect simple domain levels.
@@ -957,8 +995,15 @@ impl UnifiedTrustSnapshot {
             .collect();
 
         // Compute overall scores as unweighted averages of available domains.
+<<<<<<< HEAD
         let all_domains: std::collections::HashSet<&String> =
             simple_domains.keys().chain(bayesian_nodes.keys()).collect();
+=======
+        let all_domains: std::collections::HashSet<&String> = simple_domains
+            .keys()
+            .chain(bayesian_nodes.keys())
+            .collect();
+>>>>>>> 4b60ced (docs: update README)
 
         let (mut simple_sum, mut bayesian_sum, mut count) = (0.0, 0.0, 0usize);
         for domain in &all_domains {
@@ -968,6 +1013,7 @@ impl UnifiedTrustSnapshot {
             bayesian_sum += b;
             count += 1;
         }
+<<<<<<< HEAD
         let overall_simple = if count > 0 {
             simple_sum / count as f64
         } else {
@@ -978,6 +1024,10 @@ impl UnifiedTrustSnapshot {
         } else {
             1.0
         };
+=======
+        let overall_simple = if count > 0 { simple_sum / count as f64 } else { 1.0 };
+        let overall_bayesian = if count > 0 { bayesian_sum / count as f64 } else { 1.0 };
+>>>>>>> 4b60ced (docs: update README)
 
         // Build divergence report.
         let mut divergence_report: Vec<TrustDivergence> = vec![];
@@ -1046,7 +1096,14 @@ impl UnifiedTrustSnapshot {
             .count();
 
         let most = match self.most_divergent() {
+<<<<<<< HEAD
             Some(d) => format!(" | most_divergent: {} ({:.3})", d.domain, d.divergence),
+=======
+            Some(d) => format!(
+                " | most_divergent: {} ({:.3})",
+                d.domain, d.divergence
+            ),
+>>>>>>> 4b60ced (docs: update README)
             None => String::new(),
         };
 
@@ -1142,8 +1199,16 @@ mod tests {
         #[test]
         fn test_convert_positive_event() {
             let converter = EventToEvidenceConverter::new();
+<<<<<<< HEAD
             let event =
                 TrustEvent::positive("decision", TrustEventSource::HealthObservation, "healthy");
+=======
+            let event = TrustEvent::positive(
+                "decision",
+                TrustEventSource::HealthObservation,
+                "healthy",
+            );
+>>>>>>> 4b60ced (docs: update README)
             let (from, to, evidence) = converter.convert(&event);
             assert_eq!(from, "ananta_plane");
             assert_eq!(to, "decision");
@@ -1153,7 +1218,15 @@ mod tests {
         #[test]
         fn test_convert_negative_event() {
             let converter = EventToEvidenceConverter::new();
+<<<<<<< HEAD
             let event = TrustEvent::negative("policy", TrustEventSource::DriftAlert, "drift!");
+=======
+            let event = TrustEvent::negative(
+                "policy",
+                TrustEventSource::DriftAlert,
+                "drift!",
+            );
+>>>>>>> 4b60ced (docs: update README)
             let (_, _, evidence) = converter.convert(&event);
             assert!(!evidence.is_positive);
         }
@@ -1229,7 +1302,17 @@ mod tests {
 
             // Now add strong negative evidence to drive a domain down.
             for _ in 0..20 {
+<<<<<<< HEAD
                 engine.record_evidence("ananta_plane", "decision", false, 1.0, "test_negative");
+=======
+                engine.record_evidence(
+                    "ananta_plane",
+                    "decision",
+                    false,
+                    1.0,
+                    "test_negative",
+                );
+>>>>>>> 4b60ced (docs: update README)
             }
 
             let result = sync.sync_from_engine(&mut engine, &mut state);
@@ -1254,11 +1337,28 @@ mod tests {
 
             // Add positive evidence in the engine.
             for _ in 0..20 {
+<<<<<<< HEAD
                 engine.record_evidence("ananta_plane", "policy", true, 1.0, "test_positive");
             }
 
             let result = sync.reconcile(&mut state, &mut engine);
             let policy_change = result.trust_changes.iter().find(|c| c.domain == "policy");
+=======
+                engine.record_evidence(
+                    "ananta_plane",
+                    "policy",
+                    true,
+                    1.0,
+                    "test_positive",
+                );
+            }
+
+            let result = sync.reconcile(&mut state, &mut engine);
+            let policy_change = result
+                .trust_changes
+                .iter()
+                .find(|c| c.domain == "policy");
+>>>>>>> 4b60ced (docs: update README)
             assert!(
                 policy_change.is_some(),
                 "policy domain should have a trust change after reconciliation"
@@ -1281,8 +1381,16 @@ mod tests {
         fn test_apply_event_success() {
             let mut engine = BayesianTrustEngine::new();
             let sync = TrustStateSynchronizer::new();
+<<<<<<< HEAD
             let event =
                 TrustEvent::positive("decision", TrustEventSource::HealthObservation, "healthy");
+=======
+            let event = TrustEvent::positive(
+                "decision",
+                TrustEventSource::HealthObservation,
+                "healthy",
+            );
+>>>>>>> 4b60ced (docs: update README)
             let result = sync.apply_event(&mut engine, &event);
             assert!(result.is_ok());
             assert!(engine.edge_count() > 0);
@@ -1292,7 +1400,17 @@ mod tests {
         fn test_apply_event_rejects_empty_domain() {
             let mut engine = BayesianTrustEngine::new();
             let sync = TrustStateSynchronizer::new();
+<<<<<<< HEAD
             let event = TrustEvent::new(TrustEventSource::HealthObservation, "", true, 0.5, "test");
+=======
+            let event = TrustEvent::new(
+                TrustEventSource::HealthObservation,
+                "",
+                true,
+                0.5,
+                "test",
+            );
+>>>>>>> 4b60ced (docs: update README)
             let result = sync.apply_event(&mut engine, &event);
             assert!(result.is_err());
         }
@@ -1360,7 +1478,15 @@ mod tests {
         #[test]
         fn test_submit_event() {
             let mut orch = TrustPropagationOrchestrator::new();
+<<<<<<< HEAD
             let event = TrustEvent::positive("decision", TrustEventSource::HealthObservation, "ok");
+=======
+            let event = TrustEvent::positive(
+                "decision",
+                TrustEventSource::HealthObservation,
+                "ok",
+            );
+>>>>>>> 4b60ced (docs: update README)
             let result = orch.submit_event(event);
             assert!(result.is_ok());
             assert_eq!(orch.get_pending_count(), 1);
@@ -1375,14 +1501,22 @@ mod tests {
                 "decision",
                 TrustEventSource::HealthObservation,
                 "ok",
+<<<<<<< HEAD
             ))
             .unwrap();
+=======
+            )).unwrap();
+>>>>>>> 4b60ced (docs: update README)
             orch.submit_event(TrustEvent::negative(
                 "policy",
                 TrustEventSource::DriftAlert,
                 "drift",
+<<<<<<< HEAD
             ))
             .unwrap();
+=======
+            )).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
             let result = orch.process_pending(&mut engine);
             assert!(result.is_ok());
@@ -1403,14 +1537,22 @@ mod tests {
                 "decision",
                 TrustEventSource::DriftAlert,
                 "drift detected",
+<<<<<<< HEAD
             ))
             .unwrap();
+=======
+            )).unwrap();
+>>>>>>> 4b60ced (docs: update README)
             orch.submit_event(TrustEvent::positive(
                 "policy",
                 TrustEventSource::AttestationCycle,
                 "attestation ok",
+<<<<<<< HEAD
             ))
             .unwrap();
+=======
+            )).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
             let result = orch.run_propagation_cycle(&mut engine, &mut state);
             assert!(result.is_ok());
@@ -1426,6 +1568,7 @@ mod tests {
                 ..TrustPropagationOrchestrator::default()
             };
 
+<<<<<<< HEAD
             orch.submit_event(TrustEvent::positive(
                 "a",
                 TrustEventSource::HealthObservation,
@@ -1444,12 +1587,19 @@ mod tests {
                 TrustEventSource::HealthObservation,
                 "ok",
             ));
+=======
+            orch.submit_event(TrustEvent::positive("a", TrustEventSource::HealthObservation, "ok")).unwrap();
+            orch.submit_event(TrustEvent::positive("b", TrustEventSource::HealthObservation, "ok")).unwrap();
+
+            let result = orch.submit_event(TrustEvent::positive("c", TrustEventSource::HealthObservation, "ok"));
+>>>>>>> 4b60ced (docs: update README)
             assert!(result.is_err());
         }
 
         #[test]
         fn test_clear_pending() {
             let mut orch = TrustPropagationOrchestrator::new();
+<<<<<<< HEAD
             orch.submit_event(TrustEvent::positive(
                 "a",
                 TrustEventSource::HealthObservation,
@@ -1462,6 +1612,10 @@ mod tests {
                 "ok",
             ))
             .unwrap();
+=======
+            orch.submit_event(TrustEvent::positive("a", TrustEventSource::HealthObservation, "ok")).unwrap();
+            orch.submit_event(TrustEvent::positive("b", TrustEventSource::HealthObservation, "ok")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
             assert_eq!(orch.get_pending_count(), 2);
 
             orch.clear_pending();
@@ -1788,17 +1942,27 @@ mod tests {
             // 6. Take a unified snapshot.
             let snapshot = UnifiedTrustSnapshot::compute(&state, &mut engine);
             assert!(!snapshot.timestamp.is_empty());
+<<<<<<< HEAD
             assert!(snapshot.agreement_score >= 0.0 && snapshot.agreement_score <= 1.0);
+=======
+            assert!(
+                snapshot.agreement_score >= 0.0 && snapshot.agreement_score <= 1.0
+            );
+>>>>>>> 4b60ced (docs: update README)
 
             let summary = snapshot.agreement_summary();
             assert!(!summary.is_empty());
 
             // Decision and configuration should show some impact.
             assert!(
+<<<<<<< HEAD
                 snapshot
                     .divergence_report
                     .iter()
                     .any(|d| d.domain == "decision"),
+=======
+                snapshot.divergence_report.iter().any(|d| d.domain == "decision"),
+>>>>>>> 4b60ced (docs: update README)
                 "decision should be in divergence report"
             );
         }
@@ -1880,6 +2044,7 @@ mod tests {
 
         #[test]
         fn test_divergence_severity_classification() {
+<<<<<<< HEAD
             assert_eq!(
                 DivergenceSeverity::from_divergence(0.01),
                 DivergenceSeverity::None
@@ -1900,6 +2065,13 @@ mod tests {
                 DivergenceSeverity::from_divergence(0.60),
                 DivergenceSeverity::Critical
             );
+=======
+            assert_eq!(DivergenceSeverity::from_divergence(0.01), DivergenceSeverity::None);
+            assert_eq!(DivergenceSeverity::from_divergence(0.10), DivergenceSeverity::Low);
+            assert_eq!(DivergenceSeverity::from_divergence(0.20), DivergenceSeverity::Medium);
+            assert_eq!(DivergenceSeverity::from_divergence(0.40), DivergenceSeverity::High);
+            assert_eq!(DivergenceSeverity::from_divergence(0.60), DivergenceSeverity::Critical);
+>>>>>>> 4b60ced (docs: update README)
         }
 
         #[test]
@@ -1933,9 +2105,13 @@ mod tests {
             assert!(
                 high.weight > low.weight,
                 "high health ({:.3}) should have more weight ({:.3}) than marginal ({:.3})",
+<<<<<<< HEAD
                 0.95,
                 high.weight,
                 low.weight
+=======
+                0.95, high.weight, low.weight
+>>>>>>> 4b60ced (docs: update README)
             );
         }
 

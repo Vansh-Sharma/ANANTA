@@ -7,9 +7,15 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+<<<<<<< HEAD
 use super::evidence_chain::EvidenceItem;
 use super::playbook::PlaybookResult;
 use super::{Incident, IncidentClassification, IncidentSeverity};
+=======
+use super::{Incident, IncidentClassification, IncidentSeverity};
+use super::evidence_chain::EvidenceItem;
+use super::playbook::PlaybookResult;
+>>>>>>> 4b60ced (docs: update README)
 use crate::error::{Error, Result};
 
 // ── Output Format ──
@@ -281,8 +287,12 @@ impl ReportGenerator {
                 timestamp: item.collected_at,
                 event: format!(
                     "Evidence collected: {} ({})",
+<<<<<<< HEAD
                     item.description,
                     item.evidence_type.label()
+=======
+                    item.description, item.evidence_type.label()
+>>>>>>> 4b60ced (docs: update README)
                 ),
                 actor: "evidence_collector".to_string(),
                 category: TimelineCategory::Evidence,
@@ -295,7 +305,13 @@ impl ReportGenerator {
                 timestamp: Utc::now(),
                 event: format!(
                     "Playbook completed: {} steps done, {} failed, {}ms",
+<<<<<<< HEAD
                     result.steps_completed, result.steps_failed, result.total_time_ms
+=======
+                    result.steps_completed,
+                    result.steps_failed,
+                    result.total_time_ms
+>>>>>>> 4b60ced (docs: update README)
                 ),
                 actor: "playbook_engine".to_string(),
                 category: TimelineCategory::Response,
@@ -437,10 +453,14 @@ impl ReportGenerator {
             }
         }
 
+<<<<<<< HEAD
         RemediationActions {
             executed,
             recommended,
         }
+=======
+        RemediationActions { executed, recommended }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Summarize evidence.
@@ -456,10 +476,14 @@ impl ReportGenerator {
 
         let mut by_type: Vec<TypeBreakdown> = type_counts
             .into_iter()
+<<<<<<< HEAD
             .map(|(evidence_type, count)| TypeBreakdown {
                 evidence_type,
                 count,
             })
+=======
+            .map(|(evidence_type, count)| TypeBreakdown { evidence_type, count })
+>>>>>>> 4b60ced (docs: update README)
             .collect();
         by_type.sort_by(|a, b| b.count.cmp(&a.count));
 
@@ -482,26 +506,39 @@ impl ReportGenerator {
     }
 
     fn format_json(&self, report: &IncidentReport) -> Result<String> {
+<<<<<<< HEAD
         serde_json::to_string_pretty(report).map_err(|e| Error::Serialization(e.to_string()))
+=======
+        serde_json::to_string_pretty(report)
+            .map_err(|e| Error::Serialization(e.to_string()))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     fn format_text(&self, report: &IncidentReport) -> Result<String> {
         let mut out = String::new();
         out.push_str(&format!("=== INCIDENT RESPONSE REPORT ===\n"));
         out.push_str(&format!("Incident ID: {}\n", report.incident_id));
+<<<<<<< HEAD
         out.push_str(&format!(
             "Classification: {}\n",
             report.classification.label()
         ));
+=======
+        out.push_str(&format!("Classification: {}\n", report.classification.label()));
+>>>>>>> 4b60ced (docs: update README)
         out.push_str(&format!("Severity: {}\n", report.severity));
         out.push_str(&format!("Generated: {}\n\n", report.generated_at));
 
         out.push_str("--- EXECUTIVE SUMMARY ---\n");
         out.push_str(&format!("{}\n", report.executive_summary.overview));
+<<<<<<< HEAD
         out.push_str(&format!(
             "Contained: {}\n",
             report.executive_summary.contained
         ));
+=======
+        out.push_str(&format!("Contained: {}\n", report.executive_summary.contained));
+>>>>>>> 4b60ced (docs: update README)
         for metric in &report.executive_summary.key_metrics {
             out.push_str(&format!("  - {metric}\n"));
         }
@@ -519,10 +556,14 @@ impl ReportGenerator {
         out.push_str("\n");
 
         out.push_str("--- ROOT CAUSE ANALYSIS ---\n");
+<<<<<<< HEAD
         out.push_str(&format!(
             "Primary: {}\n",
             report.root_cause_analysis.primary_cause
         ));
+=======
+        out.push_str(&format!("Primary: {}\n", report.root_cause_analysis.primary_cause));
+>>>>>>> 4b60ced (docs: update README)
         for factor in &report.root_cause_analysis.contributing_factors {
             out.push_str(&format!("  Factor: {factor}\n"));
         }
@@ -566,9 +607,13 @@ impl ReportGenerator {
         let mut out = String::new();
         out.push_str("<!DOCTYPE html>\n<html><head>\n");
         out.push_str("<title>Incident Report</title>\n");
+<<<<<<< HEAD
         out.push_str(
             "<style>body{font-family:sans-serif;max-width:900px;margin:2em auto;padding:0 1em;}",
         );
+=======
+        out.push_str("<style>body{font-family:sans-serif;max-width:900px;margin:2em auto;padding:0 1em;}");
+>>>>>>> 4b60ced (docs: update README)
         out.push_str("h1{color:#c62828;}h2{color:#1565c0;border-bottom:1px solid #ddd;padding-bottom:0.3em;}");
         out.push_str(".metric{background:#f5f5f5;padding:0.5em;border-radius:4px;margin:0.3em 0;}");
         out.push_str(".severity-critical{color:#c62828;font-weight:bold;}");
@@ -576,6 +621,7 @@ impl ReportGenerator {
         out.push_str("table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:0.5em;text-align:left;}");
         out.push_str("th{background:#e3f2fd;}\n</style></head><body>\n");
 
+<<<<<<< HEAD
         out.push_str(&format!(
             "<h1>Incident Report: {}</h1>\n",
             report.incident_id
@@ -593,6 +639,13 @@ impl ReportGenerator {
             "<strong>Generated:</strong> {}</p>\n",
             report.generated_at
         ));
+=======
+        out.push_str(&format!("<h1>Incident Report: {}</h1>\n", report.incident_id));
+        out.push_str(&format!("<p><strong>Classification:</strong> {} | ", report.classification.label()));
+        out.push_str(&format!("<strong>Severity:</strong> <span class=\"severity-{}\">{}</span> | ",
+            format!("{:?}", report.severity).to_lowercase(), report.severity));
+        out.push_str(&format!("<strong>Generated:</strong> {}</p>\n", report.generated_at));
+>>>>>>> 4b60ced (docs: update README)
 
         out.push_str("<h2>Executive Summary</h2>\n");
         out.push_str(&format!("<p>{}</p>\n", report.executive_summary.overview));
@@ -613,15 +666,20 @@ impl ReportGenerator {
         out.push_str("</table>\n");
 
         out.push_str("<h2>Root Cause Analysis</h2>\n");
+<<<<<<< HEAD
         out.push_str(&format!(
             "<p><strong>Primary Cause:</strong> {}</p>\n",
             report.root_cause_analysis.primary_cause
         ));
+=======
+        out.push_str(&format!("<p><strong>Primary Cause:</strong> {}</p>\n", report.root_cause_analysis.primary_cause));
+>>>>>>> 4b60ced (docs: update README)
         for factor in &report.root_cause_analysis.contributing_factors {
             out.push_str(&format!("<p>Contributing Factor: {factor}</p>\n"));
         }
 
         out.push_str("<h2>Impact</h2>\n");
+<<<<<<< HEAD
         out.push_str(&format!(
             "<p>Resources affected: {}</p>\n",
             report.impact_analysis.resources_affected
@@ -658,6 +716,24 @@ impl ReportGenerator {
             out.push_str(&format!(
                 "<p>Chain integrity hash: <code>{hash}</code></p>\n"
             ));
+=======
+        out.push_str(&format!("<p>Resources affected: {}</p>\n", report.impact_analysis.resources_affected));
+        out.push_str(&format!("<p>Business impact: {:?}</p>\n", report.impact_analysis.business_impact));
+        out.push_str(&format!("<p>Data exposed: {}</p>\n", report.impact_analysis.data_exposure.exposed));
+
+        out.push_str("<h2>Remediation</h2>\n");
+        for action in &report.remediation_actions.executed {
+            out.push_str(&format!("<p>[Executed] {} ({:?})</p>\n", action.description, action.status));
+        }
+        for action in &report.remediation_actions.recommended {
+            out.push_str(&format!("<p>[Recommended] {} ({:?})</p>\n", action.description, action.status));
+        }
+
+        out.push_str("<h2>Evidence</h2>\n");
+        out.push_str(&format!("<p>Total items: {}</p>\n", report.evidence_summary.total_items));
+        if let Some(ref hash) = report.evidence_summary.chain_integrity_hash {
+            out.push_str(&format!("<p>Chain integrity hash: <code>{hash}</code></p>\n"));
+>>>>>>> 4b60ced (docs: update README)
         }
 
         out.push_str("</body></html>");
@@ -678,7 +754,15 @@ mod tests {
     use super::*;
     use crate::incident_response::evidence_chain::{EvidenceCollector, EvidenceType};
 
+<<<<<<< HEAD
     fn make_incident(cls: IncidentClassification, sev: IncidentSeverity, ring: u8) -> Incident {
+=======
+    fn make_incident(
+        cls: IncidentClassification,
+        sev: IncidentSeverity,
+        ring: u8,
+    ) -> Incident {
+>>>>>>> 4b60ced (docs: update README)
         Incident::new(cls, "test incident", ring)
             .with_severity(sev)
             .with_resources(vec!["resource-a".to_string()])
@@ -686,6 +770,7 @@ mod tests {
 
     #[test]
     fn test_output_format_serialization() {
+<<<<<<< HEAD
         assert_eq!(
             serde_json::to_string(&OutputFormat::Json).unwrap(),
             "\"json\""
@@ -694,6 +779,10 @@ mod tests {
             serde_json::to_string(&OutputFormat::Html).unwrap(),
             "\"html\""
         );
+=======
+        assert_eq!(serde_json::to_string(&OutputFormat::Json).unwrap(), "\"json\"");
+        assert_eq!(serde_json::to_string(&OutputFormat::Html).unwrap(), "\"html\"");
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -711,11 +800,15 @@ mod tests {
     #[test]
     fn test_build_timeline() {
         let gen = ReportGenerator::new();
+<<<<<<< HEAD
         let incident = make_incident(
             IncidentClassification::DataBreach,
             IncidentSeverity::Critical,
             2,
         );
+=======
+        let incident = make_incident(IncidentClassification::DataBreach, IncidentSeverity::Critical, 2);
+>>>>>>> 4b60ced (docs: update README)
         let timeline = gen.build_timeline(&incident, &[], &[]);
 
         assert_eq!(timeline.len(), 1);
@@ -725,11 +818,15 @@ mod tests {
     #[test]
     fn test_analyze_root_cause() {
         let gen = ReportGenerator::new();
+<<<<<<< HEAD
         let incident = make_incident(
             IncidentClassification::PromptInjection,
             IncidentSeverity::Medium,
             5,
         );
+=======
+        let incident = make_incident(IncidentClassification::PromptInjection, IncidentSeverity::Medium, 5);
+>>>>>>> 4b60ced (docs: update README)
         let rca = gen.analyze_root_cause(&incident);
 
         assert!(rca.primary_cause.contains("prompt"));
@@ -741,11 +838,15 @@ mod tests {
     #[test]
     fn test_assess_impact() {
         let gen = ReportGenerator::new();
+<<<<<<< HEAD
         let incident = make_incident(
             IncidentClassification::DataBreach,
             IncidentSeverity::Critical,
             1,
         );
+=======
+        let incident = make_incident(IncidentClassification::DataBreach, IncidentSeverity::Critical, 1);
+>>>>>>> 4b60ced (docs: update README)
         let impact = gen.assess_impact(&incident);
 
         assert_eq!(impact.resources_affected, 1);
@@ -766,6 +867,7 @@ mod tests {
     #[test]
     fn test_format_json() {
         let gen = ReportGenerator::new();
+<<<<<<< HEAD
         let incident = make_incident(
             IncidentClassification::PolicyViolation,
             IncidentSeverity::Low,
@@ -774,6 +876,10 @@ mod tests {
         let result = gen
             .generate(&incident, &[], &[], OutputFormat::Json)
             .unwrap();
+=======
+        let incident = make_incident(IncidentClassification::PolicyViolation, IncidentSeverity::Low, 3);
+        let result = gen.generate(&incident, &[], &[], OutputFormat::Json).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         let parsed: serde_json::Value = serde_json::from_str(&result).unwrap();
         assert_eq!(parsed["classification"], "policy_violation");
@@ -783,6 +889,7 @@ mod tests {
     #[test]
     fn test_format_text() {
         let gen = ReportGenerator::new();
+<<<<<<< HEAD
         let incident = make_incident(
             IncidentClassification::DataBreach,
             IncidentSeverity::High,
@@ -791,6 +898,10 @@ mod tests {
         let result = gen
             .generate(&incident, &[], &[], OutputFormat::Text)
             .unwrap();
+=======
+        let incident = make_incident(IncidentClassification::DataBreach, IncidentSeverity::High, 1);
+        let result = gen.generate(&incident, &[], &[], OutputFormat::Text).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         assert!(result.contains("INCIDENT RESPONSE REPORT"));
         assert!(result.contains("Data Breach"));
@@ -801,9 +912,13 @@ mod tests {
     fn test_format_html() {
         let gen = ReportGenerator::new();
         let incident = make_incident(IncidentClassification::DDoS, IncidentSeverity::Medium, 1);
+<<<<<<< HEAD
         let result = gen
             .generate(&incident, &[], &[], OutputFormat::Html)
             .unwrap();
+=======
+        let result = gen.generate(&incident, &[], &[], OutputFormat::Html).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         assert!(result.contains("<!DOCTYPE html>"));
         assert!(result.contains("<h1>Incident Report"));
@@ -814,11 +929,15 @@ mod tests {
     #[test]
     fn test_generate_with_evidence() {
         let gen = ReportGenerator::new();
+<<<<<<< HEAD
         let incident = make_incident(
             IncidentClassification::DataBreach,
             IncidentSeverity::Critical,
             2,
         );
+=======
+        let incident = make_incident(IncidentClassification::DataBreach, IncidentSeverity::Critical, 2);
+>>>>>>> 4b60ced (docs: update README)
 
         let mut collector = EvidenceCollector::new();
         collector
@@ -829,9 +948,13 @@ mod tests {
             .unwrap();
         let chain: Vec<_> = collector.get_chain(&incident.id);
 
+<<<<<<< HEAD
         let result = gen
             .generate(&incident, &chain, &[], OutputFormat::Text)
             .unwrap();
+=======
+        let result = gen.generate(&incident, &chain, &[], OutputFormat::Text).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(result.contains("Evidence collected"));
         assert!(result.contains("Total items: 2"));
     }
@@ -850,9 +973,13 @@ mod tests {
             step_details: Vec::new(),
         };
 
+<<<<<<< HEAD
         let result = gen
             .generate(&incident, &[], &[pb_result], OutputFormat::Text)
             .unwrap();
+=======
+        let result = gen.generate(&incident, &[], &[pb_result], OutputFormat::Text).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert!(result.contains("EXECUTED"));
         assert!(result.contains("Playbooks Executed: 1 (1 successful)"));
     }
@@ -874,9 +1001,13 @@ mod tests {
             .unwrap();
         let chain: Vec<_> = collector.get_chain(&incident.id);
 
+<<<<<<< HEAD
         let report_result = gen
             .generate(&incident, &chain, &[], OutputFormat::Json)
             .unwrap();
+=======
+        let report_result = gen.generate(&incident, &chain, &[], OutputFormat::Json).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         let parsed: serde_json::Value = serde_json::from_str(&report_result).unwrap();
         let summary = &parsed["evidence_summary"];
         assert_eq!(summary["total_items"], 3);

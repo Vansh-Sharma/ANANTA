@@ -17,8 +17,13 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
+<<<<<<< HEAD
 use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use tokio::sync::mpsc;
+=======
+use tokio::sync::mpsc;
+use notify::{RecommendedWatcher, RecursiveMode, Watcher, Event, EventKind};
+>>>>>>> 4b60ced (docs: update README)
 
 use crate::keshav::policy_manager::PolicyManager;
 
@@ -34,9 +39,13 @@ pub struct ConfigWatcherConfig {
     pub debounce_ms: u64,
 }
 
+<<<<<<< HEAD
 fn default_debounce_ms() -> u64 {
     500
 }
+=======
+fn default_debounce_ms() -> u64 { 500 }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for ConfigWatcherConfig {
     fn default() -> Self {

@@ -148,8 +148,12 @@ impl RuntimeState {
 
     /// Register a component.
     pub fn register_component(&mut self, name: &str) {
+<<<<<<< HEAD
         self.components
             .insert(name.into(), ComponentStatus::new(name));
+=======
+        self.components.insert(name.into(), ComponentStatus::new(name));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Set the runtime phase.
@@ -230,9 +234,13 @@ impl RuntimeState {
 
     /// Check if all registered components are running.
     pub fn all_components_running(&self) -> bool {
+<<<<<<< HEAD
         self.components
             .values()
             .all(|c| c.state == ComponentState::Running)
+=======
+        self.components.values().all(|c| c.state == ComponentState::Running)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Count components by state.
@@ -250,10 +258,14 @@ impl RuntimeState {
             "phase={} uptime={:.1}s components={}/{} running",
             self.phase,
             self.uptime_secs(),
+<<<<<<< HEAD
             self.components
                 .values()
                 .filter(|c| c.state == ComponentState::Running)
                 .count(),
+=======
+            self.components.values().filter(|c| c.state == ComponentState::Running).count(),
+>>>>>>> 4b60ced (docs: update README)
             self.components.len(),
         )
     }
@@ -425,4 +437,8 @@ mod tests {
         let restored: ComponentStatus = serde_json::from_str(&json).unwrap();
         assert_eq!(restored.name, "sentinel");
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

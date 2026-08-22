@@ -7,9 +7,13 @@
 //   - Multi-language jailbreaks
 //   - Encoding-based jailbreaks
 
+<<<<<<< HEAD
 use crate::validation::redteam::attack_types::{
     AttackCategory, AttackPayload, AttackPayloadBuilder,
 };
+=======
+use crate::validation::redteam::attack_types::{AttackCategory, AttackPayload, AttackPayloadBuilder};
+>>>>>>> 4b60ced (docs: update README)
 use crate::validation::redteam::generators::Generator;
 use crate::validation::verification::Severity;
 

@@ -386,7 +386,14 @@ pub enum GossipMessage {
         message_id: GossipMessageId,
     },
     /// Prune: Plumtree message — remove a peer from the tree.
+<<<<<<< HEAD
     Prune { from: String, topic: Topic },
+=======
+    Prune {
+        from: String,
+        topic: Topic,
+    },
+>>>>>>> 4b60ced (docs: update README)
     /// IHave: Plumtree lazy push — announce a message without sending the full payload.
     IHave {
         from: String,
@@ -400,7 +407,14 @@ pub enum GossipMessage {
         incarnation: u64,
     },
     /// Leave: graceful node departure.
+<<<<<<< HEAD
     Leave { node_id: String, incarnation: u64 },
+=======
+    Leave {
+        node_id: String,
+        incarnation: u64,
+    },
+>>>>>>> 4b60ced (docs: update README)
     /// StateTransfer: full state snapshot sent to a new node.
     StateTransfer {
         from: String,
@@ -415,6 +429,7 @@ impl GossipMessage {
         match self {
             GossipMessage::Broadcast { id, .. } => format!("bcast:{}", id),
             GossipMessage::Direct { id, target, .. } => format!("direct:{}:{}", target, id),
+<<<<<<< HEAD
             GossipMessage::Suspect {
                 suspect_node,
                 incarnation,
@@ -427,6 +442,12 @@ impl GossipMessage {
                 incarnation,
                 ..
             } => {
+=======
+            GossipMessage::Suspect { suspect_node, incarnation, .. } => {
+                format!("suspect:{}:{}", suspect_node, incarnation)
+            }
+            GossipMessage::Alive { node_id, incarnation, .. } => {
+>>>>>>> 4b60ced (docs: update README)
                 format!("alive:{}:{}", node_id, incarnation)
             }
             _ => String::new(), // Non-deduplicated messages.
@@ -673,10 +694,14 @@ impl PlumtreeState {
 
     /// Record an RTT measurement for a peer.
     pub fn record_rtt(&mut self, node_id: &str, rtt_us: u64) {
+<<<<<<< HEAD
         let measurements = self
             .rtt_measurements
             .entry(node_id.to_string())
             .or_default();
+=======
+        let measurements = self.rtt_measurements.entry(node_id.to_string()).or_default();
+>>>>>>> 4b60ced (docs: update README)
         measurements.push(rtt_us);
         // Keep only the last 10 measurements for a rolling average.
         if measurements.len() > 10 {
@@ -982,7 +1007,16 @@ impl GossipEngine {
 
     /// Initiate a broadcast of a key-value pair on a topic.
     /// Returns the message ID assigned to this broadcast.
+<<<<<<< HEAD
     pub fn broadcast(&mut self, topic: &Topic, key: &str, value: Vec<u8>) -> GossipMessageId {
+=======
+    pub fn broadcast(
+        &mut self,
+        topic: &Topic,
+        key: &str,
+        value: Vec<u8>,
+    ) -> GossipMessageId {
+>>>>>>> 4b60ced (docs: update README)
         self.local_vclock.increment(&self.self_id);
         let payload = BroadcastPayload {
             key: key.to_string(),
@@ -1435,11 +1469,16 @@ impl GossipEngine {
                 self.local_vclock.increment(&self.self_id);
                 let join_payload = BroadcastPayload {
                     key: format!("member:{}", node_id),
+<<<<<<< HEAD
                     value: format!(
                         "{{\"address\":\"{}\",\"incarnation\":{}}}",
                         address, incarnation
                     )
                     .into_bytes(),
+=======
+                    value: format!("{{\"address\":\"{}\",\"incarnation\":{}}}", address, incarnation)
+                        .into_bytes(),
+>>>>>>> 4b60ced (docs: update README)
                     vclock: self.local_vclock.clone(),
                     timestamp: Utc::now().timestamp_millis(),
                 };
@@ -2078,11 +2117,15 @@ mod tests {
         let json = serde_json::to_string(&msg).unwrap();
         let restored: GossipMessage = serde_json::from_str(&json).unwrap();
         match restored {
+<<<<<<< HEAD
             GossipMessage::Ping {
                 from,
                 incarnation,
                 seq,
             } => {
+=======
+            GossipMessage::Ping { from, incarnation, seq } => {
+>>>>>>> 4b60ced (docs: update README)
                 assert_eq!(from, "node-1");
                 assert_eq!(incarnation, 5);
                 assert_eq!(seq, 42);
@@ -2112,7 +2155,15 @@ mod tests {
     #[test]
     fn engine_broadcast_stores_locally() {
         let mut engine = make_engine("node-1");
+<<<<<<< HEAD
         let msg_id = engine.broadcast(&Topic::new("test"), "key-1", vec![1, 2, 3]);
+=======
+        let msg_id = engine.broadcast(
+            &Topic::new("test"),
+            "key-1",
+            vec![1, 2, 3],
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(msg_id.origin, "node-1");
         assert_eq!(msg_id.sequence, 0);
         assert!(engine.state.contains_key("key-1"));
@@ -2159,9 +2210,13 @@ mod tests {
         assert!(engine.members.contains_key("node-2"));
         assert_eq!(engine.members["node-2"].state, MemberState::Alive);
         // Should receive a StateTransfer response.
+<<<<<<< HEAD
         assert!(responses
             .iter()
             .any(|r| matches!(r, GossipMessage::StateTransfer { .. })));
+=======
+        assert!(responses.iter().any(|r| matches!(r, GossipMessage::StateTransfer { .. })));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -2339,10 +2394,14 @@ mod tests {
         let mut engine = make_engine("node-1");
         let leave = engine.leave();
         match leave {
+<<<<<<< HEAD
             GossipMessage::Leave {
                 node_id,
                 incarnation,
             } => {
+=======
+            GossipMessage::Leave { node_id, incarnation } => {
+>>>>>>> 4b60ced (docs: update README)
                 assert_eq!(node_id, "node-1");
                 assert_eq!(incarnation, 1);
             }
@@ -2353,6 +2412,7 @@ mod tests {
     #[test]
     fn engine_gossip_round_pings_fanout_peers() {
         let mut engine = make_engine("node-1");
+<<<<<<< HEAD
         engine
             .members
             .insert("node-2".to_string(), make_member("node-2"));
@@ -2365,6 +2425,12 @@ mod tests {
         engine
             .members
             .insert("node-5".to_string(), make_member("node-5"));
+=======
+        engine.members.insert("node-2".to_string(), make_member("node-2"));
+        engine.members.insert("node-3".to_string(), make_member("node-3"));
+        engine.members.insert("node-4".to_string(), make_member("node-4"));
+        engine.members.insert("node-5".to_string(), make_member("node-5"));
+>>>>>>> 4b60ced (docs: update README)
 
         let messages = engine.gossip_round();
         assert_eq!(messages.len(), 3); // fanout = 3

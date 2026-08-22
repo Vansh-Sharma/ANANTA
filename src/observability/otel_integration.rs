@@ -155,10 +155,14 @@ pub struct OtelResource {
 impl Default for OtelResource {
     fn default() -> Self {
         let mut attrs = HashMap::new();
+<<<<<<< HEAD
         attrs.insert(
             "telemetry.sdk.name".to_string(),
             "chakravyuh-otel".to_string(),
         );
+=======
+        attrs.insert("telemetry.sdk.name".to_string(), "chakravyuh-otel".to_string());
+>>>>>>> 4b60ced (docs: update README)
         attrs.insert("telemetry.sdk.language".to_string(), "rust".to_string());
         Self {
             service_name: "chakravyuh".to_string(),
@@ -301,11 +305,15 @@ impl OtelMetric {
             name: name.to_string(),
             description: String::new(),
             unit: "ms".to_string(),
+<<<<<<< HEAD
             value: OtelMetricValue::Histogram {
                 value,
                 buckets,
                 counts,
             },
+=======
+            value: OtelMetricValue::Histogram { value, buckets, counts },
+>>>>>>> 4b60ced (docs: update README)
             timestamp: unix_epoch_secs(),
             attributes: HashMap::new(),
         }
@@ -514,7 +522,14 @@ impl OtelExporter {
         if !self.should_sample() {
             return;
         }
+<<<<<<< HEAD
         span.trace_id = format!("{:032x}", simple_hash(&span.trace_id));
+=======
+        span.trace_id = format!(
+            "{:032x}",
+            simple_hash(&span.trace_id)
+        );
+>>>>>>> 4b60ced (docs: update README)
         if let Ok(mut batch) = self.pending.lock() {
             batch.add_span(span);
         }
@@ -729,11 +744,15 @@ impl MetricBuilder {
     /// Set as a histogram value.
     pub fn histogram(mut self, value: f64, buckets: Vec<f64>) -> Self {
         let counts = compute_histogram_counts(value, &buckets);
+<<<<<<< HEAD
         self.value = Some(OtelMetricValue::Histogram {
             value,
             buckets,
             counts,
         });
+=======
+        self.value = Some(OtelMetricValue::Histogram { value, buckets, counts });
+>>>>>>> 4b60ced (docs: update README)
         self
     }
 
@@ -769,10 +788,14 @@ pub fn convert_trace_context(trace: &crate::infra::trace::TraceContext) -> Vec<O
 
     for (i, ring_span) in trace.spans.iter().enumerate() {
         let parent_id = if i > 0 {
+<<<<<<< HEAD
             Some(format!(
                 "{:016x}",
                 simple_hash(&format!("{}-{}", trace_id, i - 1))
             ))
+=======
+            Some(format!("{:016x}", simple_hash(&format!("{}-{}", trace_id, i - 1))))
+>>>>>>> 4b60ced (docs: update README)
         } else {
             None
         };
@@ -827,6 +850,7 @@ pub fn convert_trace_context(trace: &crate::infra::trace::TraceContext) -> Vec<O
 }
 
 /// Convert an infra::trace::Span directly to an OtelSpan.
+<<<<<<< HEAD
 pub fn convert_span(ring_span: &crate::infra::trace::Span, trace_id: &str) -> OtelSpan {
     OtelSpan {
         trace_id: trace_id.to_string(),
@@ -834,11 +858,25 @@ pub fn convert_span(ring_span: &crate::infra::trace::Span, trace_id: &str) -> Ot
             "{:016x}",
             simple_hash(&format!("{}-{}", trace_id, ring_span.ring))
         ),
+=======
+pub fn convert_span(
+    ring_span: &crate::infra::trace::Span,
+    trace_id: &str,
+) -> OtelSpan {
+    OtelSpan {
+        trace_id: trace_id.to_string(),
+        span_id: format!("{:016x}", simple_hash(&format!("{}-{}", trace_id, ring_span.ring))),
+>>>>>>> 4b60ced (docs: update README)
         parent_span_id: None,
         name: format!("ring.{}", ring_span.ring),
         start_time_ns: ring_span.start_us.saturating_mul(1000),
         duration_ns: ring_span.duration_us.saturating_mul(1000),
+<<<<<<< HEAD
         status: if ring_span.decision.starts_with("deny") || ring_span.decision.starts_with("error")
+=======
+        status: if ring_span.decision.starts_with("deny")
+            || ring_span.decision.starts_with("error")
+>>>>>>> 4b60ced (docs: update README)
         {
             OtelSpanStatus::Error {
                 message: ring_span.decision.clone(),
@@ -967,10 +1005,14 @@ mod tests {
         let parent = OtelSpan::new("parent");
         let child = OtelSpan::new("child").with_parent(&parent);
         assert_eq!(child.trace_id, parent.trace_id);
+<<<<<<< HEAD
         assert_eq!(
             child.parent_span_id.as_deref(),
             Some(parent.span_id.as_str())
         );
+=======
+        assert_eq!(child.parent_span_id.as_deref(), Some(parent.span_id.as_str()));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -1018,9 +1060,13 @@ mod tests {
     #[test]
     fn otel_span_status_debug() {
         let ok = OtelSpanStatus::Ok;
+<<<<<<< HEAD
         let err = OtelSpanStatus::Error {
             message: "fail".into(),
         };
+=======
+        let err = OtelSpanStatus::Error { message: "fail".into() };
+>>>>>>> 4b60ced (docs: update README)
         assert!(format!("{:?}", ok).contains("Ok"));
         assert!(format!("{:?}", err).contains("Error"));
     }
@@ -1051,11 +1097,15 @@ mod tests {
         let buckets = vec![1.0, 5.0, 10.0, 50.0];
         let m = OtelMetric::histogram("latency_ms", 7.5, buckets.clone());
         match &m.value {
+<<<<<<< HEAD
             OtelMetricValue::Histogram {
                 value,
                 buckets: b,
                 counts,
             } => {
+=======
+            OtelMetricValue::Histogram { value, buckets: b, counts } => {
+>>>>>>> 4b60ced (docs: update README)
                 assert_eq!(*value, 7.5);
                 assert_eq!(b.len(), 4);
                 // value=7.5: only fits in bucket 10.0 and 50.0
@@ -1078,6 +1128,7 @@ mod tests {
     fn otel_metric_value_extractor() {
         assert_eq!(OtelMetricValue::Counter(10.0).value(), 10.0);
         assert_eq!(OtelMetricValue::Gauge(5.0).value(), 5.0);
+<<<<<<< HEAD
         assert_eq!(
             OtelMetricValue::Histogram {
                 value: 3.0,
@@ -1087,11 +1138,19 @@ mod tests {
             .value(),
             3.0
         );
+=======
+        assert_eq!(OtelMetricValue::Histogram { value: 3.0, buckets: vec![], counts: vec![] }.value(), 3.0);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn otel_metric_serde_roundtrip() {
+<<<<<<< HEAD
         let m = OtelMetric::counter("test_counter", 100.0).with_attribute("env", "prod");
+=======
+        let m = OtelMetric::counter("test_counter", 100.0)
+            .with_attribute("env", "prod");
+>>>>>>> 4b60ced (docs: update README)
         let json = serde_json::to_string(&m).expect("serialize");
         let restored: OtelMetric = serde_json::from_str(&json).expect("deserialize");
         assert_eq!(restored.name, "test_counter");
@@ -1109,15 +1168,25 @@ mod tests {
 
     #[test]
     fn otel_log_with_trace() {
+<<<<<<< HEAD
         let log = OtelLog::new(OtelLogSeverity::Error, "failed").with_trace("abc123", "def456");
+=======
+        let log = OtelLog::new(OtelLogSeverity::Error, "failed")
+            .with_trace("abc123", "def456");
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(log.trace_id.as_deref(), Some("abc123"));
         assert_eq!(log.span_id.as_deref(), Some("def456"));
     }
 
     #[test]
     fn otel_log_with_attribute() {
+<<<<<<< HEAD
         let log =
             OtelLog::new(OtelLogSeverity::Warn, "rate limit").with_attribute("ip", "10.0.0.1");
+=======
+        let log = OtelLog::new(OtelLogSeverity::Warn, "rate limit")
+            .with_attribute("ip", "10.0.0.1");
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(log.attributes.get("ip").unwrap(), "10.0.0.1");
     }
 
@@ -1201,7 +1270,12 @@ mod tests {
         batch.add_metric(OtelMetric::gauge("g1", 42.0));
         let bytes = batch.to_json_bytes();
         assert!(!bytes.is_empty());
+<<<<<<< HEAD
         let restored: OtelBatch = serde_json::from_slice(&bytes).expect("deserialize");
+=======
+        let restored: OtelBatch =
+            serde_json::from_slice(&bytes).expect("deserialize");
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(restored.metrics.len(), 1);
     }
 
@@ -1304,10 +1378,14 @@ mod tests {
             .parent(&parent.span_id)
             .trace_id(&parent.trace_id)
             .build();
+<<<<<<< HEAD
         assert_eq!(
             child.parent_span_id.as_deref(),
             Some(parent.span_id.as_str())
         );
+=======
+        assert_eq!(child.parent_span_id.as_deref(), Some(parent.span_id.as_str()));
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(child.trace_id, parent.trace_id);
     }
 
@@ -1370,19 +1448,36 @@ mod tests {
 
     #[test]
     fn convert_trace_context_basic() {
+<<<<<<< HEAD
         let mut trace_ctx =
             crate::infra::trace::TraceContext::new("POST", "/v1/evaluate", "1.2.3.4");
+=======
+        let mut trace_ctx = crate::infra::trace::TraceContext::new("POST", "/v1/evaluate", "1.2.3.4");
+>>>>>>> 4b60ced (docs: update README)
         trace_ctx.record_span(
             "shield",
             Duration::from_micros(150),
             "allow",
             HashMap::new(),
         );
+<<<<<<< HEAD
         trace_ctx.record_span("threat", Duration::from_micros(200), "deny:attack", {
             let mut m = HashMap::new();
             m.insert("score".to_string(), "9.5".to_string());
             m
         });
+=======
+        trace_ctx.record_span(
+            "threat",
+            Duration::from_micros(200),
+            "deny:attack",
+            {
+                let mut m = HashMap::new();
+                m.insert("score".to_string(), "9.5".to_string());
+                m
+            },
+        );
+>>>>>>> 4b60ced (docs: update README)
         trace_ctx.total_duration_us = 500;
 
         let spans = convert_trace_context(&trace_ctx);

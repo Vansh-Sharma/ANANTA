@@ -16,9 +16,15 @@
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
+<<<<<<< HEAD
 use crate::ananta::config::HashAlgorithm;
 use crate::ananta::crypto::hashing::{hash_bytes, hash_combined, HashDigest};
 use crate::ananta::crypto::merkle::{MerkleProof, MerkleTree};
+=======
+use crate::ananta::crypto::hashing::{hash_bytes, hash_combined, HashDigest};
+use crate::ananta::crypto::merkle::{MerkleProof, MerkleTree};
+use crate::ananta::config::HashAlgorithm;
+>>>>>>> 4b60ced (docs: update README)
 
 // ─── CRC-32 Implementation ─────────────────────────────────────────────────
 
@@ -63,11 +69,15 @@ fn crc32(data: &[u8]) -> u32 {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum WalError {
     /// CRC mismatch on read — data corruption detected.
+<<<<<<< HEAD
     CrcMismatch {
         expected: u32,
         actual: u32,
         offset: usize,
     },
+=======
+    CrcMismatch { expected: u32, actual: u32, offset: usize },
+>>>>>>> 4b60ced (docs: update README)
     /// The WAL buffer is truncated mid-entry.
     TruncatedEntry { offset: usize, remaining: usize },
     /// The buffer cannot hold the entry (would exceed max size).
@@ -79,6 +89,7 @@ pub enum WalError {
 impl std::fmt::Display for WalError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+<<<<<<< HEAD
             WalError::CrcMismatch {
                 expected,
                 actual,
@@ -106,6 +117,16 @@ impl std::fmt::Display for WalError {
                     "buffer overflow: requires {} bytes, {} available",
                     required, available
                 )
+=======
+            WalError::CrcMismatch { expected, actual, offset } => {
+                write!(f, "CRC mismatch at offset {}: expected 0x{:08X}, got 0x{:08X}", offset, expected, actual)
+            }
+            WalError::TruncatedEntry { offset, remaining } => {
+                write!(f, "truncated entry at offset {}: only {} bytes remaining", offset, remaining)
+            }
+            WalError::BufferOverflow { required, available } => {
+                write!(f, "buffer overflow: requires {} bytes, {} available", required, available)
+>>>>>>> 4b60ced (docs: update README)
             }
             WalError::CodecError(msg) => write!(f, "codec error: {}", msg),
         }
@@ -187,11 +208,15 @@ impl WriteAheadLog {
             entry_count: AtomicUsize::new(0),
             truncation_point: AtomicUsize::new(0),
             sync_on_write,
+<<<<<<< HEAD
             batch_sync_size: if batch_sync_size == 0 {
                 1
             } else {
                 batch_sync_size
             },
+=======
+            batch_sync_size: if batch_sync_size == 0 { 1 } else { batch_sync_size },
+>>>>>>> 4b60ced (docs: update README)
             pending_sync_count: AtomicUsize::new(0),
             sync_count: AtomicUsize::new(0),
         }
@@ -812,7 +837,16 @@ impl ImmutableEntry {
     ) -> Self {
         let timestamp = chrono::Utc::now().to_rfc3339();
         let content_hash = Self::compute_content_hash(
+<<<<<<< HEAD
             algorithm, sequence, prev_hash, &timestamp, message, payload,
+=======
+            algorithm,
+            sequence,
+            prev_hash,
+            &timestamp,
+            message,
+            payload,
+>>>>>>> 4b60ced (docs: update README)
         );
         Self {
             sequence,
@@ -987,6 +1021,7 @@ impl ImmutableLogEngine {
             .unwrap_or_else(ImmutableEntry::genesis_prev_hash);
 
         let cp_seq = self.checkpoint_sequence.load(Ordering::SeqCst);
+<<<<<<< HEAD
         let mut entry = ImmutableEntry::new(
             sequence,
             &prev_hash,
@@ -995,6 +1030,10 @@ impl ImmutableLogEngine {
             &self.algorithm,
             cp_seq,
         );
+=======
+        let mut entry =
+            ImmutableEntry::new(sequence, &prev_hash, message, payload, &self.algorithm, cp_seq);
+>>>>>>> 4b60ced (docs: update README)
 
         // Compute and attach Merkle proof against the latest checkpoint.
         // Decode hex hashes to raw bytes so the tree leaves are the actual hashes.
@@ -1052,6 +1091,7 @@ impl ImmutableLogEngine {
     pub fn create_checkpoint(&mut self) -> &MerkleCheckpoint {
         let cp_seq = self.checkpoint_sequence.fetch_add(1, Ordering::SeqCst);
         let wal_offset = self.wal.buffer_size();
+<<<<<<< HEAD
         let entry_hashes: Vec<String> = self
             .entries
             .iter()
@@ -1060,6 +1100,17 @@ impl ImmutableLogEngine {
 
         let checkpoint =
             MerkleCheckpoint::from_entry_hashes(&entry_hashes, &self.algorithm, wal_offset, cp_seq);
+=======
+        let entry_hashes: Vec<String> =
+            self.entries.iter().map(|e| e.content_hash.clone()).collect();
+
+        let checkpoint = MerkleCheckpoint::from_entry_hashes(
+            &entry_hashes,
+            &self.algorithm,
+            wal_offset,
+            cp_seq,
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         // Update Merkle proofs for entries that don't have one or have one
         // against an older checkpoint. Use content hashes directly as Merkle
@@ -1121,7 +1172,12 @@ impl ImmutableLogEngine {
 
         // Split: [entries_to_compact] + [entries_to_keep]
         let split_point = entries_before - target;
+<<<<<<< HEAD
         let entries_to_compact: Vec<ImmutableEntry> = self.entries.drain(..split_point).collect();
+=======
+        let entries_to_compact: Vec<ImmutableEntry> =
+            self.entries.drain(..split_point).collect();
+>>>>>>> 4b60ced (docs: update README)
         let entries_removed = entries_to_compact.len();
 
         // Build a summary of the compacted entries.
@@ -1129,8 +1185,15 @@ impl ImmutableLogEngine {
             "compaction snapshot: {} entries merged into 1",
             entries_removed
         );
+<<<<<<< HEAD
         let summary_payload = serde_json::to_string(&json_compaction_summary(&entries_to_compact))
             .unwrap_or_default();
+=======
+        let summary_payload = serde_json::to_string(&json_compaction_summary(
+            &entries_to_compact,
+        ))
+        .unwrap_or_default();
+>>>>>>> 4b60ced (docs: update README)
 
         // The new first entry must chain from the last compacted entry's prev.
         // We use the first compacted entry's prev_hash to maintain the chain.
@@ -1169,12 +1232,16 @@ impl ImmutableLogEngine {
             let payload = entry.payload.clone();
             let cp_seq = self.checkpoint_sequence.load(Ordering::SeqCst);
             let content_hash = ImmutableEntry::compute_content_hash(
+<<<<<<< HEAD
                 &self.algorithm,
                 seq,
                 &prev,
                 &ts,
                 &msg,
                 &payload,
+=======
+                &self.algorithm, seq, &prev, &ts, &msg, &payload,
+>>>>>>> 4b60ced (docs: update README)
             );
             entry.sequence = seq;
             entry.prev_hash = prev;
@@ -1270,11 +1337,16 @@ impl ImmutableLogEngine {
             .last()
             .ok_or_else(|| ImmutableLogError::IntegrityViolation("no checkpoints".into()))?;
 
+<<<<<<< HEAD
         let entry_hashes: Vec<String> = self
             .entries
             .iter()
             .map(|e| e.content_hash.clone())
             .collect();
+=======
+        let entry_hashes: Vec<String> =
+            self.entries.iter().map(|e| e.content_hash.clone()).collect();
+>>>>>>> 4b60ced (docs: update README)
 
         if entry_hashes.len() != checkpoint.entry_count as usize {
             // If the checkpoint covers more entries than we currently have,
@@ -1366,7 +1438,12 @@ impl ImmutableLogEngine {
 
     /// Whether compaction is needed based on current config.
     pub fn needs_compaction(&self) -> bool {
+<<<<<<< HEAD
         self.compaction_config.enabled && self.entries.len() >= self.compaction_config.min_entries
+=======
+        self.compaction_config.enabled
+            && self.entries.len() >= self.compaction_config.min_entries
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Read all entries from the ring buffer (recent entries).
@@ -1569,7 +1646,12 @@ mod tests {
 
     #[test]
     fn ring_buffer_reject_overflow() {
+<<<<<<< HEAD
         let mut rb: RingBuffer<u32> = RingBuffer::with_policy(2, OverflowPolicy::Reject);
+=======
+        let mut rb: RingBuffer<u32> =
+            RingBuffer::with_policy(2, OverflowPolicy::Reject);
+>>>>>>> 4b60ced (docs: update README)
         assert!(rb.push(1).is_ok());
         assert!(rb.push(2).is_ok());
         assert!(rb.push(3).is_err()); // Full, rejected.
@@ -1578,7 +1660,12 @@ mod tests {
 
     #[test]
     fn ring_buffer_overwrite_oldest() {
+<<<<<<< HEAD
         let mut rb: RingBuffer<u32> = RingBuffer::with_policy(2, OverflowPolicy::OverwriteOldest);
+=======
+        let mut rb: RingBuffer<u32> =
+            RingBuffer::with_policy(2, OverflowPolicy::OverwriteOldest);
+>>>>>>> 4b60ced (docs: update README)
         assert!(rb.push(1).is_ok());
         assert!(rb.push(2).is_ok());
         assert!(rb.push(3).is_ok()); // Overwrites 1.
@@ -1590,7 +1677,12 @@ mod tests {
 
     #[test]
     fn ring_buffer_wrap_around() {
+<<<<<<< HEAD
         let mut rb: RingBuffer<u32> = RingBuffer::with_policy(3, OverflowPolicy::OverwriteOldest);
+=======
+        let mut rb: RingBuffer<u32> =
+            RingBuffer::with_policy(3, OverflowPolicy::OverwriteOldest);
+>>>>>>> 4b60ced (docs: update README)
         for i in 0..10 {
             assert!(rb.push(i).is_ok());
         }
@@ -1623,7 +1715,12 @@ mod tests {
 
     #[test]
     fn ring_buffer_counters() {
+<<<<<<< HEAD
         let mut rb: RingBuffer<u32> = RingBuffer::with_policy(2, OverflowPolicy::OverwriteOldest);
+=======
+        let mut rb: RingBuffer<u32> =
+            RingBuffer::with_policy(2, OverflowPolicy::OverwriteOldest);
+>>>>>>> 4b60ced (docs: update README)
         rb.push(1).unwrap();
         rb.push(2).unwrap();
         rb.push(3).unwrap(); // Drops 1.
@@ -1640,6 +1737,7 @@ mod tests {
     fn immutable_entry_content_hash_deterministic() {
         let algo = HashAlgorithm::Sha256;
         let h1 = ImmutableEntry::compute_content_hash(
+<<<<<<< HEAD
             &algo,
             0,
             &ImmutableEntry::genesis_prev_hash(),
@@ -1654,6 +1752,14 @@ mod tests {
             "2024-01-01T00:00:00Z",
             "msg",
             "",
+=======
+            &algo, 0, &ImmutableEntry::genesis_prev_hash(),
+            "2024-01-01T00:00:00Z", "msg", "",
+        );
+        let h2 = ImmutableEntry::compute_content_hash(
+            &algo, 0, &ImmutableEntry::genesis_prev_hash(),
+            "2024-01-01T00:00:00Z", "msg", "",
+>>>>>>> 4b60ced (docs: update README)
         );
         assert_eq!(h1, h2);
     }
@@ -1694,7 +1800,13 @@ mod tests {
 
     #[test]
     fn merkle_checkpoint_empty() {
+<<<<<<< HEAD
         let cp = MerkleCheckpoint::from_entry_hashes(&[], &HashAlgorithm::Sha256, 0, 0);
+=======
+        let cp = MerkleCheckpoint::from_entry_hashes(
+            &[], &HashAlgorithm::Sha256, 0, 0,
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(cp.entry_count, 0);
         assert!(!cp.root_hash_hex.is_empty());
     }
@@ -1706,7 +1818,13 @@ mod tests {
             hash_bytes(b"b", &HashAlgorithm::Sha256).hex,
             hash_bytes(b"c", &HashAlgorithm::Sha256).hex,
         ];
+<<<<<<< HEAD
         let cp = MerkleCheckpoint::from_entry_hashes(&hashes, &HashAlgorithm::Sha256, 100, 1);
+=======
+        let cp = MerkleCheckpoint::from_entry_hashes(
+            &hashes, &HashAlgorithm::Sha256, 100, 1,
+        );
+>>>>>>> 4b60ced (docs: update README)
         assert!(cp.verify(&hashes));
     }
 
@@ -1716,7 +1834,13 @@ mod tests {
             hash_bytes(b"a", &HashAlgorithm::Sha256).hex,
             hash_bytes(b"b", &HashAlgorithm::Sha256).hex,
         ];
+<<<<<<< HEAD
         let cp = MerkleCheckpoint::from_entry_hashes(&hashes, &HashAlgorithm::Sha256, 0, 0);
+=======
+        let cp = MerkleCheckpoint::from_entry_hashes(
+            &hashes, &HashAlgorithm::Sha256, 0, 0,
+        );
+>>>>>>> 4b60ced (docs: update README)
         let mut tampered = hashes.clone();
         tampered[0] = hash_bytes(b"X", &HashAlgorithm::Sha256).hex;
         assert!(!cp.verify(&tampered));
@@ -1724,8 +1848,17 @@ mod tests {
 
     #[test]
     fn merkle_checkpoint_wrong_count() {
+<<<<<<< HEAD
         let hashes: Vec<String> = vec![hash_bytes(b"a", &HashAlgorithm::Sha256).hex];
         let cp = MerkleCheckpoint::from_entry_hashes(&hashes, &HashAlgorithm::Sha256, 0, 0);
+=======
+        let hashes: Vec<String> = vec![
+            hash_bytes(b"a", &HashAlgorithm::Sha256).hex,
+        ];
+        let cp = MerkleCheckpoint::from_entry_hashes(
+            &hashes, &HashAlgorithm::Sha256, 0, 0,
+        );
+>>>>>>> 4b60ced (docs: update README)
         // Wrong count.
         assert!(!cp.verify(&[]));
     }

@@ -9,6 +9,10 @@
 
 #![deny(unsafe_code)]
 #![warn(rust_2018_idioms)]
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4b60ced (docs: update README)
 // V1.0 release readiness: suppress pre-existing clippy/dead-code/rustdoc warnings.
 // These warnings exist in production code that is outside the scope of the
 // current verification gate (zero architecture changes).
@@ -42,17 +46,26 @@ pub mod api;
 pub mod cli;
 pub mod cross_ring;
 pub mod execution;
+<<<<<<< HEAD
 pub mod federated;
 pub mod governance;
 pub mod grpc;
 pub mod identity;
 pub mod incident_response;
+=======
+pub mod governance;
+pub mod grpc;
+pub mod identity;
+>>>>>>> 4b60ced (docs: update README)
 pub mod infra;
 pub mod keshav;
 pub mod memory;
 pub mod observability;
 pub mod plugin;
+<<<<<<< HEAD
 pub mod policy_compiler;
+=======
+>>>>>>> 4b60ced (docs: update README)
 pub mod reasoning;
 pub mod recovery_sec;
 pub mod shield;
@@ -60,12 +73,19 @@ pub mod storage;
 pub mod tenant;
 pub mod threat;
 pub mod twin;
+<<<<<<< HEAD
+=======
+pub mod federated;
+pub mod policy_compiler;
+pub mod incident_response;
+>>>>>>> 4b60ced (docs: update README)
 pub mod validation;
 
 mod config;
 mod decision;
 mod error;
 
+<<<<<<< HEAD
 pub use agent::AgentRing;
 pub use ananta::AnantaConfig;
 pub use ananta::AnantaPlane;
@@ -95,6 +115,35 @@ pub use shield::ShieldRing;
 pub use storage::{create_store, StorageConfig, Store, StoreHealth};
 pub use threat::ThreatRing;
 pub use twin::{Scenario, ScenarioResult, SecurityTwinService, TwinState};
+=======
+pub use config::Config;
+pub use config::TlsConfig;
+pub use config::UpstreamConfig;
+pub use decision::{Decision, DecisionRecord, RiskScore, Verdict};
+pub use error::{Error, Result};
+pub use ananta::AnantaConfig;
+pub use ananta::AnantaPlane;
+pub use keshav::{AllRingVerdicts, DecisionLogger, KeshavDecide, KeshavLearn, KeshavOrchestrate, KeshavRisk, PipelineContext, PipelineExecutor, PipelineResult, Policy, ToolCallContext};
+pub use cross_ring::CrossRingNetwork;
+pub use shield::ShieldRing;
+pub use threat::ThreatRing;
+pub use execution::ExecutionRing;
+pub use identity::IdentityRing;
+pub use memory::MemoryRing;
+pub use storage::{create_store, StorageConfig, Store, StoreHealth};
+pub use infra::{ShutdownState, SystemHealth, is_alive, is_ready, record_request};
+pub use infra::{
+    ApiKeyConfig, ApiKeyInfo, ApiKeyManager, AuthResult, Permission,
+    AuditConfig, AuditEntry, AuditTrail,
+    ConfigWatcherConfig, ConfigWatcherHandle, spawn_config_watcher,
+    TraceContext, extract_trace_id, record_trace, trace_stats,
+};
+pub use agent::AgentRing;
+pub use governance::GovernanceRing;
+pub use reasoning::ReasoningRing;
+pub use recovery_sec::RecoveryRing;
+pub use twin::{SecurityTwinService, Scenario, ScenarioResult, TwinState};
+>>>>>>> 4b60ced (docs: update README)
 
 use std::sync::Arc;
 
@@ -176,6 +225,7 @@ impl Chakravyuh {
         // This is by design: ANANTA is optional, and the system must
         // function without it.
         let ananta = match &config.ananta_config_path {
+<<<<<<< HEAD
             Some(path) => match std::fs::read_to_string(path) {
                 Ok(yaml_content) => match AnantaConfig::from_yaml(&yaml_content) {
                     Ok(ananta_config) => {
@@ -193,22 +243,63 @@ impl Chakravyuh {
                                         error = %e,
                                         config_path = %path,
                                         "ANANTA initialization failed — running without trust plane"
+=======
+            Some(path) => {
+                match std::fs::read_to_string(path) {
+                    Ok(yaml_content) => {
+                        match AnantaConfig::from_yaml(&yaml_content) {
+                            Ok(ananta_config) => {
+                                if ananta_config.enabled {
+                                    match AnantaPlane::new(ananta_config) {
+                                        Ok(plane) => {
+                                            tracing::info!(
+                                                config_path = %path,
+                                                "ANANTA trust plane initialized from independent config"
+                                            );
+                                            Some(Arc::new(plane))
+                                        }
+                                        Err(e) => {
+                                            tracing::error!(
+                                                error = %e,
+                                                config_path = %path,
+                                                "ANANTA initialization failed — running without trust plane"
+                                            );
+                                            None
+                                        }
+                                    }
+                                } else {
+                                    tracing::info!(
+                                        config_path = %path,
+                                        "ANANTA disabled in its own config — running without trust plane"
+>>>>>>> 4b60ced (docs: update README)
                                     );
                                     None
                                 }
                             }
+<<<<<<< HEAD
                         } else {
                             tracing::info!(
                                 config_path = %path,
                                 "ANANTA disabled in its own config — running without trust plane"
                             );
                             None
+=======
+                            Err(e) => {
+                                tracing::error!(
+                                    error = %e,
+                                    config_path = %path,
+                                    "ANANTA config parse failed — running without trust plane"
+                                );
+                                None
+                            }
+>>>>>>> 4b60ced (docs: update README)
                         }
                     }
                     Err(e) => {
                         tracing::error!(
                             error = %e,
                             config_path = %path,
+<<<<<<< HEAD
                             "ANANTA config parse failed — running without trust plane"
                         );
                         None
@@ -223,6 +314,14 @@ impl Chakravyuh {
                     None
                 }
             },
+=======
+                            "ANANTA config file not found — running without trust plane"
+                        );
+                        None
+                    }
+                }
+            }
+>>>>>>> 4b60ced (docs: update README)
             None => {
                 tracing::info!(
                     "ananta_config_path not set — ANANTA trust plane not started (degraded mode)"
@@ -232,6 +331,7 @@ impl Chakravyuh {
         };
 
         Ok(Self {
+<<<<<<< HEAD
             config,
             shield,
             identity,
@@ -252,6 +352,12 @@ impl Chakravyuh {
             shutdown,
             audit,
             api_key_manager,
+=======
+            config, shield, identity, threat, agent, memory,
+            reasoning, governance, recovery_sec,
+            decide, risk, learn, orchestrate, execution, cross_ring,
+            storage, policy_manager, shutdown, audit, api_key_manager,
+>>>>>>> 4b60ced (docs: update README)
             ananta,
         })
     }
@@ -283,6 +389,7 @@ impl Chakravyuh {
         );
 
         let app = api::build_router(
+<<<<<<< HEAD
             self.shield.clone(),
             self.threat.clone(),
             self.identity.clone(),
@@ -301,6 +408,14 @@ impl Chakravyuh {
             Some(policy_manager),
             Some(storage),
             Some(shutdown.clone()),
+=======
+            self.shield.clone(), self.threat.clone(), self.identity.clone(),
+            self.memory.clone(), self.agent.clone(), self.execution.clone(),
+            self.reasoning.clone(), self.governance.clone(), self.recovery_sec.clone(),
+            self.decide.clone(), self.risk.clone(), self.learn.clone(), self.orchestrate.clone(),
+            self.cross_ring.clone(), self.config.upstream.clone(),
+            Some(policy_manager), Some(storage), Some(shutdown.clone()),
+>>>>>>> 4b60ced (docs: update README)
             self.ananta.clone(),
         );
         let tls_config = self.config.server.tls.clone();
@@ -316,10 +431,15 @@ impl Chakravyuh {
         }
 
         tracing::info!(
+<<<<<<< HEAD
             addr = addr,
             version = env!("CARGO_PKG_VERSION"),
             upstream_configured = self.config.upstream.is_some(),
             tls = false,
+=======
+            addr = addr, version = env!("CARGO_PKG_VERSION"),
+            upstream_configured = self.config.upstream.is_some(), tls = false,
+>>>>>>> 4b60ced (docs: update README)
             ananta_active = self.ananta.is_some(),
             "CHAKRAVYUH starting (HTTP)"
         );
@@ -358,6 +478,7 @@ impl Chakravyuh {
         use axum_server::tls_rustls::RustlsConfig;
         use std::path::Path;
         if !Path::new(&tls.cert_path).exists() {
+<<<<<<< HEAD
             return Err(crate::error::Error::ConfigLoad(format!(
                 "TLS cert_path not found: {}",
                 tls.cert_path
@@ -380,12 +501,27 @@ impl Chakravyuh {
         let result = axum_server::bind_rustls(bind_addr, rustls_config)
             .serve(app.into_make_service())
             .await;
+=======
+            return Err(crate::error::Error::ConfigLoad(format!("TLS cert_path not found: {}", tls.cert_path)));
+        }
+        if !Path::new(&tls.key_path).exists() {
+            return Err(crate::error::Error::ConfigLoad(format!("TLS key_path not found: {}", tls.key_path)));
+        }
+        let rustls_config = RustlsConfig::from_pem_file(&tls.cert_path, &tls.key_path).await
+            .map_err(|e| crate::error::Error::ConfigLoad(format!("TLS load failed: {}", e)))?;
+        let bind_addr: std::net::SocketAddr = addr.parse()
+            .map_err(|e| crate::error::Error::ConfigLoad(format!("invalid addr {addr:?}: {e}")))?;
+
+        // ── Graceful shutdown: stop ANANTA after TLS server exits ──
+        let result = axum_server::bind_rustls(bind_addr, rustls_config).serve(app.into_make_service()).await;
+>>>>>>> 4b60ced (docs: update README)
 
         if let Some(ref ananta) = ananta {
             ananta.shutdown().await;
             tracing::info!("ANANTA shutdown signal sent (TLS path)");
         }
 
+<<<<<<< HEAD
         result.map_err(|e| crate::error::Error::Other(format!("TLS server error: {e}")))?;
         Ok(())
     }
@@ -435,6 +571,28 @@ impl Chakravyuh {
     pub fn shutdown(&self) -> &ShutdownState {
         &self.shutdown
     }
+=======
+        result
+            .map_err(|e| crate::error::Error::Other(format!("TLS server error: {e}")))?;
+        Ok(())
+    }
+
+    pub fn config(&self) -> &Config { &self.config }
+    pub fn agent(&self) -> &AgentRing { &self.agent }
+    pub fn memory(&self) -> &MemoryRing { &self.memory }
+    pub fn reasoning(&self) -> &ReasoningRing { &self.reasoning }
+    pub fn governance(&self) -> &GovernanceRing { &self.governance }
+    pub fn recovery_sec(&self) -> &recovery_sec::RecoveryRing { &self.recovery_sec }
+    pub fn identity(&self) -> &IdentityRing { &self.identity }
+    pub fn execution(&self) -> &ExecutionRing { &self.execution }
+    pub fn risk(&self) -> &KeshavRisk { &self.risk }
+    pub fn learn(&self) -> &KeshavLearn { &self.learn }
+    pub fn orchestrate(&self) -> &KeshavOrchestrate { &self.orchestrate }
+    pub fn cross_ring(&self) -> &cross_ring::CrossRingNetwork { &self.cross_ring }
+    pub fn storage(&self) -> &dyn Store { &*self.storage }
+    pub fn policy_manager(&self) -> &keshav::policy_manager::PolicyManager { &self.policy_manager }
+    pub fn shutdown(&self) -> &ShutdownState { &self.shutdown }
+>>>>>>> 4b60ced (docs: update README)
     pub fn ananta(&self) -> Option<&AnantaPlane> {
         self.ananta.as_ref().map(|arc| arc.as_ref())
     }
@@ -446,7 +604,14 @@ impl Chakravyuh {
 /// This bridges ANANTA's integrity checking with the live system state.
 /// ANANTA hashes the output of each provider and compares against the
 /// trusted manifest entries.
+<<<<<<< HEAD
 fn register_ananta_integrity_providers(ananta: &Arc<AnantaPlane>, _config: &Config) {
+=======
+fn register_ananta_integrity_providers(
+    ananta: &Arc<AnantaPlane>,
+    _config: &Config,
+) {
+>>>>>>> 4b60ced (docs: update README)
     // We use a tokio block_in_place because register_integrity_provider
     // is async but we're in a sync context here.
     // The actual provider registration is lightweight — just storing a
@@ -455,12 +620,19 @@ fn register_ananta_integrity_providers(ananta: &Arc<AnantaPlane>, _config: &Conf
     tokio::spawn(async move {
         // Domain: Binary integrity — hash of a known constant to verify
         // ANANTA's own hashing pipeline is working.
+<<<<<<< HEAD
         ananta
             .register_integrity_provider(
                 crate::ananta::anchor::integrity::IntegrityDomain::Binary,
                 || b"chakravyuh-binary-integrity-check".to_vec(),
             )
             .await;
+=======
+        ananta.register_integrity_provider(
+            crate::ananta::anchor::integrity::IntegrityDomain::Binary,
+            || b"chakravyuh-binary-integrity-check".to_vec(),
+        ).await;
+>>>>>>> 4b60ced (docs: update README)
 
         // Domain: Configuration integrity — hash the serialized config.
         // If config changes unexpectedly, ANANTA detects it as drift.
@@ -470,19 +642,30 @@ fn register_ananta_integrity_providers(ananta: &Arc<AnantaPlane>, _config: &Conf
             // Capture only security-relevant config fields for integrity.
             format!(
                 "shield:{}|threat:{}|identity:{}|keshav:{}|cross_ring:{}",
+<<<<<<< HEAD
                 "active", // Shield is always active if we're here
+=======
+                "active",  // Shield is always active if we're here
+>>>>>>> 4b60ced (docs: update README)
                 "active",
                 "active",
                 "active",
                 "active",
             )
         };
+<<<<<<< HEAD
         ananta
             .register_integrity_provider(
                 crate::ananta::anchor::integrity::IntegrityDomain::Config,
                 move || config_hash_bytes.as_bytes().to_vec(),
             )
             .await;
+=======
+        ananta.register_integrity_provider(
+            crate::ananta::anchor::integrity::IntegrityDomain::Config,
+            move || config_hash_bytes.as_bytes().to_vec(),
+        ).await;
+>>>>>>> 4b60ced (docs: update README)
 
         tracing::info!(
             providers = 2,

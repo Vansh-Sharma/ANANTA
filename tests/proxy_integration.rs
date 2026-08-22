@@ -16,11 +16,15 @@ use mockito::Server;
 use serde_json::{json, Value};
 use tower::ServiceExt;
 
+<<<<<<< HEAD
 use chakravyuh::{
     api::build_router, AgentRing, Config, CrossRingNetwork, ExecutionRing, GovernanceRing,
     IdentityRing, KeshavDecide, KeshavLearn, KeshavOrchestrate, KeshavRisk, MemoryRing,
     ReasoningRing, RecoveryRing, ShieldRing, ThreatRing, UpstreamConfig,
 };
+=======
+use chakravyuh::{api::build_router, AgentRing, Config, CrossRingNetwork, ExecutionRing, GovernanceRing, IdentityRing, KeshavDecide, KeshavLearn, KeshavOrchestrate, KeshavRisk, MemoryRing, ReasoningRing, RecoveryRing, ShieldRing, ThreatRing, UpstreamConfig};
+>>>>>>> 4b60ced (docs: update README)
 
 fn router_with_upstream(upstream: UpstreamConfig) -> axum::Router {
     let config: Config = Config::default_yaml().parse().expect("config parses");
@@ -40,6 +44,7 @@ fn router_with_upstream(upstream: UpstreamConfig) -> axum::Router {
     let learn = KeshavLearn::new(config.keshav.learn.clone()).expect("learn builds");
     let orchestrate = KeshavOrchestrate::new(config.keshav.orchestrate.clone());
     let cross_ring = CrossRingNetwork::new(&config.cross_ring).expect("cross_ring builds");
+<<<<<<< HEAD
     build_router(
         shield,
         threat,
@@ -61,6 +66,9 @@ fn router_with_upstream(upstream: UpstreamConfig) -> axum::Router {
         None,
         None,
     )
+=======
+    build_router(shield, threat, identity, memory, agent, execution, reasoning, governance, recovery_sec, decide, risk, learn, orchestrate, cross_ring, Some(upstream), None, None, None, None)
+>>>>>>> 4b60ced (docs: update README)
 }
 
 #[tokio::test]

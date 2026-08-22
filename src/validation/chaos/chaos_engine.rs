@@ -138,18 +138,26 @@ pub struct ChaosResult {
 impl ChaosResult {
     /// Number of faults that passed (system recovered as expected).
     pub fn pass_count(&self) -> usize {
+<<<<<<< HEAD
         self.fault_results
             .iter()
             .filter(|r| r.verdict == Verdict::Pass)
             .count()
+=======
+        self.fault_results.iter().filter(|r| r.verdict == Verdict::Pass).count()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Number of faults that failed.
     pub fn fail_count(&self) -> usize {
+<<<<<<< HEAD
         self.fault_results
             .iter()
             .filter(|r| r.verdict == Verdict::Fail)
             .count()
+=======
+        self.fault_results.iter().filter(|r| r.verdict == Verdict::Fail).count()
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -205,7 +213,13 @@ impl ChaosEngine {
         };
 
         if filtered.is_empty() {
+<<<<<<< HEAD
             return Err("No faults match configured targets; scenario would be empty".to_string());
+=======
+            return Err(
+                "No faults match configured targets; scenario would be empty".to_string()
+            );
+>>>>>>> 4b60ced (docs: update README)
         }
 
         Ok(ChaosScenario::new(
@@ -242,8 +256,12 @@ impl ChaosEngine {
         let mut cascade_map: HashMap<String, Vec<String>> = HashMap::new();
 
         for fault in &scenario.faults {
+<<<<<<< HEAD
             let fr =
                 self.execute_single_fault(fault, &mut recovery_metrics_list, &mut cascade_map)?;
+=======
+            let fr = self.execute_single_fault(fault, &mut recovery_metrics_list, &mut cascade_map)?;
+>>>>>>> 4b60ced (docs: update README)
 
             // Record evidence for this fault.
             self.record_fault_evidence(&fr, fault, report);
@@ -253,12 +271,16 @@ impl ChaosEngine {
             // Enforce max concurrent faults.
             while self.injector.active_count() >= self.config.max_concurrent_faults {
                 // Release the oldest active fault.
+<<<<<<< HEAD
                 let oldest = self
                     .injector
                     .active_faults()
                     .iter()
                     .find(|f| f.active)
                     .cloned();
+=======
+                let oldest = self.injector.active_faults().iter().find(|f| f.active).cloned();
+>>>>>>> 4b60ced (docs: update README)
                 if let Some(active) = oldest {
                     let _ = self.injector.release(&active.injection_id);
                     // Simulate recovery for released fault's target.
@@ -323,7 +345,12 @@ impl ChaosEngine {
 
         // 2. Simulate health impact: mark primary target unhealthy.
         if let Some(target) = fault.fault.primary_target() {
+<<<<<<< HEAD
             self.monitor.sample(target.clone(), false, None, 1.0);
+=======
+            self.monitor
+                .sample(target.clone(), false, None, 1.0);
+>>>>>>> 4b60ced (docs: update README)
 
             // 3. Simulate cascade for certain fault types.
             if matches!(
@@ -341,9 +368,15 @@ impl ChaosEngine {
             }
 
             // 4. Detect cascades.
+<<<<<<< HEAD
             let cascaded = self.monitor.detect_cascade(target.clone(), &injected_at);
             let cascade_labels: Vec<String> =
                 cascaded.iter().map(|t| t.label().to_string()).collect();
+=======
+            let cascaded =
+                self.monitor.detect_cascade(target.clone(), &injected_at);
+            let cascade_labels: Vec<String> = cascaded.iter().map(|t| t.label().to_string()).collect();
+>>>>>>> 4b60ced (docs: update README)
             if !cascade_labels.is_empty() {
                 cascade_map.insert(fault.id.clone(), cascade_labels.clone());
             }
@@ -352,6 +385,7 @@ impl ChaosEngine {
             self.injector.release(&injection_id)?;
 
             // 6. Simulate recovery.
+<<<<<<< HEAD
             self.monitor.sample(target.clone(), true, Some(5), 0.0);
             // Also recover cascade targets.
             for ct in &cascaded {
@@ -360,6 +394,20 @@ impl ChaosEngine {
 
             // 7. Measure recovery time.
             let recovery_time = self.monitor.recovery_time(target.clone(), &injected_at);
+=======
+            self.monitor
+                .sample(target.clone(), true, Some(5), 0.0);
+            // Also recover cascade targets.
+            for ct in &cascaded {
+                self.monitor
+                    .sample(ct.clone(), true, Some(10), 0.0);
+            }
+
+            // 7. Measure recovery time.
+            let recovery_time = self
+                .monitor
+                .recovery_time(target.clone(), &injected_at);
+>>>>>>> 4b60ced (docs: update README)
             let recovered = recovery_time.is_some();
 
             // Detect data loss for state faults.
@@ -369,7 +417,13 @@ impl ChaosEngine {
 
             let verdict = if recovered {
                 Verdict::Pass
+<<<<<<< HEAD
             } else if recovery_time.is_none() && self.config.recovery_timeout_ms > 0 {
+=======
+            } else if recovery_time.is_none()
+                && self.config.recovery_timeout_ms > 0
+            {
+>>>>>>> 4b60ced (docs: update README)
                 Verdict::Fail
             } else {
                 Verdict::Pass
@@ -386,7 +440,15 @@ impl ChaosEngine {
             };
 
             // Build recovery metrics.
+<<<<<<< HEAD
             let mut rm = RecoveryMetrics::new(&fault.id, &fault_type_str, &target_label);
+=======
+            let mut rm = RecoveryMetrics::new(
+                &fault.id,
+                &fault_type_str,
+                &target_label,
+            );
+>>>>>>> 4b60ced (docs: update README)
             if let Some(rt) = recovery_time {
                 rm = rm.recovered(rt);
             }
@@ -461,12 +523,16 @@ impl ChaosEngine {
     }
 
     /// Record evidence for a fault result into the validation report.
+<<<<<<< HEAD
     fn record_fault_evidence(
         &self,
         result: &FaultResult,
         fault: &FaultInjection,
         report: &mut ValidationReport,
     ) {
+=======
+    fn record_fault_evidence(&self, result: &FaultResult, fault: &FaultInjection, report: &mut ValidationReport) {
+>>>>>>> 4b60ced (docs: update README)
         let (verdict, evidence) = match result.verdict {
             Verdict::Pass => {
                 let ev = Evidence::pass(
@@ -535,6 +601,7 @@ mod tests {
     use crate::validation::verification::Severity;
 
     fn make_fault_injection(id: &str, fault: FaultType) -> FaultInjection {
+<<<<<<< HEAD
         FaultInjection::new(
             id,
             fault,
@@ -544,6 +611,12 @@ mod tests {
         .expected_behavior("System should recover")
         .severity(Severity::High)
         .tag("test")
+=======
+        FaultInjection::new(id, fault, &format!("fault-{}", id), &format!("Test fault {}", id))
+            .expected_behavior("System should recover")
+            .severity(Severity::High)
+            .tag("test")
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -613,8 +686,16 @@ mod tests {
                 target: FaultTarget::Agent,
             },
         );
+<<<<<<< HEAD
         let scenario =
             ChaosScenario::new("single-crash", "Test single crash recovery", vec![fault]);
+=======
+        let scenario = ChaosScenario::new(
+            "single-crash",
+            "Test single crash recovery",
+            vec![fault],
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         let result = engine.execute_scenario(&scenario, &mut report).unwrap();
         assert_eq!(result.fault_results.len(), 1);
@@ -657,9 +738,13 @@ mod tests {
 
         let result = engine.execute_scenario(&scenario, &mut report).unwrap();
         // Network partition should cause cascade.
+<<<<<<< HEAD
         assert!(
             !result.cascade_map.is_empty() || result.fault_results[0].cascade_targets.is_empty()
         );
+=======
+        assert!(!result.cascade_map.is_empty() || result.fault_results[0].cascade_targets.is_empty());
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

@@ -114,8 +114,12 @@ impl LearningStore {
 
         // Track error patterns.
         for record in records.iter().filter(|r| !r.correct) {
+<<<<<<< HEAD
             *self
                 .error_patterns
+=======
+            *self.error_patterns
+>>>>>>> 4b60ced (docs: update README)
                 .entry(record.attack_category.clone())
                 .or_insert(0) += 1;
         }
@@ -140,11 +144,15 @@ impl LearningStore {
                 let suggestion = format!(
                     "Consider lowering {} ring threshold or adding new detection patterns \
                      for this attack variant.",
+<<<<<<< HEAD
                     record
                         .rings
                         .first()
                         .map(|s| s.as_str())
                         .unwrap_or("unknown")
+=======
+                    record.rings.first().map(|s| s.as_str()).unwrap_or("unknown")
+>>>>>>> 4b60ced (docs: update README)
                 );
                 (InsightType::ThresholdAdjustment, desc, suggestion)
             }
@@ -162,6 +170,7 @@ impl LearningStore {
                 );
                 (InsightType::MissingPattern, desc, suggestion)
             }
+<<<<<<< HEAD
             (PredictionType::Uncertain, PredictionType::Blocked) => (
                 InsightType::ConfidenceMiscalibration,
                 format!(
@@ -194,6 +203,28 @@ impl LearningStore {
                 ),
                 "Add handling for this case.".to_string(),
             ),
+=======
+            (PredictionType::Uncertain, PredictionType::Blocked) => {
+                (InsightType::ConfidenceMiscalibration,
+                    format!("Twin was uncertain but {} attack was actually blocked.", record.attack_category),
+                    "Review scoring function for this category.".to_string())
+            }
+            (PredictionType::Uncertain, PredictionType::Allowed) => {
+                (InsightType::MissingPattern,
+                    format!("Twin was uncertain and {} attack was not blocked — potential gap.", record.attack_category),
+                    "Add patterns for this attack category.".to_string())
+            }
+            (PredictionType::Escalated, _) => {
+                (InsightType::WrongRing,
+                    format!("Twin predicted escalation for {} attack but outcome was different.", record.attack_category),
+                    "Review escalation logic.".to_string())
+            }
+            (p, a) => {
+                (InsightType::MissingPattern,
+                    format!("Unhandled prediction mismatch: {:?} vs {:?} for {}.", p, a, record.attack_category),
+                    "Add handling for this case.".to_string())
+            }
+>>>>>>> 4b60ced (docs: update README)
         };
 
         LearningRecord {
@@ -243,6 +274,7 @@ impl LearningStore {
 mod tests {
     use super::*;
 
+<<<<<<< HEAD
     fn record(
         payload: &str,
         predicted: PredictionType,
@@ -257,18 +289,26 @@ mod tests {
             vec!["shield".to_string()],
             cat,
         )
+=======
+    fn record(payload: &str, predicted: PredictionType, actual: PredictionType, cat: &str) -> PredictionRecord {
+        PredictionRecord::new(payload, predicted, actual, 0.9, vec!["shield".to_string()], cat)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
     fn learn_from_correct_predictions() {
         let mut store = LearningStore::new();
         let records = vec![
+<<<<<<< HEAD
             record(
                 "a",
                 PredictionType::Blocked,
                 PredictionType::Blocked,
                 "sqli",
             ),
+=======
+            record("a", PredictionType::Blocked, PredictionType::Blocked, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
             record("b", PredictionType::Allowed, PredictionType::Allowed, "xss"),
         ];
         let insights = store.learn_from_records(&records);
@@ -279,12 +319,18 @@ mod tests {
     #[test]
     fn learn_from_false_positive() {
         let mut store = LearningStore::new();
+<<<<<<< HEAD
         let records = vec![record(
             "sqli",
             PredictionType::Blocked,
             PredictionType::Allowed,
             "sqli",
         )];
+=======
+        let records = vec![
+            record("sqli", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+        ];
+>>>>>>> 4b60ced (docs: update README)
         let insights = store.learn_from_records(&records);
         assert_eq!(insights.len(), 1);
         assert_eq!(insights[0].insight_type, InsightType::ThresholdAdjustment);
@@ -293,12 +339,18 @@ mod tests {
     #[test]
     fn learn_from_false_negative() {
         let mut store = LearningStore::new();
+<<<<<<< HEAD
         let records = vec![record(
             "xss",
             PredictionType::Allowed,
             PredictionType::Blocked,
             "xss",
         )];
+=======
+        let records = vec![
+            record("xss", PredictionType::Allowed, PredictionType::Blocked, "xss"),
+        ];
+>>>>>>> 4b60ced (docs: update README)
         let insights = store.learn_from_records(&records);
         assert_eq!(insights.len(), 1);
         assert_eq!(insights[0].insight_type, InsightType::MissingPattern);
@@ -308,6 +360,7 @@ mod tests {
     fn deduplication() {
         let mut store = LearningStore::new();
         let records = vec![
+<<<<<<< HEAD
             record(
                 "a",
                 PredictionType::Blocked,
@@ -320,6 +373,10 @@ mod tests {
                 PredictionType::Allowed,
                 "sqli",
             ),
+=======
+            record("a", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+            record("b", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
         ];
         let insights = store.learn_from_records(&records);
         // Two records of same category+type should be merged.
@@ -331,6 +388,7 @@ mod tests {
     fn error_frequency() {
         let mut store = LearningStore::new();
         let records = vec![
+<<<<<<< HEAD
             record(
                 "a",
                 PredictionType::Blocked,
@@ -343,6 +401,10 @@ mod tests {
                 PredictionType::Allowed,
                 "sqli",
             ),
+=======
+            record("a", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+            record("b", PredictionType::Blocked, PredictionType::Allowed, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
             record("c", PredictionType::Blocked, PredictionType::Allowed, "xss"),
         ];
         store.learn_from_records(&records);
@@ -356,12 +418,16 @@ mod tests {
         let mut store = LearningStore::new();
         // All correct → accuracy should go up.
         let records = vec![
+<<<<<<< HEAD
             record(
                 "a",
                 PredictionType::Blocked,
                 PredictionType::Blocked,
                 "sqli",
             ),
+=======
+            record("a", PredictionType::Blocked, PredictionType::Blocked, "sqli"),
+>>>>>>> 4b60ced (docs: update README)
             record("b", PredictionType::Allowed, PredictionType::Allowed, "xss"),
         ];
         store.learn_from_records(&records);

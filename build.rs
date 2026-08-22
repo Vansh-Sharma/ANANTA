@@ -8,7 +8,14 @@ fn ensure_protoc() -> Result<String, String> {
         if std::path::Path::new(&p).exists() {
             return Ok(p);
         }
+<<<<<<< HEAD
         return Err(format!("PROTOC env var points to non-existent path: {}", p));
+=======
+        return Err(format!(
+            "PROTOC env var points to non-existent path: {}",
+            p
+        ));
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // 2. Check PATH for system protoc.
@@ -33,12 +40,19 @@ fn ensure_protoc() -> Result<String, String> {
         }
     }
 
+<<<<<<< HEAD
     Err(
         "protoc not found. Install it via `apt-get install protobuf-compiler`, \
         `brew install protobuf`, or set the PROTOC env var. \
         See https://docs.rs/prost-build/#sourcing-protoc for details."
             .to_string(),
     )
+=======
+    Err("protoc not found. Install it via `apt-get install protobuf-compiler`, \
+        `brew install protobuf`, or set the PROTOC env var. \
+        See https://docs.rs/prost-build/#sourcing-protoc for details."
+        .to_string())
+>>>>>>> 4b60ced (docs: update README)
 }
 
 fn main() {
@@ -53,7 +67,14 @@ fn main() {
     std::env::set_var("PROTOC", &protoc);
 
     if let Err(e) = tonic_build::compile_protos("proto/chakravyuh.proto") {
+<<<<<<< HEAD
         eprintln!("cargo:error=failed to compile protobuf: {}", e);
+=======
+        eprintln!(
+            "cargo:error=failed to compile protobuf: {}",
+            e
+        );
+>>>>>>> 4b60ced (docs: update README)
         std::process::exit(1);
     }
 }

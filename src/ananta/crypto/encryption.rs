@@ -31,8 +31,13 @@ pub enum EncryptionAlgorithm {
 
 /// Encrypt data with a password-derived key.
 pub fn encrypt(password: &str, plaintext: &[u8]) -> Result<EncryptedPayload, CryptoError> {
+<<<<<<< HEAD
     use aes_gcm::aead::Aead;
     use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+=======
+    use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+    use aes_gcm::aead::Aead;
+>>>>>>> 4b60ced (docs: update README)
     use rand::Rng;
 
     // Derive key using PBKDF2.
@@ -45,9 +50,15 @@ pub fn encrypt(password: &str, plaintext: &[u8]) -> Result<EncryptedPayload, Cry
     let nonce = Nonce::from_slice(&nonce_bytes);
 
     // Encrypt.
+<<<<<<< HEAD
     let cipher = Aes256Gcm::new_from_slice(&key).map_err(|_| CryptoError::KeyDerivationFailed)?;
     let ciphertext = cipher
         .encrypt(nonce, plaintext)
+=======
+    let cipher = Aes256Gcm::new_from_slice(&key)
+        .map_err(|_| CryptoError::KeyDerivationFailed)?;
+    let ciphertext = cipher.encrypt(nonce, plaintext)
+>>>>>>> 4b60ced (docs: update README)
         .map_err(|_| CryptoError::EncryptionFailed)?;
 
     Ok(EncryptedPayload {
@@ -60,15 +71,26 @@ pub fn encrypt(password: &str, plaintext: &[u8]) -> Result<EncryptedPayload, Cry
 
 /// Decrypt data with a password.
 pub fn decrypt(password: &str, payload: &EncryptedPayload) -> Result<Vec<u8>, CryptoError> {
+<<<<<<< HEAD
     use aes_gcm::aead::Aead;
     use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+=======
+    use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+    use aes_gcm::aead::Aead;
+>>>>>>> 4b60ced (docs: update README)
 
     let key = derive_key(password, &payload.salt)?;
     let nonce = Nonce::from_slice(&payload.nonce);
 
+<<<<<<< HEAD
     let cipher = Aes256Gcm::new_from_slice(&key).map_err(|_| CryptoError::KeyDerivationFailed)?;
     let plaintext = cipher
         .decrypt(nonce, payload.ciphertext.as_ref())
+=======
+    let cipher = Aes256Gcm::new_from_slice(&key)
+        .map_err(|_| CryptoError::KeyDerivationFailed)?;
+    let plaintext = cipher.decrypt(nonce, payload.ciphertext.as_ref())
+>>>>>>> 4b60ced (docs: update README)
         .map_err(|_| CryptoError::DecryptionFailed)?;
 
     Ok(plaintext)
@@ -101,9 +123,13 @@ impl std::fmt::Display for CryptoError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CryptoError::EncryptionFailed => write!(f, "encryption failed"),
+<<<<<<< HEAD
             CryptoError::DecryptionFailed => {
                 write!(f, "decryption failed (wrong password or tampered data)")
             }
+=======
+            CryptoError::DecryptionFailed => write!(f, "decryption failed (wrong password or tampered data)"),
+>>>>>>> 4b60ced (docs: update README)
             CryptoError::KeyDerivationFailed => write!(f, "key derivation failed"),
             CryptoError::InvalidPayload => write!(f, "invalid encrypted payload"),
         }
@@ -128,18 +154,29 @@ impl Encryptor {
     }
 
     pub fn encrypt(&self, plaintext: &[u8]) -> Result<EncryptedPayload, CryptoError> {
+<<<<<<< HEAD
         use aes_gcm::aead::Aead;
         use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+=======
+        use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+        use aes_gcm::aead::Aead;
+>>>>>>> 4b60ced (docs: update README)
         use rand::RngCore;
 
         let mut nonce_bytes = [0u8; 12];
         rand::rng().fill_bytes(&mut nonce_bytes);
         let nonce = Nonce::from_slice(&nonce_bytes);
 
+<<<<<<< HEAD
         let cipher =
             Aes256Gcm::new_from_slice(&self.key).map_err(|_| CryptoError::KeyDerivationFailed)?;
         let ciphertext = cipher
             .encrypt(nonce, plaintext)
+=======
+        let cipher = Aes256Gcm::new_from_slice(&self.key)
+            .map_err(|_| CryptoError::KeyDerivationFailed)?;
+        let ciphertext = cipher.encrypt(nonce, plaintext)
+>>>>>>> 4b60ced (docs: update README)
             .map_err(|_| CryptoError::EncryptionFailed)?;
 
         Ok(EncryptedPayload {
@@ -150,9 +187,13 @@ impl Encryptor {
         })
     }
 
+<<<<<<< HEAD
     pub fn salt(&self) -> &[u8] {
         &self.salt
     }
+=======
+    pub fn salt(&self) -> &[u8] { &self.salt }
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Decryptor holds a derived key for repeated operations.
@@ -168,6 +209,7 @@ impl Decryptor {
     }
 
     pub fn decrypt(&self, payload: &EncryptedPayload) -> Result<Vec<u8>, CryptoError> {
+<<<<<<< HEAD
         use aes_gcm::aead::Aead;
         use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
 
@@ -176,6 +218,15 @@ impl Decryptor {
             Aes256Gcm::new_from_slice(&self.key).map_err(|_| CryptoError::KeyDerivationFailed)?;
         cipher
             .decrypt(nonce, payload.ciphertext.as_ref())
+=======
+        use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+        use aes_gcm::aead::Aead;
+
+        let nonce = Nonce::from_slice(&payload.nonce);
+        let cipher = Aes256Gcm::new_from_slice(&self.key)
+            .map_err(|_| CryptoError::KeyDerivationFailed)?;
+        cipher.decrypt(nonce, payload.ciphertext.as_ref())
+>>>>>>> 4b60ced (docs: update README)
             .map_err(|_| CryptoError::DecryptionFailed)
     }
 }
@@ -225,4 +276,8 @@ mod tests {
         let decrypted = decrypt("key", &encrypted).unwrap();
         assert_eq!(decrypted.len(), 100_000);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

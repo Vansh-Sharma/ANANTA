@@ -18,8 +18,13 @@ pub mod verifier;
 // Re-export the core types that every D-phase uses.
 pub use evidence::{Evidence, EvidenceId, ReplayData, RunId, Severity, Verdict};
 pub use metrics::{
+<<<<<<< HEAD
     Metric, MetricSummary, RunMetrics, SeverityDistribution, SubsystemMetrics, TimingMetrics,
     VerdictDistribution,
+=======
+    Metric, MetricSummary, RunMetrics, SeverityDistribution, SubsystemMetrics,
+    TimingMetrics, VerdictDistribution,
+>>>>>>> 4b60ced (docs: update README)
 };
 pub use report::{ChainStatus, RunStatus, ValidationReport};
 pub use verifier::{verify_and_record, verify_match, MatchStrategy, VerificationSpec};
@@ -125,16 +130,24 @@ impl VerificationEngine {
 
     /// Finalize and export a run as JSON.
     pub fn export_run_json(&mut self, run_id: &str) -> Result<String, String> {
+<<<<<<< HEAD
         let report = self
             .finalize_run(run_id)
+=======
+        let report = self.finalize_run(run_id)
+>>>>>>> 4b60ced (docs: update README)
             .ok_or_else(|| format!("Run {} not found", run_id))?;
         report.to_json()
     }
 
     /// Finalize and export a run as text summary.
     pub fn export_run_text(&mut self, run_id: &str) -> Result<String, String> {
+<<<<<<< HEAD
         let report = self
             .finalize_run(run_id)
+=======
+        let report = self.finalize_run(run_id)
+>>>>>>> 4b60ced (docs: update README)
             .ok_or_else(|| format!("Run {} not found", run_id))?;
         Ok(report.to_text_summary())
     }
@@ -162,12 +175,17 @@ mod tests {
         let run_id = report.run_id.clone();
 
         report.record_evidence(Evidence::pass(
+<<<<<<< HEAD
             &run_id,
             "check",
             "D0",
             "v",
             serde_json::json!(true),
             serde_json::json!(true),
+=======
+            &run_id, "check", "D0", "v",
+            serde_json::json!(true), serde_json::json!(true),
+>>>>>>> 4b60ced (docs: update README)
         ));
 
         let json = engine.export_run_json(&run_id).unwrap();
@@ -182,12 +200,17 @@ mod tests {
         let run_id = report.run_id.clone();
 
         report.record_evidence(Evidence::pass(
+<<<<<<< HEAD
             &run_id,
             "c",
             "D0",
             "v",
             serde_json::json!(1),
             serde_json::json!(1),
+=======
+            &run_id, "c", "D0", "v",
+            serde_json::json!(1), serde_json::json!(1),
+>>>>>>> 4b60ced (docs: update README)
         ));
 
         let text = engine.export_run_text(&run_id).unwrap();

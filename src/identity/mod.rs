@@ -66,12 +66,17 @@ pub struct IdentityConfig {
 fn default_enabled() -> bool {
     true
 }
+<<<<<<< HEAD
 fn default_challenge_threshold() -> f64 {
     6.0
 }
 fn default_deny_threshold() -> f64 {
     9.0
 }
+=======
+fn default_challenge_threshold() -> f64 { 6.0 }
+fn default_deny_threshold() -> f64 { 9.0 }
+>>>>>>> 4b60ced (docs: update README)
 
 impl Default for IdentityConfig {
     fn default() -> Self {
@@ -202,9 +207,16 @@ impl IdentityRing {
         let mut engine_results: Vec<IdentityEngineResult> = Vec::with_capacity(4);
 
         // Engine 1: SessionIdentity — classify credentials.
+<<<<<<< HEAD
         let id_result = self
             .session_identity
             .evaluate(request.api_key.as_deref(), &request.headers);
+=======
+        let id_result = self.session_identity.evaluate(
+            request.api_key.as_deref(),
+            &request.headers,
+        );
+>>>>>>> 4b60ced (docs: update README)
         engine_results.push(IdentityEngineResult {
             engine_name: "session_identity".into(),
             decision: if id_result.valid { "valid" } else { "invalid" }.into(),
@@ -269,6 +281,7 @@ impl IdentityRing {
         );
         engine_results.push(IdentityEngineResult {
             engine_name: "identity_anomaly".into(),
+<<<<<<< HEAD
             decision: if anomaly_result.is_severe {
                 "severe"
             } else if anomaly_result.composite_score > 0.0 {
@@ -277,6 +290,9 @@ impl IdentityRing {
                 "clear"
             }
             .into(),
+=======
+            decision: if anomaly_result.is_severe { "severe" } else if anomaly_result.composite_score > 0.0 { "flagged" } else { "clear" }.into(),
+>>>>>>> 4b60ced (docs: update README)
             reason: anomaly_result.summary.clone(),
             latency_ms: 0.0,
             metadata: serde_json::to_value(&anomaly_result).unwrap_or_default(),
@@ -288,7 +304,11 @@ impl IdentityRing {
         let identity_risk_score = {
             let anomaly_component = anomaly_result.composite_score; // 0-10
             let trust_component = (1.0 - trust_result.trust_score) * 10.0; // 0-10
+<<<<<<< HEAD
                                                                            // Weight: anomaly is 60%, trust is 40%.
+=======
+            // Weight: anomaly is 60%, trust is 40%.
+>>>>>>> 4b60ced (docs: update README)
             (anomaly_component * 0.6 + trust_component * 0.4).clamp(0.0, 10.0)
         };
 
@@ -377,10 +397,14 @@ mod tests {
         let request = make_request(None, "1.2.3.4");
         let verdict = ring.evaluate(&request);
         assert!(verdict.decision.is_allow());
+<<<<<<< HEAD
         assert_eq!(
             verdict.identity_profile.as_ref().unwrap().identity_type,
             IdentityType::Anonymous
         );
+=======
+        assert_eq!(verdict.identity_profile.as_ref().unwrap().identity_type, IdentityType::Anonymous);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -389,10 +413,14 @@ mod tests {
         let request = make_request(Some("sk-test-regular-api-key-12345"), "1.2.3.4");
         let verdict = ring.evaluate(&request);
         assert!(verdict.decision.is_allow());
+<<<<<<< HEAD
         assert_eq!(
             verdict.identity_profile.as_ref().unwrap().identity_type,
             IdentityType::ApiKey
         );
+=======
+        assert_eq!(verdict.identity_profile.as_ref().unwrap().identity_type, IdentityType::ApiKey);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(verdict.role.as_ref().unwrap(), &Role::User);
     }
 
@@ -435,11 +463,15 @@ mod tests {
         let request = make_request(Some("sk-test-key-16chars-min"), "1.2.3.4");
         let verdict = ring.evaluate(&request);
         assert_eq!(verdict.engine_results.len(), 4);
+<<<<<<< HEAD
         let names: Vec<&str> = verdict
             .engine_results
             .iter()
             .map(|r| r.engine_name.as_str())
             .collect();
+=======
+        let names: Vec<&str> = verdict.engine_results.iter().map(|r| r.engine_name.as_str()).collect();
+>>>>>>> 4b60ced (docs: update README)
         assert!(names.contains(&"session_identity"));
         assert!(names.contains(&"role_resolver"));
         assert!(names.contains(&"trust_accumulator"));
@@ -494,10 +526,14 @@ mod tests {
     fn session_identity_headers() {
         let ring = default_ring();
         let mut headers = std::collections::HashMap::new();
+<<<<<<< HEAD
         headers.insert(
             "x-session-token".into(),
             "sess_abcdefghij12345678901234".into(),
         );
+=======
+        headers.insert("x-session-token".into(), "sess_abcdefghij12345678901234".into());
+>>>>>>> 4b60ced (docs: update README)
         let request = IdentityRequest {
             source_ip: "1.2.3.4".into(),
             user_agent: None,
@@ -507,10 +543,14 @@ mod tests {
             headers,
         };
         let verdict = ring.evaluate(&request);
+<<<<<<< HEAD
         assert_eq!(
             verdict.identity_profile.as_ref().unwrap().identity_type,
             IdentityType::Session
         );
+=======
+        assert_eq!(verdict.identity_profile.as_ref().unwrap().identity_type, IdentityType::Session);
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]
@@ -527,10 +567,14 @@ mod tests {
             headers,
         };
         let verdict = ring.evaluate(&request);
+<<<<<<< HEAD
         assert_eq!(
             verdict.identity_profile.as_ref().unwrap().identity_type,
             IdentityType::Internal
         );
+=======
+        assert_eq!(verdict.identity_profile.as_ref().unwrap().identity_type, IdentityType::Internal);
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(verdict.role.as_ref().unwrap(), &Role::Admin);
         let trust = verdict.trust_result.as_ref().unwrap();
         assert!(trust.trust_score > 0.5); // High trust for internal.

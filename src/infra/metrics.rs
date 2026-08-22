@@ -45,6 +45,7 @@ pub static METRICS_START: std::sync::OnceLock<Instant> = std::sync::OnceLock::ne
 /// Record an endpoint request.
 pub fn record_endpoint(endpoint: &str) {
     match endpoint {
+<<<<<<< HEAD
         "evaluate" | "/v1/evaluate" | "/grpc/evaluate" => {
             EVALUATE_REQUESTS.fetch_add(1, Ordering::Relaxed);
         }
@@ -57,6 +58,12 @@ pub fn record_endpoint(endpoint: &str) {
         "grpc" => {
             GRPC_REQUESTS.fetch_add(1, Ordering::Relaxed);
         }
+=======
+        "evaluate" | "/v1/evaluate" | "/grpc/evaluate" => { EVALUATE_REQUESTS.fetch_add(1, Ordering::Relaxed); }
+        "proxy" | "/v1/proxy" => { PROXY_REQUESTS.fetch_add(1, Ordering::Relaxed); }
+        "execute" | "/v1/execute" | "/grpc/execute" => { EXECUTE_REQUESTS.fetch_add(1, Ordering::Relaxed); }
+        "grpc" => { GRPC_REQUESTS.fetch_add(1, Ordering::Relaxed); }
+>>>>>>> 4b60ced (docs: update README)
         _ => {}
     }
 }
@@ -77,6 +84,7 @@ pub fn record_decision(decision: &str) {
 /// Record a ring evaluation.
 pub fn record_ring_eval(ring: &str) {
     match ring {
+<<<<<<< HEAD
         "shield" => {
             SHIELD_EVALS.fetch_add(1, Ordering::Relaxed);
         }
@@ -104,6 +112,17 @@ pub fn record_ring_eval(ring: &str) {
         "recovery_sec" | "recovery" => {
             RECOVERY_SEC_EVALS.fetch_add(1, Ordering::Relaxed);
         }
+=======
+        "shield" => { SHIELD_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "threat" => { THREAT_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "identity" => { IDENTITY_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "memory" => { MEMORY_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "agent" => { AGENT_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "execution" => { EXECUTION_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "reasoning" => { REASONING_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "governance" => { GOVERNANCE_EVALS.fetch_add(1, Ordering::Relaxed); }
+        "recovery_sec" | "recovery" => { RECOVERY_SEC_EVALS.fetch_add(1, Ordering::Relaxed); }
+>>>>>>> 4b60ced (docs: update README)
         _ => {}
     }
 }
@@ -144,6 +163,7 @@ pub fn metrics_text() -> String {
     // Endpoint requests.
     out.push_str("# HELP chakravyuh_requests_total Total requests per endpoint\n");
     out.push_str("# TYPE chakravyuh_requests_total counter\n");
+<<<<<<< HEAD
     out.push_str(&format!(
         "chakravyuh_requests_total{{endpoint=\"evaluate\"}} {}\n",
         read_counter(&EVALUATE_REQUESTS)
@@ -160,10 +180,17 @@ pub fn metrics_text() -> String {
         "chakravyuh_requests_total{{endpoint=\"grpc\"}} {}\n\n",
         read_counter(&GRPC_REQUESTS)
     ));
+=======
+    out.push_str(&format!("chakravyuh_requests_total{{endpoint=\"evaluate\"}} {}\n", read_counter(&EVALUATE_REQUESTS)));
+    out.push_str(&format!("chakravyuh_requests_total{{endpoint=\"proxy\"}} {}\n", read_counter(&PROXY_REQUESTS)));
+    out.push_str(&format!("chakravyuh_requests_total{{endpoint=\"execute\"}} {}\n", read_counter(&EXECUTE_REQUESTS)));
+    out.push_str(&format!("chakravyuh_requests_total{{endpoint=\"grpc\"}} {}\n\n", read_counter(&GRPC_REQUESTS)));
+>>>>>>> 4b60ced (docs: update README)
 
     // Decision counts.
     out.push_str("# HELP chakravyuh_decisions_total Total decisions by outcome\n");
     out.push_str("# TYPE chakravyuh_decisions_total counter\n");
+<<<<<<< HEAD
     out.push_str(&format!(
         "chakravyuh_decisions_total{{decision=\"allow\"}} {}\n",
         read_counter(&ALLOW_DECISIONS)
@@ -180,10 +207,17 @@ pub fn metrics_text() -> String {
         "chakravyuh_decisions_total{{decision=\"escalate\"}} {}\n\n",
         read_counter(&ESCALATE_DECISIONS)
     ));
+=======
+    out.push_str(&format!("chakravyuh_decisions_total{{decision=\"allow\"}} {}\n", read_counter(&ALLOW_DECISIONS)));
+    out.push_str(&format!("chakravyuh_decisions_total{{decision=\"deny\"}} {}\n", read_counter(&DENY_DECISIONS)));
+    out.push_str(&format!("chakravyuh_decisions_total{{decision=\"challenge\"}} {}\n", read_counter(&CHALLENGE_DECISIONS)));
+    out.push_str(&format!("chakravyuh_decisions_total{{decision=\"escalate\"}} {}\n\n", read_counter(&ESCALATE_DECISIONS)));
+>>>>>>> 4b60ced (docs: update README)
 
     // Ring evaluations.
     out.push_str("# HELP chakravyuh_ring_evaluations_total Total ring evaluations\n");
     out.push_str("# TYPE chakravyuh_ring_evaluations_total counter\n");
+<<<<<<< HEAD
     out.push_str(&format!(
         "chakravyuh_ring_evaluations_total{{ring=\"shield\"}} {}\n",
         read_counter(&SHIELD_EVALS)
@@ -220,10 +254,22 @@ pub fn metrics_text() -> String {
         "chakravyuh_ring_evaluations_total{{ring=\"recovery\"}} {}\n\n",
         read_counter(&RECOVERY_SEC_EVALS)
     ));
+=======
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"shield\"}} {}\n", read_counter(&SHIELD_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"threat\"}} {}\n", read_counter(&THREAT_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"identity\"}} {}\n", read_counter(&IDENTITY_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"memory\"}} {}\n", read_counter(&MEMORY_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"agent\"}} {}\n", read_counter(&AGENT_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"execution\"}} {}\n", read_counter(&EXECUTION_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"reasoning\"}} {}\n", read_counter(&REASONING_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"governance\"}} {}\n", read_counter(&GOVERNANCE_EVALS)));
+    out.push_str(&format!("chakravyuh_ring_evaluations_total{{ring=\"recovery\"}} {}\n\n", read_counter(&RECOVERY_SEC_EVALS)));
+>>>>>>> 4b60ced (docs: update README)
 
     // Latency histogram.
     out.push_str("# HELP chakravyuh_request_duration_ms Request latency histogram\n");
     out.push_str("# TYPE chakravyuh_request_duration_ms histogram\n");
+<<<<<<< HEAD
     out.push_str(&format!(
         "chakravyuh_request_duration_ms_bucket{{le=\"1\"}} {}\n",
         read_counter(&LATENCY_UNDER_1MS)
@@ -248,6 +294,14 @@ pub fn metrics_text() -> String {
         "chakravyuh_request_duration_ms_bucket{{le=\"+Inf\"}} {}\n\n",
         read_counter(&LATENCY_OVER_100MS)
     ));
+=======
+    out.push_str(&format!("chakravyuh_request_duration_ms_bucket{{le=\"1\"}} {}\n", read_counter(&LATENCY_UNDER_1MS)));
+    out.push_str(&format!("chakravyuh_request_duration_ms_bucket{{le=\"5\"}} {}\n", read_counter(&LATENCY_UNDER_5MS)));
+    out.push_str(&format!("chakravyuh_request_duration_ms_bucket{{le=\"10\"}} {}\n", read_counter(&LATENCY_UNDER_10MS)));
+    out.push_str(&format!("chakravyuh_request_duration_ms_bucket{{le=\"50\"}} {}\n", read_counter(&LATENCY_UNDER_50MS)));
+    out.push_str(&format!("chakravyuh_request_duration_ms_bucket{{le=\"100\"}} {}\n", read_counter(&LATENCY_UNDER_100MS)));
+    out.push_str(&format!("chakravyuh_request_duration_ms_bucket{{le=\"+Inf\"}} {}\n\n", read_counter(&LATENCY_OVER_100MS)));
+>>>>>>> 4b60ced (docs: update README)
 
     out
 }
@@ -277,10 +331,14 @@ mod tests {
         record_decision("challenge");
         assert_eq!(read_counter(&ALLOW_DECISIONS), before_allow + 1);
         assert_eq!(read_counter(&DENY_DECISIONS), before_deny + 2);
+<<<<<<< HEAD
         assert_eq!(
             read_counter(&CHALLENGE_DECISIONS),
             read_counter(&CHALLENGE_DECISIONS)
         ); // just runs
+=======
+        assert_eq!(read_counter(&CHALLENGE_DECISIONS), read_counter(&CHALLENGE_DECISIONS)); // just runs
+>>>>>>> 4b60ced (docs: update README)
     }
 
     #[test]

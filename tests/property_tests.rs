@@ -4,6 +4,7 @@
 // across the 9-ring security architecture.
 
 use chakravyuh::{
+<<<<<<< HEAD
     ananta::{
         config::HashAlgorithm,
         crypto::{
@@ -35,6 +36,36 @@ use chakravyuh::{
 use proptest::prelude::*;
 use std::collections::HashMap;
 use std::sync::Arc;
+=======
+    Config,
+    Decision,
+    shield::{ShieldRing, ShieldRequest},
+    identity::{IdentityRing, IdentityConfig, IdentityRequest},
+    keshav::{
+        risk::{KeshavRisk, RiskSignals, ContextSignals},
+        feedback_collector::{FeedbackCollector, FeedbackCollectorConfig, FeedbackEntry, FeedbackType, FeedbackSeverity},
+    },
+    ananta::{
+        crypto::{
+            hashing::{hash_bytes, hash_combined, constant_time_eq},
+            signing::{sign, verify, KeyPair},
+            merkle::MerkleTree,
+            encryption::{encrypt, decrypt},
+            ShamirScheme, lagrange_interpolate_at_zero,
+        },
+        config::HashAlgorithm,
+        ovaph_loop::OvaphStage,
+    },
+    storage::{MemoryStore, Store},
+    policy_compiler::vm::PolicyVM,
+    policy_compiler::bytecode::{OpCode, Instruction, Constant, BytecodeProgram},
+    cross_ring::{CrossRingMessage, CrossRingType, MessagePriority},
+    infra::{AuditTrail, AuditConfig},
+};
+use proptest::prelude::*;
+use std::sync::Arc;
+use std::collections::HashMap;
+>>>>>>> 4b60ced (docs: update README)
 
 // ─────────────────────────────────────────────────────────────────────
 // Helpers
@@ -63,8 +94,12 @@ fn make_shield_request(prompt: &str) -> ShieldRequest {
 /// Construct a minimal valid Decision::Challenge via JSON deserialization.
 /// ChallengeType is in a private module, so we use serde to construct it.
 fn make_challenge_decision() -> Decision {
+<<<<<<< HEAD
     serde_json::from_value(serde_json::json!({"type": "challenge", "challenge_type": "javascript"}))
         .unwrap()
+=======
+    serde_json::from_value(serde_json::json!({"type": "challenge", "challenge_type": "javascript"})).unwrap()
+>>>>>>> 4b60ced (docs: update README)
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -957,8 +992,13 @@ fn config_default_yaml_roundtrip() {
     let yaml = Config::default_yaml();
     let mut tmp = tempfile::NamedTempFile::new().unwrap();
     std::io::Write::write_all(tmp.as_file_mut(), yaml.as_bytes()).unwrap();
+<<<<<<< HEAD
     let config =
         Config::from_file(tmp.path()).expect("default_yaml should parse into a valid Config");
+=======
+    let config = Config::from_file(tmp.path())
+        .expect("default_yaml should parse into a valid Config");
+>>>>>>> 4b60ced (docs: update README)
     assert!(config.shield.enabled, "shield should be enabled by default");
 }
 

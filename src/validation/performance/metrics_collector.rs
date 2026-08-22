@@ -180,7 +180,15 @@ impl MetricsCollector {
         if self.samples.is_empty() {
             return 0.0;
         }
+<<<<<<< HEAD
         let errors = self.samples.iter().filter(|s| s.error.is_some()).count();
+=======
+        let errors = self
+            .samples
+            .iter()
+            .filter(|s| s.error.is_some())
+            .count();
+>>>>>>> 4b60ced (docs: update README)
         errors as f64 / self.samples.len() as f64
     }
 
@@ -207,7 +215,14 @@ impl MetricsCollector {
     // ── Internal helpers ──────────────────────────────────────────
 
     /// Compute latency summary from a slice of samples.
+<<<<<<< HEAD
     fn compute_latency(samples: &[PerformanceSample], _percentiles: &[f64]) -> LatencySummary {
+=======
+    fn compute_latency(
+        samples: &[PerformanceSample],
+        _percentiles: &[f64],
+    ) -> LatencySummary {
+>>>>>>> 4b60ced (docs: update README)
         if samples.is_empty() {
             return LatencySummary {
                 count: 0,
@@ -355,7 +370,16 @@ mod tests {
             collector.record(make_sample(&format!("a{}", i), 50 + i, "shield", "Benign"));
         }
         for i in 0..50u64 {
+<<<<<<< HEAD
             collector.record(make_sample(&format!("b{}", i), 200 + i, "threat", "Attack"));
+=======
+            collector.record(make_sample(
+                &format!("b{}", i),
+                200 + i,
+                "threat",
+                "Attack",
+            ));
+>>>>>>> 4b60ced (docs: update README)
         }
         let per_ring = collector.per_ring_latency();
         assert_eq!(per_ring.len(), 2);

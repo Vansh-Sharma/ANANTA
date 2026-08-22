@@ -3,6 +3,7 @@
 // Persists benchmark results and comparison snapshots.
 // Enables time-series analysis of performance evolution.
 
+<<<<<<< HEAD
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -10,6 +11,13 @@ use std::path::{Path, PathBuf};
 use super::benchmarks::{
     BenchmarkCategory, BenchmarkDef, BenchmarkResult, BenchmarkSuite, Direction,
 };
+=======
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use serde::{Deserialize, Serialize};
+
+use super::benchmarks::{BenchmarkCategory, BenchmarkDef, BenchmarkResult, BenchmarkSuite, Direction};
+>>>>>>> 4b60ced (docs: update README)
 use super::comparison::{ComparisonReport, ComparisonSnapshot};
 
 /// Query filter for benchmark results.
@@ -30,6 +38,7 @@ impl Query {
         Self::default()
     }
 
+<<<<<<< HEAD
     pub fn with_system(mut self, s: &str) -> Self {
         self.system = Some(s.to_string());
         self
@@ -50,6 +59,13 @@ impl Query {
         self.limit = Some(n);
         self
     }
+=======
+    pub fn with_system(mut self, s: &str) -> Self { self.system = Some(s.to_string()); self }
+    pub fn with_version(mut self, v: &str) -> Self { self.version = Some(v.to_string()); self }
+    pub fn with_category(mut self, c: BenchmarkCategory) -> Self { self.category = Some(c); self }
+    pub fn with_tag(mut self, t: &str) -> Self { self.tags.push(t.to_string()); self }
+    pub fn with_limit(mut self, n: usize) -> Self { self.limit = Some(n); self }
+>>>>>>> 4b60ced (docs: update README)
 
     /// Filter a list of results by this query.
     pub fn filter<'a>(&self, results: &'a [BenchmarkResult]) -> Vec<&'a BenchmarkResult> {
@@ -136,10 +152,14 @@ impl BenchmarkStore {
 
     /// Get all snapshots for a version.
     pub fn snapshots_for_version(&self, version: &str) -> Vec<&ComparisonSnapshot> {
+<<<<<<< HEAD
         self.snapshots
             .iter()
             .filter(|s| s.version == version)
             .collect()
+=======
+        self.snapshots.iter().filter(|s| s.version == version).collect()
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Compare the latest snapshot of two versions.
@@ -148,11 +168,17 @@ impl BenchmarkStore {
         baseline_version: &str,
         current_version: &str,
     ) -> Result<ComparisonReport, String> {
+<<<<<<< HEAD
         let baseline = self
             .latest_snapshot(baseline_version)
             .ok_or_else(|| format!("No snapshot found for version {}", baseline_version))?;
         let current = self
             .latest_snapshot(current_version)
+=======
+        let baseline = self.latest_snapshot(baseline_version)
+            .ok_or_else(|| format!("No snapshot found for version {}", baseline_version))?;
+        let current = self.latest_snapshot(current_version)
+>>>>>>> 4b60ced (docs: update README)
             .ok_or_else(|| format!("No snapshot found for version {}", current_version))?;
 
         Ok(ComparisonReport::compare(
@@ -164,18 +190,33 @@ impl BenchmarkStore {
 
     /// Export the entire store as JSON.
     pub fn to_json(&self) -> Result<String, String> {
+<<<<<<< HEAD
         serde_json::to_string_pretty(self).map_err(|e| format!("JSON serialization failed: {}", e))
+=======
+        serde_json::to_string_pretty(self)
+            .map_err(|e| format!("JSON serialization failed: {}", e))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Import a store from JSON.
     pub fn from_json(json: &str) -> Result<Self, String> {
+<<<<<<< HEAD
         serde_json::from_str(json).map_err(|e| format!("JSON parse failed: {}", e))
+=======
+        serde_json::from_str(json)
+            .map_err(|e| format!("JSON parse failed: {}", e))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Save store to a file.
     pub fn save_to_file(&self, path: &Path) -> Result<(), String> {
         let json = self.to_json()?;
+<<<<<<< HEAD
         std::fs::write(path, json).map_err(|e| format!("Failed to write {}: {}", path.display(), e))
+=======
+        std::fs::write(path, json)
+            .map_err(|e| format!("Failed to write {}: {}", path.display(), e))
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Load store from a file.
@@ -217,6 +258,7 @@ mod tests {
     #[test]
     fn store_snapshot_and_compare() {
         let mut store = BenchmarkStore::new();
+<<<<<<< HEAD
         store
             .direction_map
             .insert("detection_rate".to_string(), Direction::HigherIsBetter);
@@ -225,6 +267,18 @@ mod tests {
             ComparisonSnapshot::new("1.0.0", "run-1", vec![make_result("b1", "1.0.0", 0.85)]);
         let snap2 =
             ComparisonSnapshot::new("2.0.0", "run-2", vec![make_result("b1", "2.0.0", 0.95)]);
+=======
+        store.direction_map.insert("detection_rate".to_string(), Direction::HigherIsBetter);
+
+        let snap1 = ComparisonSnapshot::new(
+            "1.0.0", "run-1",
+            vec![make_result("b1", "1.0.0", 0.85)],
+        );
+        let snap2 = ComparisonSnapshot::new(
+            "2.0.0", "run-2",
+            vec![make_result("b1", "2.0.0", 0.95)],
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         store.save_snapshot(snap1);
         store.save_snapshot(snap2);

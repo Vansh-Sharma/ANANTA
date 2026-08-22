@@ -76,9 +76,15 @@ impl FaultTarget {
             | FaultTarget::AnantaPhoenix
             | FaultTarget::AnantaVault
             | FaultTarget::AnantaAdapter => "ananta",
+<<<<<<< HEAD
             FaultTarget::KeshavDecide | FaultTarget::KeshavLearn | FaultTarget::KeshavRisk => {
                 "keshav"
             }
+=======
+            FaultTarget::KeshavDecide
+            | FaultTarget::KeshavLearn
+            | FaultTarget::KeshavRisk => "keshav",
+>>>>>>> 4b60ced (docs: update README)
             FaultTarget::CrossRingNetwork => "network",
             FaultTarget::Storage => "infra",
         }
@@ -132,7 +138,14 @@ pub enum FaultType {
 
     // --- Network faults ---
     /// Network communication from one target to another is severed.
+<<<<<<< HEAD
     NetworkPartition { from: FaultTarget, to: FaultTarget },
+=======
+    NetworkPartition {
+        from: FaultTarget,
+        to: FaultTarget,
+    },
+>>>>>>> 4b60ced (docs: update README)
     /// Network communication from one target to another is delayed.
     NetworkLatency {
         from: FaultTarget,
@@ -158,7 +171,14 @@ pub enum FaultType {
     /// Corrupt the trust chain to a given depth.
     TrustChainCorruption { depth: u32 },
     /// Inject drift into a subsystem with a given magnitude.
+<<<<<<< HEAD
     DriftInjection { subsystem: String, magnitude: f64 },
+=======
+    DriftInjection {
+        subsystem: String,
+        magnitude: f64,
+    },
+>>>>>>> 4b60ced (docs: update README)
     /// Force an attestation failure with a reason.
     AttestationFailure { reason: String },
 }

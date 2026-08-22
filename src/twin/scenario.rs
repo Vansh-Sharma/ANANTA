@@ -128,12 +128,16 @@ pub struct ScenarioResult {
 
 impl ScenarioResult {
     /// Create a new scenario result.
+<<<<<<< HEAD
     pub fn new(
         scenario_id: &str,
         outcome: ScenarioOutcome,
         details: String,
         duration_ms: u64,
     ) -> Self {
+=======
+    pub fn new(scenario_id: &str, outcome: ScenarioOutcome, details: String, duration_ms: u64) -> Self {
+>>>>>>> 4b60ced (docs: update README)
         Self {
             scenario_id: scenario_id.to_string(),
             outcome,
@@ -308,9 +312,13 @@ mod tests {
 impl Scenario {
     /// Get a specific parameter as bool, returning None if missing or wrong type.
     fn param_bool(&self, key: &str) -> bool {
+<<<<<<< HEAD
         self.parameters
             .get(key)
             .and_then(|v| v.as_bool())
             .unwrap_or(false)
+=======
+        self.parameters.get(key).and_then(|v| v.as_bool()).unwrap_or(false)
+>>>>>>> 4b60ced (docs: update README)
     }
 }

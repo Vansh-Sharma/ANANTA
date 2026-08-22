@@ -22,8 +22,13 @@ use tonic::{Request, Response, Status};
 
 use crate::api::ApiState;
 use crate::infra::{is_ready, RingHealth};
+<<<<<<< HEAD
 use crate::keshav::orchestrate::RequestType;
 use crate::keshav::PipelineContext;
+=======
+use crate::keshav::PipelineContext;
+use crate::keshav::orchestrate::RequestType;
+>>>>>>> 4b60ced (docs: update README)
 
 /// gRPC configuration.
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -86,17 +91,27 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
             "messages": messages_json,
         });
 
+<<<<<<< HEAD
         let shield_request =
             crate::api::build_shield_request("/grpc/evaluate", &axum::http::HeaderMap::new(), body);
+=======
+        let shield_request = crate::api::build_shield_request(
+            "/grpc/evaluate", &axum::http::HeaderMap::new(), body,
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         let request_id = uuid::Uuid::new_v4().to_string();
         let prompt_text = crate::api::extract_prompt_text(&shield_request.body);
 
         // Build orchestration plan and execute via PipelineExecutor.
+<<<<<<< HEAD
         let plan = self
             .state
             .orchestrate
             .plan(RequestType::SimplePrompt, false);
+=======
+        let plan = self.state.orchestrate.plan(RequestType::SimplePrompt, false);
+>>>>>>> 4b60ced (docs: update README)
         let ctx = PipelineContext {
             shield_request,
             request_id,
@@ -123,16 +138,27 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
             req.request_id.clone()
         };
 
+<<<<<<< HEAD
         let parameters: serde_json::Value =
             serde_json::from_str(&req.parameters).unwrap_or(serde_json::Value::Null);
+=======
+        let parameters: serde_json::Value = serde_json::from_str(&req.parameters)
+            .unwrap_or(serde_json::Value::Null);
+>>>>>>> 4b60ced (docs: update README)
 
         let body = serde_json::json!({
             "tool_name": req.tool_name,
             "parameters": parameters,
         });
 
+<<<<<<< HEAD
         let shield_request =
             crate::api::build_shield_request("/grpc/execute", &axum::http::HeaderMap::new(), body);
+=======
+        let shield_request = crate::api::build_shield_request(
+            "/grpc/execute", &axum::http::HeaderMap::new(), body,
+        );
+>>>>>>> 4b60ced (docs: update README)
 
         let prompt_text = crate::api::extract_prompt_text(&shield_request.body);
 
@@ -145,11 +171,15 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
             tool_call: Some(crate::keshav::ToolCallContext {
                 tool_name: req.tool_name,
                 parameters,
+<<<<<<< HEAD
                 agent_id: if req.agent_id.is_empty() {
                     None
                 } else {
                     Some(req.agent_id)
                 },
+=======
+                agent_id: if req.agent_id.is_empty() { None } else { Some(req.agent_id) },
+>>>>>>> 4b60ced (docs: update README)
             }),
         };
 
@@ -161,7 +191,14 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
 
     // ── Health ──
 
+<<<<<<< HEAD
     async fn health(&self, _request: Request<Empty>) -> Result<Response<HealthResponse>, Status> {
+=======
+    async fn health(
+        &self,
+        _request: Request<Empty>,
+    ) -> Result<Response<HealthResponse>, Status> {
+>>>>>>> 4b60ced (docs: update README)
         Ok(Response::new(HealthResponse {
             status: "ok".into(),
             version: env!("CARGO_PKG_VERSION").into(),
@@ -171,6 +208,7 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
 
     // ── Ready ──
 
+<<<<<<< HEAD
     async fn ready(&self, _request: Request<Empty>) -> Result<Response<ReadyResponse>, Status> {
         let known_rings = &[
             "shield",
@@ -202,16 +240,43 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
                 error_rate: 0.0,
             })
             .collect();
+=======
+    async fn ready(
+        &self,
+        _request: Request<Empty>,
+    ) -> Result<Response<ReadyResponse>, Status> {
+        let known_rings = &["shield", "threat", "identity", "memory", "agent", "execution"];
+        let ring_health = self.state.cross_ring.ring_health(known_rings);
+
+        let infra_health: Vec<RingStatus> = ring_health.iter().map(|h| RingStatus {
+            name: h.ring_name.clone(),
+            healthy: h.is_healthy,
+        }).collect();
+
+        let ring_health_for_check: Vec<RingHealth> = infra_health.iter().map(|h| RingHealth {
+            name: h.name.clone(),
+            enabled: true,
+            healthy: h.healthy,
+            last_check_ms: 0.0,
+            total_evaluations: 0,
+            total_errors: 0,
+            error_rate: 0.0,
+        }).collect();
+>>>>>>> 4b60ced (docs: update README)
 
         let ready = is_ready(&ring_health_for_check);
         let (total_reqs, total_errs) = crate::infra::request_counts();
 
         Ok(Response::new(ReadyResponse {
+<<<<<<< HEAD
             status: if ready {
                 "ready".into()
             } else {
                 "not_ready".into()
             },
+=======
+            status: if ready { "ready".into() } else { "not_ready".into() },
+>>>>>>> 4b60ced (docs: update README)
             ready,
             total_requests: total_reqs,
             total_errors: total_errs,
@@ -256,6 +321,7 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
         let req = request.into_inner();
 
         let feedback_type = match req.feedback_type.to_lowercase().as_str() {
+<<<<<<< HEAD
             "false_positive" | "fp" => {
                 crate::keshav::feedback_collector::FeedbackType::FalsePositive
             }
@@ -270,6 +336,14 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
             "escalation_denied" => {
                 crate::keshav::feedback_collector::FeedbackType::EscalationDenied
             }
+=======
+            "false_positive" | "fp" => crate::keshav::feedback_collector::FeedbackType::FalsePositive,
+            "false_negative" | "fn" => crate::keshav::feedback_collector::FeedbackType::FalseNegative,
+            "approve" => crate::keshav::feedback_collector::FeedbackType::Approve,
+            "reject" => crate::keshav::feedback_collector::FeedbackType::Reject,
+            "escalation_approved" => crate::keshav::feedback_collector::FeedbackType::EscalationApproved,
+            "escalation_denied" => crate::keshav::feedback_collector::FeedbackType::EscalationDenied,
+>>>>>>> 4b60ced (docs: update README)
             _ => return Err(Status::invalid_argument("invalid feedback_type")),
         };
 
@@ -281,6 +355,7 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
             _ => crate::keshav::feedback_collector::FeedbackSeverity::Medium,
         };
 
+<<<<<<< HEAD
         let target_rings = if req.ring.is_empty() {
             vec![]
         } else {
@@ -301,6 +376,22 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
                 timestamp: chrono::Utc::now().to_rfc3339(),
                 processed: false,
             });
+=======
+        let target_rings = if req.ring.is_empty() { vec![] } else { vec![req.ring.clone()] };
+
+        self.state.learn.submit_feedback(crate::keshav::feedback_collector::FeedbackEntry {
+            feedback_id: uuid::Uuid::new_v4().to_string(),
+            request_id: req.request_id,
+            feedback_type,
+            severity,
+            target_rings,
+            original_decision: req.original_decision,
+            explanation: req.explanation,
+            submitted_by: req.submitted_by,
+            timestamp: chrono::Utc::now().to_rfc3339(),
+            processed: false,
+        });
+>>>>>>> 4b60ced (docs: update README)
 
         Ok(Response::new(AckResponse {
             status: "accepted".into(),
@@ -320,10 +411,14 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
             profiles_count: status.profiles_count as u64,
             patterns_count: status.patterns_count as u64,
             thresholds_count: status.threshold_count as u64,
+<<<<<<< HEAD
             last_optimization: status
                 .last_optimization
                 .map(|o| o.timestamp)
                 .unwrap_or_default(),
+=======
+            last_optimization: status.last_optimization.map(|o| o.timestamp).unwrap_or_default(),
+>>>>>>> 4b60ced (docs: update README)
         }))
     }
 
@@ -332,6 +427,7 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
         _request: Request<Empty>,
     ) -> Result<Response<OptimizeResponse>, Status> {
         let results = self.state.learn.optimize_thresholds();
+<<<<<<< HEAD
         let adjustments: Vec<ThresholdAdjustment> = results
             .iter()
             .map(|r| ThresholdAdjustment {
@@ -345,6 +441,18 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
                 confidence: r.confidence,
             })
             .collect();
+=======
+        let adjustments: Vec<ThresholdAdjustment> = results.iter().map(|r| ThresholdAdjustment {
+            ring: r.ring_name.clone(),
+            old_deny: r.old_deny,
+            new_deny: r.new_deny,
+            old_challenge: r.old_challenge,
+            new_challenge: r.new_challenge,
+            direction: format!("{:?}", r.direction),
+            reason: r.reason.clone(),
+            confidence: r.confidence,
+        }).collect();
+>>>>>>> 4b60ced (docs: update README)
 
         Ok(Response::new(OptimizeResponse {
             optimizations_applied: adjustments.len() as u32,
@@ -360,6 +468,7 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
     ) -> Result<Response<DecisionLogResponse>, Status> {
         let _req = request.into_inner();
         let entries = self.state.decide.logger().entries();
+<<<<<<< HEAD
         let records: Vec<DecisionRecord> = entries
             .iter()
             .map(|e| DecisionRecord {
@@ -371,6 +480,16 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
                 timestamp: 0,
             })
             .collect();
+=======
+        let records: Vec<DecisionRecord> = entries.iter().map(|e| DecisionRecord {
+            request_id: e.record.request_id.clone(),
+            decision: format!("{:?}", e.record.final_decision),
+            reasoning: e.record.reasoning.clone(),
+            policy_applied: e.record.policy_applied.clone().unwrap_or_default(),
+            latency_ms: e.record.latency_ms,
+            timestamp: 0,
+        }).collect();
+>>>>>>> 4b60ced (docs: update README)
 
         Ok(Response::new(DecisionLogResponse {
             count: records.len() as u64,
@@ -400,9 +519,13 @@ impl proto::chakravyuh_service_server::ChakravyuhService for ChakravyuhGrpcServi
 // protobuf response manually with per-ring logic duplicated from
 // api/mod.rs. Now it reuses the PipelineResult from PipelineExecutor.
 
+<<<<<<< HEAD
 fn pipeline_result_to_decision_response(
     result: &crate::keshav::PipelineResult,
 ) -> DecisionResponse {
+=======
+fn pipeline_result_to_decision_response(result: &crate::keshav::PipelineResult) -> DecisionResponse {
+>>>>>>> 4b60ced (docs: update README)
     use crate::decision::Decision;
 
     let decision_str = match &result.decision_record.final_decision {
@@ -415,6 +538,7 @@ fn pipeline_result_to_decision_response(
     let mut rings = std::collections::HashMap::new();
 
     // Shield Ring.
+<<<<<<< HEAD
     rings.insert(
         "shield".into(),
         RingDetail {
@@ -453,10 +577,36 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+    rings.insert("shield".into(), RingDetail {
+        decision: format!("{:?}", result.shield_verdict.decision),
+        latency_ms: result.shield_verdict.latency_ms,
+        engine_results: result.shield_verdict.engine_results.iter().map(|r| EngineResult {
+            engine: r.engine_name.clone(),
+            decision: format!("{:?}", r.decision),
+            reason: r.reason.clone(),
+            latency_ms: r.latency_ms,
+        }).collect(),
+    });
+
+    // Threat Ring.
+    if let Some(t) = &result.threat_verdict {
+        rings.insert("threat".into(), RingDetail {
+            decision: format!("{:?}", t.decision),
+            latency_ms: t.latency_ms,
+            engine_results: t.engine_results.iter().map(|r| EngineResult {
+                engine: r.engine_name.clone(),
+                decision: "score".into(),
+                reason: r.reason.clone(),
+                latency_ms: r.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Identity Ring.
     if let Some(i) = &result.identity_verdict {
+<<<<<<< HEAD
         rings.insert(
             "identity".into(),
             RingDetail {
@@ -474,10 +624,23 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+        rings.insert("identity".into(), RingDetail {
+            decision: format!("{:?}", i.decision),
+            latency_ms: i.latency_ms,
+            engine_results: i.engine_results.iter().map(|r| EngineResult {
+                engine: r.engine_name.clone(),
+                decision: r.decision.clone(),
+                reason: r.reason.clone(),
+                latency_ms: r.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Memory Ring.
     if let Some(m) = &result.memory_verdict {
+<<<<<<< HEAD
         rings.insert(
             "memory".into(),
             RingDetail {
@@ -495,10 +658,23 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+        rings.insert("memory".into(), RingDetail {
+            decision: format!("{:?}", m.decision),
+            latency_ms: m.latency_ms,
+            engine_results: m.engine_results.iter().map(|r| EngineResult {
+                engine: r.engine_name.clone(),
+                decision: r.decision.clone(),
+                reason: r.reason.clone(),
+                latency_ms: r.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Agent Ring.
     if let Some(a) = &result.agent_verdict {
+<<<<<<< HEAD
         rings.insert(
             "agent".into(),
             RingDetail {
@@ -516,10 +692,23 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+        rings.insert("agent".into(), RingDetail {
+            decision: format!("{:?}", a.decision),
+            latency_ms: a.latency_ms,
+            engine_results: a.engine_results.iter().map(|r| EngineResult {
+                engine: r.engine_name.clone(),
+                decision: r.decision.clone(),
+                reason: r.reason.clone(),
+                latency_ms: r.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Execution Ring.
     if let Some(e) = &result.execution_verdict {
+<<<<<<< HEAD
         rings.insert(
             "execution".into(),
             RingDetail {
@@ -537,10 +726,23 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+        rings.insert("execution".into(), RingDetail {
+            decision: format!("{:?}", e.decision),
+            latency_ms: e.latency_ms,
+            engine_results: e.engine_results.iter().map(|r| EngineResult {
+                engine: r.engine_name.clone(),
+                decision: format!("{:?}", r.decision),
+                reason: r.reason.clone(),
+                latency_ms: r.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Reasoning Ring.
     if let Some(r) = &result.reasoning_verdict {
+<<<<<<< HEAD
         rings.insert(
             "reasoning".into(),
             RingDetail {
@@ -558,10 +760,23 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+        rings.insert("reasoning".into(), RingDetail {
+            decision: format!("{:?}", r.decision),
+            latency_ms: r.latency_ms,
+            engine_results: r.engine_results.iter().map(|e| EngineResult {
+                engine: e.engine_name.clone(),
+                decision: format!("{:?}", e.decision),
+                reason: e.reason.clone(),
+                latency_ms: e.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     // Governance Ring.
     if let Some(g) = &result.governance_verdict {
+<<<<<<< HEAD
         rings.insert(
             "governance".into(),
             RingDetail {
@@ -579,6 +794,18 @@ fn pipeline_result_to_decision_response(
                     .collect(),
             },
         );
+=======
+        rings.insert("governance".into(), RingDetail {
+            decision: format!("{:?}", g.decision),
+            latency_ms: g.latency_ms,
+            engine_results: g.engine_results.iter().map(|e| EngineResult {
+                engine: e.engine_name.clone(),
+                decision: format!("{:?}", e.decision),
+                reason: e.reason.clone(),
+                latency_ms: e.latency_ms,
+            }).collect(),
+        });
+>>>>>>> 4b60ced (docs: update README)
     }
 
     let risk_pb = RiskScore {
@@ -590,7 +817,11 @@ fn pipeline_result_to_decision_response(
         execution: result.risk_score.execution,
         reasoning: 0.0,  // Not yet tracked in RiskScore
         governance: 0.0, // Not yet tracked in RiskScore
+<<<<<<< HEAD
         recovery: 0.0,   // Not yet tracked in RiskScore
+=======
+        recovery: 0.0,  // Not yet tracked in RiskScore
+>>>>>>> 4b60ced (docs: update README)
         context: result.risk_score.context,
     };
 
@@ -598,11 +829,15 @@ fn pipeline_result_to_decision_response(
         decision: decision_str,
         reason: result.decision_record.reasoning.clone(),
         request_id: result.decision_record.request_id.clone(),
+<<<<<<< HEAD
         policy_applied: result
             .decision_record
             .policy_applied
             .clone()
             .unwrap_or_default(),
+=======
+        policy_applied: result.decision_record.policy_applied.clone().unwrap_or_default(),
+>>>>>>> 4b60ced (docs: update README)
         latency_ms: result.decision_record.latency_ms,
         rings,
         risk_score: Some(risk_pb),

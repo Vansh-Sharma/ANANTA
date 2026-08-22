@@ -50,6 +50,7 @@ pub enum TransportErrorKind {
 
 impl TransportError {
     pub fn full(msg: impl Into<String>) -> Self {
+<<<<<<< HEAD
         Self {
             kind: TransportErrorKind::Full,
             message: msg.into(),
@@ -78,6 +79,21 @@ impl TransportError {
             kind: TransportErrorKind::Other,
             message: msg.into(),
         }
+=======
+        Self { kind: TransportErrorKind::Full, message: msg.into() }
+    }
+    pub fn disconnected(msg: impl Into<String>) -> Self {
+        Self { kind: TransportErrorKind::Disconnected, message: msg.into() }
+    }
+    pub fn timeout(msg: impl Into<String>) -> Self {
+        Self { kind: TransportErrorKind::Timeout, message: msg.into() }
+    }
+    pub fn unavailable(msg: impl Into<String>) -> Self {
+        Self { kind: TransportErrorKind::Unavailable, message: msg.into() }
+    }
+    pub fn other(msg: impl Into<String>) -> Self {
+        Self { kind: TransportErrorKind::Other, message: msg.into() }
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -105,7 +121,11 @@ pub trait RingTransport: Send + Sync {
     /// Default returns an error — override for multi-consumer transports.
     fn subscribe(&self) -> TransportResult<Box<dyn RingSubscriber>> {
         Err(TransportError::unavailable(
+<<<<<<< HEAD
             "this transport does not support multi-subscriber",
+=======
+            "this transport does not support multi-subscriber"
+>>>>>>> 4b60ced (docs: update README)
         ))
     }
 
@@ -167,9 +187,15 @@ impl InProcessTransport {
 impl RingTransport for InProcessTransport {
     fn send(&self, msg: CrossRingMessage) -> TransportResult<()> {
         // Send to primary receiver (non-blocking — returns Full if buffer at capacity).
+<<<<<<< HEAD
         self.sender
             .try_send(msg.clone())
             .map_err(|e| TransportError::full(format!("channel full or closed: {}", e)))?;
+=======
+        self.sender.try_send(msg.clone()).map_err(|e| {
+            TransportError::full(format!("channel full or closed: {}", e))
+        })?;
+>>>>>>> 4b60ced (docs: update README)
 
         // Fan-out to all subscriber channels.
         if let Ok(subs) = self.subscribers.lock() {
@@ -183,10 +209,16 @@ impl RingTransport for InProcessTransport {
     }
 
     fn recv(&self) -> TransportResult<Option<CrossRingMessage>> {
+<<<<<<< HEAD
         let guard = self
             .receiver
             .lock()
             .map_err(|e| TransportError::other(format!("receiver lock poisoned: {}", e)))?;
+=======
+        let guard = self.receiver.lock().map_err(|e| {
+            TransportError::other(format!("receiver lock poisoned: {}", e))
+        })?;
+>>>>>>> 4b60ced (docs: update README)
         match guard.try_recv() {
             Ok(msg) => Ok(Some(msg)),
             Err(std::sync::mpsc::TryRecvError::Empty) => Ok(None),
@@ -198,10 +230,16 @@ impl RingTransport for InProcessTransport {
 
     fn subscribe(&self) -> TransportResult<Box<dyn RingSubscriber>> {
         let (tx, rx) = std::sync::mpsc::sync_channel(self.capacity);
+<<<<<<< HEAD
         self.subscribers
             .lock()
             .map_err(|e| TransportError::other(format!("subscriber lock poisoned: {}", e)))?
             .push(tx);
+=======
+        self.subscribers.lock().map_err(|e| {
+            TransportError::other(format!("subscriber lock poisoned: {}", e))
+        })?.push(tx);
+>>>>>>> 4b60ced (docs: update README)
         Ok(Box::new(InProcessSubscriber {
             receiver: Mutex::new(rx),
         }))
@@ -246,9 +284,15 @@ impl RingSubscriber for InProcessSubscriber {
         match guard.try_recv() {
             Ok(msg) => Ok(Some(msg)),
             Err(std::sync::mpsc::TryRecvError::Empty) => Ok(None),
+<<<<<<< HEAD
             Err(std::sync::mpsc::TryRecvError::Disconnected) => Err(TransportError::disconnected(
                 "subscriber channel disconnected",
             )),
+=======
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                Err(TransportError::disconnected("subscriber channel disconnected"))
+            }
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -297,12 +341,26 @@ impl BroadcastTransport {
 
     /// Number of active subscribers.
     pub fn subscriber_count(&self) -> usize {
+<<<<<<< HEAD
         self.sender.lock().map(|s| s.len()).unwrap_or(0)
+=======
+        self.sender
+            .lock()
+            .map(|s| s.len())
+            .unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Total messages broadcast.
     pub fn total_sent(&self) -> u64 {
+<<<<<<< HEAD
         self.send_count.lock().map(|c| *c).unwrap_or(0)
+=======
+        self.send_count
+            .lock()
+            .map(|c| *c)
+            .unwrap_or(0)
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -318,10 +376,16 @@ impl RingTransport for BroadcastTransport {
         }
 
         // Fan-out to all subscribers.
+<<<<<<< HEAD
         let senders = self
             .sender
             .lock()
             .map_err(|e| TransportError::other(format!("broadcast sender lock poisoned: {}", e)))?;
+=======
+        let senders = self.sender.lock().map_err(|e| {
+            TransportError::other(format!("broadcast sender lock poisoned: {}", e))
+        })?;
+>>>>>>> 4b60ced (docs: update README)
 
         if senders.is_empty() {
             // No subscribers — message is dropped (acceptable for broadcast).
@@ -364,7 +428,11 @@ impl RingTransport for BroadcastTransport {
         // BroadcastTransport doesn't have a primary receiver.
         // Use subscribe() to get a subscriber handle.
         Err(TransportError::unavailable(
+<<<<<<< HEAD
             "BroadcastTransport has no primary receiver — use subscribe()",
+=======
+            "BroadcastTransport has no primary receiver — use subscribe()"
+>>>>>>> 4b60ced (docs: update README)
         ))
     }
 
@@ -379,12 +447,18 @@ impl RingTransport for BroadcastTransport {
             }
         }
 
+<<<<<<< HEAD
         self.sender
             .lock()
             .map_err(|e| {
                 TransportError::other(format!("broadcast subscriber lock poisoned: {}", e))
             })?
             .push(tx);
+=======
+        self.sender.lock().map_err(|e| {
+            TransportError::other(format!("broadcast subscriber lock poisoned: {}", e))
+        })?.push(tx);
+>>>>>>> 4b60ced (docs: update README)
 
         Ok(Box::new(InProcessSubscriber {
             receiver: Mutex::new(rx),
@@ -489,7 +563,13 @@ impl TransportMetricsCollector {
     }
 
     pub fn snapshot(&self, pending: usize) -> TransportMetrics {
+<<<<<<< HEAD
         let mut m = self.metrics.lock().map(|g| g.clone()).unwrap_or_default();
+=======
+        let mut m = self.metrics.lock()
+            .map(|g| g.clone())
+            .unwrap_or_default();
+>>>>>>> 4b60ced (docs: update README)
         m.pending_count = pending;
         m
     }
@@ -518,12 +598,17 @@ mod tests {
     #[test]
     fn in_process_backpressure() {
         let transport = InProcessTransport::new(2);
+<<<<<<< HEAD
         transport
             .send(test_msg(CrossRingType::Command, "keshav", "shield"))
             .unwrap();
         transport
             .send(test_msg(CrossRingType::Command, "keshav", "shield"))
             .unwrap();
+=======
+        transport.send(test_msg(CrossRingType::Command, "keshav", "shield")).unwrap();
+        transport.send(test_msg(CrossRingType::Command, "keshav", "shield")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         // Third send should fail — buffer full.
         let result = transport.send(test_msg(CrossRingType::Command, "keshav", "shield"));
         assert!(result.is_err());
@@ -598,6 +683,7 @@ mod tests {
     fn broadcast_history_size_limit() {
         let transport = BroadcastTransport::new(10, 2);
 
+<<<<<<< HEAD
         transport
             .send(test_msg(CrossRingType::Communication, "s", "b"))
             .unwrap();
@@ -607,6 +693,11 @@ mod tests {
         transport
             .send(test_msg(CrossRingType::Communication, "s", "b"))
             .unwrap();
+=======
+        transport.send(test_msg(CrossRingType::Communication, "s", "b")).unwrap();
+        transport.send(test_msg(CrossRingType::Communication, "s", "b")).unwrap();
+        transport.send(test_msg(CrossRingType::Communication, "s", "b")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
 
         // Late joiner should only get last 2 messages.
         let sub = transport.subscribe().unwrap();
@@ -628,12 +719,17 @@ mod tests {
     fn broadcast_total_sent() {
         let transport = BroadcastTransport::new(10, 100);
         assert_eq!(transport.total_sent(), 0);
+<<<<<<< HEAD
         transport
             .send(test_msg(CrossRingType::Communication, "s", "b"))
             .unwrap();
         transport
             .send(test_msg(CrossRingType::Communication, "s", "b"))
             .unwrap();
+=======
+        transport.send(test_msg(CrossRingType::Communication, "s", "b")).unwrap();
+        transport.send(test_msg(CrossRingType::Communication, "s", "b")).unwrap();
+>>>>>>> 4b60ced (docs: update README)
         assert_eq!(transport.total_sent(), 2);
     }
 

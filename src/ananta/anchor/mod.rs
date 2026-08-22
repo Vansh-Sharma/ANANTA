@@ -25,4 +25,8 @@ pub use key_manager::{KeyManager, KeyPurpose};
 pub use manifest::{Manifest, ManifestEntry};
 pub use secure_enclave::*;
 pub use secure_store::SecureStore;
+<<<<<<< HEAD
 pub use trust_chain::TrustChain;
+=======
+pub use trust_chain::TrustChain;
+>>>>>>> 4b60ced (docs: update README)

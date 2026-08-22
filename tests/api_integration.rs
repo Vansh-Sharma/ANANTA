@@ -19,11 +19,15 @@ use http_body_util::BodyExt;
 use serde_json::{json, Value};
 use tower::ServiceExt;
 
+<<<<<<< HEAD
 use chakravyuh::{
     api::build_router, AgentRing, Config, CrossRingNetwork, ExecutionRing, GovernanceRing,
     IdentityRing, KeshavDecide, KeshavLearn, KeshavOrchestrate, KeshavRisk, MemoryRing,
     ReasoningRing, RecoveryRing, ShieldRing, ThreatRing,
 };
+=======
+use chakravyuh::{api::build_router, AgentRing, Config, CrossRingNetwork, ExecutionRing, GovernanceRing, IdentityRing, KeshavDecide, KeshavLearn, KeshavOrchestrate, KeshavRisk, MemoryRing, ReasoningRing, RecoveryRing, ShieldRing, ThreatRing};
+>>>>>>> 4b60ced (docs: update README)
 
 fn router() -> axum::Router {
     let config: Config = Config::default_yaml().parse().expect("config parses");
@@ -43,6 +47,7 @@ fn router() -> axum::Router {
     let learn = KeshavLearn::new(config.keshav.learn.clone()).expect("learn builds");
     let orchestrate = KeshavOrchestrate::new(config.keshav.orchestrate.clone());
     let cross_ring = CrossRingNetwork::new(&config.cross_ring).expect("cross_ring builds");
+<<<<<<< HEAD
     build_router(
         shield,
         threat,
@@ -64,6 +69,9 @@ fn router() -> axum::Router {
         None,
         None,
     )
+=======
+    build_router(shield, threat, identity, memory, agent, execution, reasoning, governance, recovery_sec, decide, risk, learn, orchestrate, cross_ring, None, None, None, None, None)
+>>>>>>> 4b60ced (docs: update README)
 }
 
 /// Send a POST /v1/evaluate request with the given JSON body and headers.

@@ -74,6 +74,10 @@ enum Commands {
     Version,
 
     // ── Extended CLI subcommands (delegated to cli module) ──
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4b60ced (docs: update README)
     /// Configuration management (validate, show, diff, defaults)
     Config {
         #[command(subcommand)]
@@ -129,7 +133,15 @@ async fn main() {
     // Initialize logging for server mode.
     // CLI-only commands suppress logging to keep output clean.
     let cli = Cli::parse();
+<<<<<<< HEAD
     let needs_logging = matches!(cli.command, Commands::Serve { .. } | Commands::Test { .. });
+=======
+    let needs_logging = matches!(
+        cli.command,
+        Commands::Serve { .. }
+            | Commands::Test { .. }
+    );
+>>>>>>> 4b60ced (docs: update README)
     if needs_logging {
         init_logging();
     } else {
@@ -139,6 +151,7 @@ async fn main() {
 
     let exit_code = match cli.command {
         // ── Server mode ──────────────────────────────────────────────
+<<<<<<< HEAD
         Commands::Serve { addr } => match serve(&cli.config, &addr).await {
             Ok(()) => 0,
             Err(e) => {
@@ -212,6 +225,49 @@ async fn main() {
                 2
             }
         },
+=======
+        Commands::Serve { addr } => {
+            match serve(&cli.config, &addr).await {
+                Ok(()) => 0,
+                Err(e) => {
+                    tracing::error!(error = %e, "server error");
+                    eprintln!("Error: {}", e);
+                    1
+                }
+            }
+        }
+
+        // ── Legacy quick commands ────────────────────────────────────
+        Commands::Validate { verbose } => {
+            match Config::from_file(&cli.config) {
+                Ok(config) => {
+                    if verbose {
+                        println!("Configuration is valid");
+                        println!("  Shield Ring: {}",
+                            if config.shield.enabled { "enabled" } else { "disabled" });
+                        println!("  Threat Ring: {}",
+                            if config.threat.enabled { "enabled" } else { "disabled" });
+                        println!("  Identity Ring: {}",
+                            if config.identity.enabled { "enabled" } else { "disabled" });
+                        println!("  Agent Ring: {}",
+                            if config.agent.enabled { "enabled" } else { "disabled" });
+                        println!("  Memory Ring: {}",
+                            if config.memory.enabled { "enabled" } else { "disabled" });
+                        println!("  Execution Ring: {}",
+                            if config.execution.enabled { "enabled" } else { "disabled" });
+                        println!("  Storage: {}", config.storage.backend);
+                    } else {
+                        println!("Configuration is valid");
+                    }
+                    0
+                }
+                Err(e) => {
+                    eprintln!("Configuration invalid: {}", e);
+                    2
+                }
+            }
+        }
+>>>>>>> 4b60ced (docs: update README)
 
         Commands::Test { endpoint, api_key } => {
             match run_test(&endpoint, api_key.as_deref()).await {
@@ -226,16 +282,22 @@ async fn main() {
         Commands::Version => {
             println!("CHAKRAVYUH v{}", env!("CARGO_PKG_VERSION"));
             println!("  Commit:  {}", env!("CARGO_PKG_VERSION"));
+<<<<<<< HEAD
             println!(
                 "  Build:   {}",
                 std::env::var("BUILD_PROFILE").unwrap_or_else(|_| "debug".into())
             );
+=======
+            println!("  Build:   {}",
+                std::env::var("BUILD_PROFILE").unwrap_or_else(|_| "debug".into()));
+>>>>>>> 4b60ced (docs: update README)
             println!("  License: Apache-2.0");
             println!("  Repo:    https://github.com/vinomoid/chakravyuh");
             0
         }
 
         // ── Extended CLI subcommands (delegated) ─────────────────────
+<<<<<<< HEAD
         Commands::Config { command } => chakravyuh::cli::config_cmd::run(command)
             .await
             .to_process_code(),
@@ -257,6 +319,29 @@ async fn main() {
         Commands::Status { command } => chakravyuh::cli::status_cmd::run(command)
             .await
             .to_process_code(),
+=======
+        Commands::Config { command } => {
+            chakravyuh::cli::config_cmd::run(command).await.to_process_code()
+        }
+        Commands::Policy { command } => {
+            chakravyuh::cli::policy_cmd::run(command).await.to_process_code()
+        }
+        Commands::Evaluate { command } => {
+            chakravyuh::cli::evaluate_cmd::run(command).await.to_process_code()
+        }
+        Commands::TestSuite { command } => {
+            chakravyuh::cli::test_cmd::run(command).await.to_process_code()
+        }
+        Commands::Keys { command } => {
+            chakravyuh::cli::keys_cmd::run(command).await.to_process_code()
+        }
+        Commands::Audit { command } => {
+            chakravyuh::cli::audit_cmd::run(command).await.to_process_code()
+        }
+        Commands::Status { command } => {
+            chakravyuh::cli::status_cmd::run(command).await.to_process_code()
+        }
+>>>>>>> 4b60ced (docs: update README)
         Commands::Completions { shell } => {
             clap_complete::generate(
                 shell,
@@ -287,8 +372,12 @@ async fn serve(config_path: &PathBuf, addr: &str) -> anyhow::Result<()> {
         ctrlc::set_handler(move || {
             tracing::info!("received SIGINT/SIGTERM, initiating graceful shutdown");
             shutdown.initiate();
+<<<<<<< HEAD
         })
         .expect("failed to set Ctrl-C handler");
+=======
+        }).expect("failed to set Ctrl-C handler");
+>>>>>>> 4b60ced (docs: update README)
     });
 
     cv.serve(addr).await?;

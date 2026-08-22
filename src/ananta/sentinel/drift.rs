@@ -66,12 +66,17 @@ impl DriftAlert {
     pub fn summary(&self) -> String {
         format!(
             "[DRIFT] type={} z={:.2} mean={:.4} std={:.4} value={:.4} context={}",
+<<<<<<< HEAD
             self.drift_type,
             self.z_score,
             self.current_mean,
             self.current_stddev,
             self.observed_value,
             self.context,
+=======
+            self.drift_type, self.z_score, self.current_mean,
+            self.current_stddev, self.observed_value, self.context,
+>>>>>>> 4b60ced (docs: update README)
         )
     }
 }
@@ -152,11 +157,15 @@ impl DriftDetector {
         for dt in DriftType::all() {
             detectors.insert(dt.clone(), TypeDetector::new(window_size));
         }
+<<<<<<< HEAD
         Self {
             detectors,
             sigma_threshold,
             window_size,
         }
+=======
+        Self { detectors, sigma_threshold, window_size }
+>>>>>>> 4b60ced (docs: update README)
     }
 
     /// Feed an observation. Returns Some(DriftAlert) if drift detected.
@@ -192,11 +201,15 @@ impl DriftDetector {
     /// Get current stats for a drift type.
     pub fn stats(&self, drift_type: &DriftType) -> Option<(f64, f64, usize)> {
         let d = self.detectors.get(drift_type)?;
+<<<<<<< HEAD
         let variance = if d.count > 1 {
             d.m2 / (d.count - 1) as f64
         } else {
             0.0
         };
+=======
+        let variance = if d.count > 1 { d.m2 / (d.count - 1) as f64 } else { 0.0 };
+>>>>>>> 4b60ced (docs: update README)
         Some((d.mean, variance.sqrt(), d.window.len()))
     }
 
@@ -254,12 +267,16 @@ mod tests {
         let mut det = make_detector();
         // Feed stable data.
         for _ in 0..50 {
+<<<<<<< HEAD
             assert!(det
                 .observe(obs(
                     DriftType::Decision,
                     0.85 + (rand::random::<f64>() * 0.02 - 0.01)
                 ))
                 .is_none());
+=======
+            assert!(det.observe(obs(DriftType::Decision, 0.85 + (rand::random::<f64>() * 0.02 - 0.01))).is_none());
+>>>>>>> 4b60ced (docs: update README)
         }
     }
 
@@ -326,4 +343,8 @@ mod tests {
         let alert = det.observe(obs(DriftType::Policy, -5.0)).unwrap();
         assert_eq!(alert.severity, AlertSeverity::Critical);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

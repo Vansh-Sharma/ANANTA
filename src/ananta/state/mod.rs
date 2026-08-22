@@ -17,9 +17,15 @@ pub use state_sync::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+<<<<<<< HEAD
 use crate::ananta::config::HashAlgorithm;
 use crate::ananta::crypto::hashing::hash_bytes;
 use crate::ananta::trust::trust_state::TrustState;
+=======
+use crate::ananta::trust::trust_state::TrustState;
+use crate::ananta::config::HashAlgorithm;
+use crate::ananta::crypto::hashing::hash_bytes;
+>>>>>>> 4b60ced (docs: update README)
 
 /// A point-in-time snapshot of ANANTA's state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -130,10 +136,14 @@ impl StateDiff {
         let mut domain_changes = vec![];
 
         // Check all domains in both snapshots.
+<<<<<<< HEAD
         let all_domains: std::collections::HashSet<&str> = from
             .trust_state
             .domains
             .keys()
+=======
+        let all_domains: std::collections::HashSet<&str> = from.trust_state.domains.keys()
+>>>>>>> 4b60ced (docs: update README)
             .map(|s| s.as_str())
             .chain(to.trust_state.domains.keys().map(|s| s.as_str()))
             .collect();
@@ -156,11 +166,15 @@ impl StateDiff {
         // Sort by absolute delta (biggest changes first).
         domain_changes.sort_by(|a, b| b.delta.abs().partial_cmp(&a.delta.abs()).unwrap());
 
+<<<<<<< HEAD
         let new_alerts = to
             .trust_state
             .alerts
             .len()
             .saturating_sub(from.trust_state.alerts.len());
+=======
+        let new_alerts = to.trust_state.alerts.len().saturating_sub(from.trust_state.alerts.len());
+>>>>>>> 4b60ced (docs: update README)
         // For cleared alerts, we can't easily compute without tracking individual alerts.
         let cleared_alerts = 0;
 
@@ -217,9 +231,13 @@ impl StateManager {
     ) -> &StateSnapshot {
         self.current_version += 1;
 
+<<<<<<< HEAD
         let prev_hash = self
             .snapshots
             .last()
+=======
+        let prev_hash = self.snapshots.last()
+>>>>>>> 4b60ced (docs: update README)
             .map(|s| s.hash.clone())
             .unwrap_or_else(|| "0".repeat(64));
 
@@ -315,16 +333,24 @@ impl StateManager {
 
     /// Find snapshots triggered by anomalies.
     pub fn anomaly_snapshots(&self) -> Vec<&StateSnapshot> {
+<<<<<<< HEAD
         self.snapshots
             .iter()
+=======
+        self.snapshots.iter()
+>>>>>>> 4b60ced (docs: update README)
             .filter(|s| s.metadata.anomaly_triggered)
             .collect()
     }
 
     /// Find snapshots where trust dropped significantly.
     pub fn trust_drop_snapshots(&self, threshold: f64) -> Vec<&StateSnapshot> {
+<<<<<<< HEAD
         self.snapshots
             .windows(2)
+=======
+        self.snapshots.windows(2)
+>>>>>>> 4b60ced (docs: update README)
             .filter(|w| {
                 let delta = w[1].metadata.trust_score - w[0].metadata.trust_score;
                 delta < -threshold
@@ -336,7 +362,12 @@ impl StateManager {
     /// Export the latest snapshot as JSON.
     pub fn export_latest(&self) -> Result<String, String> {
         let snap = self.latest().ok_or("no snapshots")?;
+<<<<<<< HEAD
         serde_json::to_string_pretty(snap).map_err(|e| format!("state export: {}", e))
+=======
+        serde_json::to_string_pretty(snap)
+            .map_err(|e| format!("state export: {}", e))
+>>>>>>> 4b60ced (docs: update README)
     }
 }
 
@@ -404,7 +435,11 @@ mod tests {
 
         let mut state = healthy_state();
         state.set_domain_level("decision", 0.5); // -0.5
+<<<<<<< HEAD
         state.set_domain_level("plugin", 0.8); // -0.2
+=======
+        state.set_domain_level("plugin", 0.8);    // -0.2
+>>>>>>> 4b60ced (docs: update README)
         mgr.snapshot(&state, HashMap::new(), "after");
 
         let diff = mgr.latest_diff().unwrap();
@@ -484,4 +519,8 @@ mod tests {
         assert_eq!(diff.trust_score_delta, 0.0);
         assert!(diff.domain_changes.is_empty());
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4b60ced (docs: update README)

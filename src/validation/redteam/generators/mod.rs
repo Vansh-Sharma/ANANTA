@@ -1,5 +1,6 @@
 // Red Team OS — Attack Generators Module Root (D1)
 
+<<<<<<< HEAD
 pub mod agent_attack;
 pub mod ananta_attack;
 pub mod identity_attack;
@@ -10,6 +11,18 @@ pub mod policy_attack;
 pub mod prompt_injection;
 pub mod reasoning_attack;
 pub mod tool_attack;
+=======
+pub mod prompt_injection;
+pub mod jailbreak;
+pub mod memory_poisoning;
+pub mod agent_attack;
+pub mod tool_attack;
+pub mod policy_attack;
+pub mod orchestration_attack;
+pub mod reasoning_attack;
+pub mod identity_attack;
+pub mod ananta_attack;
+>>>>>>> 4b60ced (docs: update README)
 
 use crate::validation::redteam::attack_types::{AttackCategory, AttackPayload};
 
